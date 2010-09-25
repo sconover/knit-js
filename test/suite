@@ -1,0 +1,1 @@
+find test -name "*_test.js" | sort | xargs v8

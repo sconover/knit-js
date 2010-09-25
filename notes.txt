@@ -1,0 +1,10 @@
+- unit tests on straight v8
+- integration tests on memory engine
+
+apply the same integration suite everywhere?  possible?
+ 
+sql engine
+- integration tests that run on node-sqlite (i.e. incorporating node)
+- then take those same integration tests and reuse on html5 client side db 
+    (in-browser tests [html pages]?  
+       what about headless safari?  "run if darwin"  could just be loading an html page and scraping the results, printing to command line (could even poll and puts...use ruby).  use a plain-text jasmine runner.  extract this?)

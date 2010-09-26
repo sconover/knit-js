@@ -1,8 +1,6 @@
 require(__dirname + "/test_helper.js");
 
-var isVerbose = false;
-var showColors = true;
-
-jasmine.executeSpecsInFolder(__dirname, function(runner, log){
-  process.exit(runner.results().failedCount);
-}, isVerbose, showColors);
+files = jasmine.getAllSpecFiles(__dirname)
+for (var i = 0, len = files.length; i < len; ++i){
+  require(files[i]);
+}

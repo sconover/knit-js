@@ -8,12 +8,19 @@ for(var key in jasmine) {
   global[key] = jasmine[key];
 }
 
-var isVerbose = false;
-var showColors = true;
-process.argv.forEach(function(arg){
-  switch(arg) {
-  case '--color': showColors = true; break;
-  case '--noColor': showColors = false; break;
-  case '--verbose': isVerbose = true; break;
+
+assert = require('assert');
+
+jasmine.alreadyRan = false
+process.on('exit', function () {
+  if (!jasmine.alreadyRan) {  
+    var isVerbose = false;
+    var showColors = true;
+  
+    jasmine.execute(function(runner, log){
+      jasmine.alreadyRan = true
+      process.exit(runner.results().failedCount);
+    }, isVerbose, showColors);  
   }
 });
+

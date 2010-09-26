@@ -14,26 +14,20 @@ delete global.window;
 
 function noop(){}
 
-jasmine.executeSpecsInFolder = function(folder, done, isVerbose, showColors, specs){
+jasmine.execute = function(done, isVerbose, showColors, specs){
   var log = [];
   var columnCounter = 0;
   var start = 0;
   var elapsed = 0;
   var verbose = isVerbose || false;
   var colors = showColors || false;
-  var specs = specs || jasmine.getAllSpecFiles(folder);
-
+  
   var ansi = {
     green: '\033[32m',
     red: '\033[31m',
     yellow: '\033[33m',
     none: '\033[0m'
   };
-
-  for (var i = 0, len = specs.length; i < len; ++i){
-    var filename = specs[i];
-    require(filename.replace(/\.js$/, ""));
-  }
 
   var jasmineEnv = jasmine.getEnv();
   jasmineEnv.reporter = {

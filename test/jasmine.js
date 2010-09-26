@@ -461,6 +461,8 @@ var it = function(desc, func) {
   return jasmine.getEnv().it(desc, func);
 };
 
+var test = it
+
 /**
  * Creates a <em>disabled</em> Jasmine spec.
  *
@@ -472,6 +474,8 @@ var it = function(desc, func) {
 var xit = function(desc, func) {
   return jasmine.getEnv().xit(desc, func);
 };
+
+var xtest = xit
 
 /**
  * Starts a chain for a Jasmine expectation.
@@ -556,6 +560,7 @@ var describe = function(description, specDefinitions) {
   return jasmine.getEnv().describe(description, specDefinitions);
 };
 
+var regarding = describe
 /**
  * Disables a suite of specifications.  Used to disable some suites in a file, or files, temporarily during development.
  *
@@ -566,6 +571,7 @@ var xdescribe = function(description, specDefinitions) {
   return jasmine.getEnv().xdescribe(description, specDefinitions);
 };
 
+var xregarding = xdescribe
 
 // Provide the XMLHttpRequest class for IE 5.x-6.x:
 jasmine.XmlHttpRequest = (typeof XMLHttpRequest == "undefined") ? function() {
@@ -771,6 +777,8 @@ jasmine.Env.prototype.describe = function(description, specDefinitions) {
   return suite;
 };
 
+jasmine.Env.prototype.regarding = jasmine.Env.prototype.describe
+
 jasmine.Env.prototype.beforeEach = function(beforeEachFunction) {
   if (this.currentSuite) {
     this.currentSuite.beforeEach(beforeEachFunction);
@@ -799,6 +807,8 @@ jasmine.Env.prototype.xdescribe = function(desc, specDefinitions) {
   };
 };
 
+jasmine.Env.prototype.xregarding = jasmine.Env.prototype.xdescribe
+
 jasmine.Env.prototype.it = function(description, func) {
   var spec = new jasmine.Spec(this, this.currentSuite, description);
   this.currentSuite.add(spec);
@@ -811,6 +821,8 @@ jasmine.Env.prototype.it = function(description, func) {
   return spec;
 };
 
+jasmine.Env.prototype.test = jasmine.Env.prototype.it
+
 jasmine.Env.prototype.xit = function(desc, func) {
   return {
     id: this.nextSpecId(),
@@ -818,6 +830,8 @@ jasmine.Env.prototype.xit = function(desc, func) {
     }
   };
 };
+
+jasmine.Env.prototype.xtest = jasmine.Env.prototype.xit
 
 jasmine.Env.prototype.compareObjects_ = function(a, b, mismatchKeys, mismatchValues) {
   if (a.__Jasmine_been_here_before__ === b && b.__Jasmine_been_here_before__ === a) {

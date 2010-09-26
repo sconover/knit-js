@@ -9,8 +9,9 @@ regarding(arel.Attributes.String, function () {
       assert.equal("foo", new arel.Attributes.String().typeCast("foo"));
     });
 
-    test('casting null is just yields null', function () {
+    test('casting null/undef is just yields null/undef', function () {
       assert.equal(null, new arel.Attributes.String().typeCast(null));
+      assert.equal(undefined, new arel.Attributes.String().typeCast(undefined));
     });
 
     test('casting an integer yields the string equivalent', function () {
@@ -21,6 +22,11 @@ regarding(arel.Attributes.String, function () {
       var Widget = function(){};
       Widget.prototype.toString = function(){return "zzz";};
       assert.equal("zzz", new arel.Attributes.String().typeCast(new Widget()));
+    });
+
+    test('booleans', function () {
+      assert.equal("true", new arel.Attributes.String().typeCast(true));
+      assert.equal("false", new arel.Attributes.String().typeCast(false));
     });
 
   });

@@ -14,7 +14,7 @@ delete global.window;
 
 function noop(){}
 
-jasmine.execute = function(done, isVerbose, showColors, specs){
+jasmine.execute = function(done, isVerbose, showColors){
   var log = [];
   var columnCounter = 0;
   var start = 0;

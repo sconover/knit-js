@@ -8,3 +8,13 @@ sql engine
 - then take those same integration tests and reuse on html5 client side db 
     (in-browser tests [html pages]?  
        what about headless safari?  "run if darwin"  could just be loading an html page and scraping the results, printing to command line (could even poll and puts...use ruby).  use a plain-text jasmine runner.  extract this?)
+
+
+idea: every time "suite" runs, run this:
+
+http://github.com/codespeaks/modulr
+
+(if it's fast)
+
+and generate an arel-all.js in the root of the project
+also a minified arel-all-minified.js?

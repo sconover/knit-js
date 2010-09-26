@@ -262,6 +262,7 @@ var modulr = (function(global) {
 (function(require, module) {require.define({
 'arel/attributes': function(require, exports, module) {
 require("arel/attributes/string")
+require("arel/attributes/integer")
 }, 
 'arel/attributes/string': function(require, exports, module) {
 global["arel"] = global.arel || {};
@@ -271,6 +272,17 @@ arel.Attributes.String = function(){};
 
 arel.Attributes.String.prototype.typeCast = function(raw_value) {
   return raw_value==null || raw_value==undefined ? raw_value : raw_value.toString();
+};
+}, 
+'arel/attributes/integer': function(require, exports, module) {
+global["arel"] = global.arel || {};
+arel.Attributes = arel.Attributes || {};
+
+arel.Attributes.Integer = function(){};
+
+arel.Attributes.Integer.prototype.typeCast = function(raw_value) {
+  return raw_value;
+  // return raw_value==null || raw_value==undefined ? raw_value : raw_value.toString();
 };
 }
 });

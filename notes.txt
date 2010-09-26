@@ -18,3 +18,7 @@ http://github.com/codespeaks/modulr
 
 and generate an arel-all.js in the root of the project
 also a minified arel-all-minified.js?
+
+==========
+Arel bugs:
+  String likely does not convert false to "false"

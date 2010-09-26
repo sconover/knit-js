@@ -1,4 +1,4 @@
-- unit tests on straight v8
+- unit tests on -x-straight v8-x-  >> no, just use node.  straight v8 is too bare.
 - integration tests on memory engine
 
 apply the same integration suite everywhere?  possible?

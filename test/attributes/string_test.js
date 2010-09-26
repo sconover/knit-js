@@ -13,6 +13,16 @@ regarding(arel.Attributes.String, function () {
       assert.equal(null, new arel.Attributes.String().typeCast(null));
     });
 
+    test('casting an integer yields the string equivalent', function () {
+      assert.equal("56", new arel.Attributes.String().typeCast(56));
+    });
+
+    test('any object with toString defined can be cast', function () {
+      var Widget = function(){};
+      Widget.prototype.toString = function(){return "zzz";};
+      assert.equal("zzz", new arel.Attributes.String().typeCast(new Widget()));
+    });
+
   });
 
 });

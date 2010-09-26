@@ -52,13 +52,13 @@ jasmine.execute = function(done, isVerbose, showColors){
       var description = path.join(' ');
 
       if (verbose)
-        log.push('Spec ' + description);
+        log.push('regarding: ' + description);
 
       specResults.items_.forEach(function(spec){
         if (spec.failedCount > 0 && spec.description) {
           if (!verbose)
               log.push(description);
-          log.push('  it ' + spec.description);
+          log.push('  test: ' + spec.description);
           spec.items_.forEach(function(result){
             log.push('  ' + result.trace.stack + '\n');
           });

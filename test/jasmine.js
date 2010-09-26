@@ -760,7 +760,7 @@ jasmine.Env.prototype.describe = function(description, specDefinitions) {
     declarationError = e;
   }
 
-  this.currentSuite = parentSuite;
+  // this.currentSuite = parentSuite;
 
   if (declarationError) {
     this.it("encountered a declaration exception", function() {
@@ -1725,9 +1725,10 @@ jasmine.Queue.prototype.next_ = function() {
         var now = new Date().getTime();
         if (self.env.updateInterval && now - self.env.lastUpdate > self.env.updateInterval) {
           self.env.lastUpdate = now;
-          self.env.setTimeout(function() {
-            self.next_();
-          }, 0);
+          self.next_();
+          // self.env.setTimeout(function() {
+          //   self.next_();
+          // }, 0);
         } else {
           if (jasmine.Queue.LOOP_DONT_RECURSE && completedSynchronously) {
             goAgain = true;

@@ -1,10 +1,19 @@
-load("test/jasmine.js");
+require.paths.push("./test");
 
-// var regarding = describe;
-// var xregarding = xdescribe;
-// 
-// jasmine.Env.prototype.regarding = jasmine.Env.prototype.describe;
-// jasmine.Env.prototype.xregarding = jasmine.Env.prototype.xdescribe;
+require("jasmine-node.js");
 
-jasmine.Env.prototype.test = jasmine.Env.prototype.it
-jasmine.Env.prototype.xtest = jasmine.Env.prototype.xit
+var sys = require('sys');
+
+for(var key in jasmine) {
+  global[key] = jasmine[key];
+}
+
+var isVerbose = false;
+var showColors = true;
+process.argv.forEach(function(arg){
+  switch(arg) {
+  case '--color': showColors = true; break;
+  case '--noColor': showColors = false; break;
+  case '--verbose': isVerbose = true; break;
+  }
+});

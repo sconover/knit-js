@@ -1,3 +1,7 @@
+set up all the namespaces for a module in one place?
+
+require("arel/attributes/namespace")
+
 - unit tests on -x-straight v8-x-  >> no, just use node.  straight v8 is too bare.
 - integration tests on memory engine
 
@@ -10,14 +14,15 @@ sql engine
        what about headless safari?  "run if darwin"  could just be loading an html page and scraping the results, printing to command line (could even poll and puts...use ruby).  use a plain-text jasmine runner.  extract this?)
 
 
-idea: every time "suite" runs, run this:
+generate a minified arel-all-minified.js?
 
-http://github.com/codespeaks/modulr
+idea: jasmine plain-text html runner, plus rubycocoa safari stuff from schnauzer =
+  fast command-line browser-based js test run
+  ...can the output be seen incrementally?
+  target: unit test output looks exactly like command line output
+    (failures look the same, etc).
+  do it with macruby?
 
-(if it's fast)
-
-and generate an arel-all.js in the root of the project
-also a minified arel-all-minified.js?
 
 ==========
 Arel bugs:

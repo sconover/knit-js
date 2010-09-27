@@ -1,3 +1,47 @@
+Hmm.  Why is there specialization at the engine level, and the same specialization expressed in a different manner in the "algebra" classes?
+
+e.g.
+
+    def engine
+      relation1.engine != relation2.engine ? Memory::Engine.new : relation1.engine
+    end
+
+    def table_sql(formatter = Sql::TableReference.new(self))
+      relation1.externalize.table_sql(formatter)
+    end
+
+    def joins(environment, formatter = Sql::TableReference.new(environment))
+
+seems suboptimal, sitting under the algebra folder.
+
+also why is Arel::Array owned by/hardwired to memory engine?
+
+
+maybe the engine should be a factory:
+
+sessions = my_memory_engine.array(:session)
+my_sql_engine.table(:user).join(my_memory_engine.table(:session)) => read
+read.execute ==> result
+
+...also you can just join in a raw array
+my_sql_engine.table(:user).join([[1,'blue'],[2,'red'],[3,'green']]) => read
+read.execute
+
+? the joiner has to offer a couple of forms:
+  - SqlStatement
+  - Array
+
+the joinee accepts one of them...?
+
+or perhaps it's the joiner that makes the decision:
+   Create a temporary (in-memory?) table with these rows.
+   Then join using sql.
+   Then continue, but clean up the temporary table when we're done.
+
+*** more scenarios ***
+
+===========
+
 set up all the namespaces for a module in one place?
 
 require("arel/attributes/namespace")

@@ -3,6 +3,13 @@ require(__dirname + "/../../lib/arel/attributes/string")
 
 regarding(arel.Attributes.String, function () {
 
+  regarding("properties", function () {
+    test('can have a name', function () {
+      assert.equal("id", new arel.Attributes.String("id").name);
+    });
+
+  });
+  
   regarding("type casting", function () {
 
     test('casting a string to string just yields the original value', function () {

@@ -265,20 +265,47 @@ require("arel/attributes/string")
 require("arel/attributes/integer")
 }, 
 'arel/attributes/string': function(require, exports, module) {
-global["arel"] = global.arel || {};
-arel.Attributes = arel.Attributes || {};
+require("arel/attributes/attribute");
 
-arel.Attributes.String = function(){};
+arel.Attributes.String = function(name){
+  this.name = name;
+};
+Object.inherits(arel.Attributes.String, arel.Attributes.Attribute);
 
 arel.Attributes.String.prototype.typeCast = function(raw_value) {
   return raw_value==null || raw_value==undefined ? raw_value : raw_value.toString();
 };
 }, 
-'arel/attributes/integer': function(require, exports, module) {
+'arel/attributes/attribute': function(require, exports, module) {
+require("core");
+
 global["arel"] = global.arel || {};
 arel.Attributes = arel.Attributes || {};
 
-arel.Attributes.Integer = function(){};
+arel.Attributes.Attribute = function(name){
+  this.name = name;
+};
+}, 
+'core': function(require, exports, module) {
+//from node.js
+Object.inherits = function (ctor, superCtor) {
+    ctor.super_ = superCtor;
+    ctor.prototype = Object.create(superCtor.prototype, {
+        constructor: {
+            value: ctor,
+            enumerable: false
+        }
+    });
+};
+
+}, 
+'arel/attributes/integer': function(require, exports, module) {
+require("arel/attributes/attribute");
+
+arel.Attributes.Integer = function(name){
+  this.name = name;
+};
+Object.inherits(arel.Attributes.Integer, arel.Attributes.Attribute);
 
 arel.Attributes.Integer.prototype.typeCast = function(raw_value) {
   

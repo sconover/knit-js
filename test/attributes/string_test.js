@@ -1,7 +1,7 @@
 require("../test_helper.js");
 require("arel/attributes/string")
 
-regarding(arel.Attributes.String, function () {
+regarding("arel.Attributes.String", function () {
 
   regarding("properties", function () {
     test('can have a name', function () {

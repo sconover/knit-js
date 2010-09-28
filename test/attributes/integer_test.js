@@ -1,7 +1,7 @@
 require("../test_helper.js");
 require("arel/attributes/integer")
 
-regarding(arel.Attributes.Integer, function () {
+regarding("arel.Attributes.Integer", function () {
 
   regarding("type casting", function () {
 

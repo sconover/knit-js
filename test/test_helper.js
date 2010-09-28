@@ -1,7 +1,18 @@
-require.paths.push("./test");
-require.paths.push("./lib");
+require.paths.push("test");
+require.paths.push("lib");
 
-require("jasmine-node.js");
+require("../../jasmine-node/lib/jasmine");
+
+jasmine.Env.prototype.regarding = jasmine.Env.prototype.describe;
+jasmine.Env.prototype.xregarding = jasmine.Env.prototype.xdescribe;
+
+jasmine.Env.prototype.test = jasmine.Env.prototype.it;
+jasmine.Env.prototype.xtest = jasmine.Env.prototype.xit;
+
+regarding = describe;
+xregarding = xdescribe;
+test = it;
+xtest = xit;
 
 var sys = require('sys');
 
@@ -15,17 +26,4 @@ for(var key in jasmine) {
 
 
 assert = require('assert');
-
-jasmine.alreadyRan = false
-process.on('exit', function () {
-  if (!jasmine.alreadyRan) {  
-    var isVerbose = false;
-    var showColors = true;
-  
-    jasmine.execute(function(runner, log){
-      jasmine.alreadyRan = true
-      process.exit(runner.results().failedCount);
-    }, isVerbose, showColors);  
-  }
-});
 

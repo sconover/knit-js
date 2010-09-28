@@ -1,5 +1,5 @@
-require(__dirname + "/../test_helper.js");
-require(__dirname + "/../../lib/arel/attributes/integer")
+require("../test_helper.js");
+require("arel/attributes/integer")
 
 regarding(arel.Attributes.Integer, function () {
 

@@ -1,5 +1,5 @@
-require(__dirname + "/../test_helper.js");
-require(__dirname + "/../../lib/arel/attributes/string")
+require("../test_helper.js");
+require("arel/attributes/string")
 
 regarding(arel.Attributes.String, function () {
 

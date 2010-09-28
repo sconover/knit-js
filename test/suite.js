@@ -1,9 +1,6 @@
-require(__dirname + "/test_helper.js");
+require("./test_helper");
 
-files = jasmine.getAllSpecFiles(__dirname)
-for (var i = 0, len = files.length; i < len; ++i){
-  require(files[i]);
-}
+jasmine.requireAllSpecFiles(__dirname)
 
 var exec = require('child_process').exec;
 exec("sh -c 'cd lib && modulrize arel.js > ../arel-all.js'", function (error, stdout, stderr) {

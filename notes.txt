@@ -1,3 +1,100 @@
+
+I'm projecting on a relation (that's a join)
+
+join = join(relation_a, relation_b)
+
+projection(rename(relation_a.attribute("age"), "AGE"), relation_b.attribute("height"))
+
+restriction(predicate)
+
+
+
+a Table HAS A relation
+
+relation
+  heading
+    attributes
+===========
+
+relation = heading(attributes) + tuples - it's the definition, not the content
+  an attribute OF a relation
+  you can *extend* a relation to have a new attribute
+
+projection (select cols...)
+
+restriction (where)
+
+natural join (inner join)
+
+intersection, difference, cartesian product (natural join w/o matching attrs.  special case of nat join), union
+
+rename (table foo as far, column yyy as zzz)
+
+
+"extend" a relation.
+extend(foo * bar)
+extend(max(foo))
+
+
+the relation (name, age, weight)
+the relation's projection over the attributes age, weight
+
+
+
+produce a function that acts on a set and produces a result...
+
+restriction(relation) => function
+
+projection(relation) => function
+
+
+...should be a delay before you plug in the actual data.  this is a specification.
+  
+
+(select) projection (from) relation (where) restriction
+(select) projection (join) relation1, relation2 (where) restriction
+
+as a matter of modeling, js prototypes might match up very well.
+
+
+===============
+
+The Relational algebra implemented via Prolog rules and queries.
+Selection:
+
+select( variables ) :- conditions on the constants. 
+Constants select rows in the relation.
+Intersection:
+
+r_1in_r2( Vars ) :- r_1( Vars ), r2( Vars ). 
+selects the entities that are in both r_1 and r2 (use the same variables).
+Difference:
+
+diff_r_1_r2( Vars ) :- r_1( Vars ), not r2( Vars ). 
+selects the entities in r_1 that are not in r2.
+Projection:
+
+pr( variables ) :- r( variables and don't cares ). 
+Don't cares represent columns to be deleted.
+Cartesian product:
+
+prod( variables ) :- r_1( vars ), r2( vars ). 
+prod variables is the list of variables both in r_1 and r2.
+Union: (two rules are required to perform union.)
+union( variables ) :- first_relation( variables ). 
+union( variables ) :- second_relation( variables ).
+
+Natural Join: In the rule,
+nat_join( variables shared variables ) :- 
+    r_1(variables, shared variables), 
+    r2(variables, shared variables).
+
+the shared variables restrict search to common elements, reduced number of variables in the join eliminate multiple columns.
+
+
+
+===================
+
 Hmm.  Why is there specialization at the engine level, and the same specialization expressed in a different manner in the "algebra" classes?
 
 e.g.

@@ -1,6 +1,6 @@
 #<script type="text/javascript" src="src/Player.js"></script>
 
-require "../schnauzer/lib/schnauzer"
+require "../schnauzer/lib/schnauzer/safari"
 require "fileutils"
 
 def to_script_file_tag(file)
@@ -26,9 +26,10 @@ html = File.read("test/browser_suite.html.in")
 html.sub!("<!--SOURCE-->", source_files.collect{|sf|to_script_file_tag(sf)}.join)
 html.sub!("<!--TEST-->", test_files.collect{|tf|to_script_file_tag(tf)}.join)
 
-# File.open("arel_test_suite.html", "w+"){|f|f<<html}
+File.open("browser_suite.html", "w+"){|f|f<<html}
 
-browser = Schnauzer::Browser.new
-browser.load_html(html, "file://" + FileUtils.pwd)
-browser.js("window.onload()")
+browser = Schnauzer::SafariBrowser.new
+# puts html
+browser.load_html(html, :base_url => "file://" + FileUtils.pwd, :wait_after_load => 3)
+# browser.js("window.onload()")
 puts browser.js("document.body.innerHTML")

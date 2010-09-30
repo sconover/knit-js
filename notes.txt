@@ -10,6 +10,25 @@ Async by default
   what parts should be async?  tuples() ?  anything else?
 
 =========
+
+http://c2.com/cgi/wiki?NotesOnaCeePlusPlusRdbmsApi
+
+  void PrintEmployeeProjectManagers?(CDatabase& db)
+  {
+	CTupleList tl(db["Employees"]
+		  .Join("Projects")
+		  .Join(db["Employees"]
+			.Rename("ID", "ManagerID")
+			.Rename("Name", "ManagerName?"))
+		  .DropAllBut?(attr("Name") | attr("ManagerName?")));
+	for (CTupleList::iterator i = tl.begin(); i != tl.end(); ++i)
+	std::cout << (*i)["Name"] << "  " << (*i)["ManagerName?"] << std::endl;
+  }
+
+
+
+
+=========
 [topical!]
 
 http://c2.com/cgi/wiki?RelationalLanguage

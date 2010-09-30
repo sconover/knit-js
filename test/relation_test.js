@@ -12,7 +12,7 @@ regarding("arel.Relation", function () {
       
       names = _.map(new arel.Relation.Heading([name, age]), function(attr){return attr.name})
       
-      assert.ok(_.isEqual(["name", "age"], names));
+      assert.equal(["name", "age"], names);
     });
 
   });

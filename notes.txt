@@ -1,3 +1,7 @@
+A table is a relation
+  it aliases heading to columns
+
+=========
 
 I'm projecting on a relation (that's a join)
 

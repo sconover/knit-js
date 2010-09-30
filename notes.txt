@@ -9,6 +9,18 @@ inputs and outputs are tuples, expressed as arrays.
 Async by default
   what parts should be async?  tuples() ?  anything else?
 
+=========
+
+from: http://c2.com/cgi/wiki?DatabaseType
+
+I just realized recently that a RelVar is actually an instance of a DatabaseType (or, maybe more specifically, a Table Type)... for example, all variables are instances of a type (for those who think in types). So in fact a relvar is really an instance of some sort of grander type.. or RelType?. The specifications of the RelType? or DatabaseType are the schema, the constraints, etc. The types that determine attribute restraints (column restraints) are just like how a struct or record has sub fields with more type specifications per each struct or record field.
+No, a relvar is an instance of a variable. A variable may possess a type which constrains the values it may contain, but a variable is not a type.
+
+{Well it is a 'rel'var, not just any old 'var'. That implies it is named at the top level of a relational database, and that it names a mutable relation (if not mutable, not really a 'variable'). I would note that relation does not equal table... except in practice. Tables can't be infinite. Relations - subsets of cartesian products of potentially infinite domains - certainly can be.}
+
+It is, in fact, "any old 'var'" that happens to contain a value which is a relation, and which is often but not necessarily persistent, as a relvar (short for "relation-valued variable" or "relation variable") may be temporary or local. A relvar is not necessarily at the top level of a relational database (i.e., it may be a local relvar), though the top level of a relational database consists of persistent relvars. Variables are named, relations are not. See RdbRelVar. By the way, the cardinality of a relation held by a relvar is immaterial to the definition of "relvar".
+
+{A 'var' that necessarily identifies a relation isn't just "any old 'var'" - the proof being trivial, that I can point at a 'var' at random (e.g. one identifying an 'int') and it isn't a relvar. As far as the 'naming' goes, from my viewpoint variables never 'contain' values (values being immaterial and entirely un-containable). Variables do identify (or 'point at') and thereby give name to values - generally a temporally limited name based upon the lifetime of an object containing a representation of said value and an associated decodec. And I do know that the cardinality of a relation held by a relvar is immaterial to the definition of "relvar". That's why it would be a 'wrong answer' to say that a relvar has some sort of 'table type', because tables necessarily have finite cardinality, they being defined in terms of specifying exactly what they contain. A relvar identifies a relation, which could potentially have infinite cardinality, which is sufficient to say that it is not a 'table type'. (The statement to which you're responding was targeted originally at someone else rather than you, of course.)}
 
 =========
 http://infolab.stanford.edu/~ullman/fcdb/oracle/or-intro.html

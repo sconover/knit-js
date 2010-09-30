@@ -11,8 +11,10 @@ regarding("arel.Relation", function () {
       var age = new arel.Attribute("age", arel.Attribute.IntegerType);
       
       names = _.map(new arel.Relation.Heading([name, age]), function(attr){return attr.name})
-      
+      types = _.map(new arel.Relation.Heading([name, age]), function(attr){return attr.type})
+    
       assert.equal(["name", "age"], names);
+      assert.equal([arel.Attribute.StringType, arel.Attribute.IntegerType], types);
     });
 
   });

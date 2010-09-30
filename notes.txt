@@ -1,3 +1,14 @@
+Should be able to prove out various engines using a common set of acceptance tests
+
+inputs and outputs are tuples, expressed as arrays.
+
+...so we need to insert
+
+
+Async by default
+  what parts should be async?  tuples() ?  anything else?
+
+=========
 A table is a relation
   it aliases heading to columns
 

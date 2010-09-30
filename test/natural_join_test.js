@@ -4,13 +4,13 @@ require("arel/natural_join")
 regarding("arel.NaturalJoin", function () {
     
   beforeEach(function() {
-    person = new arel.Relation("person")
+    person = new arel.MutableRelation("person")
               .attr("id", arel.Attribute.IntegerType)
               .attr("house_id", arel.Attribute.IntegerType)
               .attr("name", arel.Attribute.StringType)      
               .attr("age", arel.Attribute.IntegerType);      
 
-    house = new arel.Relation("house")
+    house = new arel.MutableRelation("house")
               .attr("house_id", arel.Attribute.IntegerType)
               .attr("address", arel.Attribute.StringType);
 

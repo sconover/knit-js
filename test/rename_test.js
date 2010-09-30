@@ -1,5 +1,5 @@
 require("./test_helper.js");
-require("arel/relation")
+require("arel/mutable_relation")
 require("arel/rename")
 
 regarding("arel.Rename", function () {
@@ -7,7 +7,7 @@ regarding("arel.Rename", function () {
   regarding("relations", function () {
     
     test("makes a copy of the relation with a different name", function () {
-      var person = new arel.Relation("person")
+      var person = new arel.MutableRelation("person")
                     .attr("name", arel.Attribute.StringType)      
                     .attr("age", arel.Attribute.IntegerType);      
 

@@ -10,6 +10,18 @@ Async by default
   what parts should be async?  tuples() ?  anything else?
 
 =========
+[topical!]
+
+http://c2.com/cgi/wiki?RelationalLanguage
+
+It is sad to see SQL being the only widespread data language, as it really adds a lot of mess to the relatively clean conceptual model of relational algebra. The strength of the relational model is its enormously simple data model: in addition to data types (ints, strings, etc.), it only has relations, operators (projection, selection, join, union, sorting, and some others) and integrity constraints.
+
+It would be great to be able to use, in production code, a language where one could say 't' instead of 'select * from t' and 't * t2 [foo = bar]' instead of 'select * from t join t2 on foo=bar'.
+
+In practice since very few would use a multiplication without a filter, I believe they should be combined into a single operator (join). (We can still keep multiplication.) Further, a functional style would be nice so that DBA's could more easily define their own operators without having to add new syntax. A new function that uses two existing functions is not new syntax, just a new function.
+
+
+=========
 
 from: http://c2.com/cgi/wiki?DatabaseType
 

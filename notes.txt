@@ -44,6 +44,11 @@ Set operations.  They do something to a relation, and yield a relation.
 	projection, selection(restriction), join
 
 =========
+r l a js
+
+ra
+
+=========
 DSL ideas
 
 OO style / functional style

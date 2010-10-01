@@ -9,6 +9,92 @@ inputs and outputs are tuples, expressed as arrays.
 Async by default
   what parts should be async?  tuples() ?  anything else?
 
+insert, update, delete ...come back with what?  boolean?
+
+
+GOAL: you can learn about relational algebra by reading the code.
+  ...so things like Rename being duck-typed to relation might be weird...
+GOAL: DSL for naturally expressing a statement
+
+
+inner join: "The result of the join can be defined as the outcome of first taking the Cartesian product (or cross-join) of all records in the tables (combining every record in table A with every record in table B)—then return all records which satisfy the join predicate."
+
+
+- an equi join is a theta join that only allows equality compairsons in the join predicate
+  (sql "using" - though undoubtedly this is the kind of thing where specific
+   dbms's will want to accomplish this different ways)
+- a natural join is an equi join that joins on all identical attributes
+
+later:
+  allow join strategies (at least on inner join)
+    - hash merge
+    - sort merge
+    ...this applies to in-memory cases only
+   calculate the "expense" of a join (carindality) - expose this, 
+     use this value to acceptance-test the join strategy
+
+
+Set operations.  They do something to a relation, and yield a relation.
+	General set operations:
+	sort, set difference, intersection, union
+	  
+	  should be a mixin.
+
+	Set operations specialized for RA:
+	projection, selection(restriction), join
+
+=========
+DSL ideas
+
+OO style / functional style
+
+r2 = person.project("name", "age") / r2 = project(person, "name", "age")
+
+r2 = person
+  .join(house)
+    .on("house_id", "id")
+  .end 
+/ 
+r2 = join(person, "house_id", house, "id")
+
+r2 = sort(person, ["name",ASC])
+
+
+engine.relation("person").join(engine.relation("house"))
+
+person
+  .join(house)
+    .on("house_id", "id")
+  .end 
+
+
+=========
+
+noun / verb
+
+relation
+  attributes, aka heading
+  attribute, aka domain
+
+rename (relation / attribute)
+
+projection / project
+join / join
+selection / select  , alias restriction / restrict
+
+union / union
+intersection / intersect
+difference / diff
+
+
+
+
+=========
+
+t * t2 [foo = bar]
+
+t * t2 ()
+
 =========
 
 http://c2.com/cgi/wiki?NotesOnaCeePlusPlusRdbmsApi
@@ -54,6 +140,9 @@ It is, in fact, "any old 'var'" that happens to contain a value which is a relat
 {A 'var' that necessarily identifies a relation isn't just "any old 'var'" - the proof being trivial, that I can point at a 'var' at random (e.g. one identifying an 'int') and it isn't a relvar. As far as the 'naming' goes, from my viewpoint variables never 'contain' values (values being immaterial and entirely un-containable). Variables do identify (or 'point at') and thereby give name to values - generally a temporally limited name based upon the lifetime of an object containing a representation of said value and an associated decodec. And I do know that the cardinality of a relation held by a relvar is immaterial to the definition of "relvar". That's why it would be a 'wrong answer' to say that a relvar has some sort of 'table type', because tables necessarily have finite cardinality, they being defined in terms of specifying exactly what they contain. A relvar identifies a relation, which could potentially have infinite cardinality, which is sufficient to say that it is not a 'table type'. (The statement to which you're responding was targeted originally at someone else rather than you, of course.)}
 
 =========
+
+http://www.cs.rochester.edu/~nelson/courses/csc_173/relations/algebra.html
+
 http://infolab.stanford.edu/~ullman/fcdb/oracle/or-intro.html
 
 =========
@@ -68,7 +157,7 @@ join = join(relation_a, relation_b)
 
 projection(rename(relation_a.attribute("age"), "AGE"), relation_b.attribute("height"))
 
-restriction(predicate)
+selection(predicate)  #aka restriction
 
 
 
@@ -85,7 +174,7 @@ relation = heading(attributes) + tuples - it's the definition, not the content
 
 projection (select cols...)
 
-restriction (where)
+selection (where) #aka restriction
 
 natural join (inner join)
 
@@ -106,7 +195,7 @@ the relation's projection over the attributes age, weight
 
 produce a function that acts on a set and produces a result...
 
-restriction(relation) => function
+selection(relation) => function  #aka restriction
 
 projection(relation) => function
 
@@ -114,8 +203,8 @@ projection(relation) => function
 ...should be a delay before you plug in the actual data.  this is a specification.
   
 
-(select) projection (from) relation (where) restriction
-(select) projection (join) relation1, relation2 (where) restriction
+(select) projection (from) relation (where) selection #aka restriction
+(select) projection (join) relation1, relation2 (where) selection
 
 as a matter of modeling, js prototypes might match up very well.
 

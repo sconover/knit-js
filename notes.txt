@@ -1,5 +1,27 @@
-Should be able to prove out various engines using a common set of acceptance tests
-  defined in json, maybe?
+grand unification
+
+- good_question is really about a couple of things:  (-rb first)
+  - basic http request validation and parsing
+  - constructing and validating a relation (e.g. relation-rb)
+
+- predicated becomes extensions in relation-rb, around the relation-rb predicate model  (-rb first)
+  - port that stuff to js?
+
+- validation/constraints on a relation (-rb first)
+  - constraint on join magnitude
+    - "this relation may not participate in a join in which more than 1000 tuples are used"
+
+- prove out various engines using a common set of acceptance tests defined in json  (-js first)
+  - relation-acceptance project.  notes plus json.
+
+- should all relation projects have a possible async style?
+  - what do you do in ruby?  em or something?
+  - http://www.igvita.com/2008/09/05/asynchronous-database-access-in-ruby/
+  - http://github.com/tmm1/em-mysql
+  - http://www.espace.com.eg/neverblock/blog/2008/09/04/neverblock-instant-scaling-for-your-rails-apps/
+  - http://www.espace.com.eg/neverblock/blog/2008/08/28/neverblock-mysql-support/
+
+========
 
 inputs and outputs are tuples, expressed as arrays.
 

@@ -1,5 +1,5 @@
 require("./test_helper.js");
-require("arel/mutable_relation")
+require("arel/relation")
 require("arel/rename")
 
 regarding("arel.Rename", function () {

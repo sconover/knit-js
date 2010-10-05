@@ -1,3 +1,13 @@
+Breaking up selections with complex conditions
+
+A selection whose condition is a conjunction of simpler conditions is equivalent to a sequence of selections with those same individual conditions, and selection whose condition is a disjunction is equivalent to a union of selections. These identities can be used to merge selections so that fewer selections need to be evaluated, or to split them so that the component selections may be moved or optimized separately.
+
+
+
+This can be effectively done, if the cross product is followed by a selection operator, e.g. σA(R × P). Considering the definition of join, this is the most likely case. If the cross product is not followed by a selection operator, we can try to push down a selection from higher levels of the expression tree using the other selection rules.
+
+============
+
 grand unification
 
 - good_question is really about a couple of things:  (-rb first)

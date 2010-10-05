@@ -135,37 +135,28 @@ regarding("In Memory Engine", function () {
     
   });
 
-  
-  xregarding("Natural Join", function () {
+  regarding("Projection", function () {
 
-    test("basic natural join.  all rows connect.", function (){
+    test("project a subset of attributes over the relation", function (){
       person.insertSync([
         [1, 101, "Jane", 5],
         [2, 101, "Puck", 12],
         [3, 102, "Fanny", 30]
-      ])
+      ]);
       
-      house.insertSync([
-        [101, "Chimney Hill"],
-        [102, "Parnassus"]
-      ])
-      
-      resultRelation = person.naturalJoin(house);
-      
-      assert.equal([
-        [1, 101, "Jane", 5, "Chimney Hill"],
-        [2, 101, "Puck", 12, "Chimney Hill"],
-        [3, 102, "Fanny", 30, "Parnassus"]
-      ], resultRelation.tuplesSync());
+      smallerRelation = person.project(person.attributes().get("name", "age"));
 
-      // assert.equal(person.
-      //                join(house).
-      //                  on(person.attr("house_id").eq(house.attr("house_id")))).
-      //                end.
-      //              tuplesSync(), 
-      //              relation.tuplesSync());
+      assert.equal({
+        name:"person",
+        attributes:["name", "age"],
+        tuples:[
+          ["Jane", 5],
+          ["Puck", 12],
+          ["Fanny", 30]
+        ]
+      }, relationContents(smallerRelation));
     });
-    
+          
   });
 
   

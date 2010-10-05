@@ -27,6 +27,4 @@ for(var key in jasmine) {
 
 assert = require('assert');
 
-assert.equal = function equal(actual, expected, message) {
-  if (!_.isEqual(actual, expected)) assert.fail(actual, expected, message, "==", assert.equal);
-};
+assert.equal = assert.deepEqual;

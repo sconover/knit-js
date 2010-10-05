@@ -10,17 +10,17 @@
 	  if (str == "assert") {
 		return {
 	 	  equal: function(expected, actual) {
-		    expect(actual).toEqual(expected);	
+		    expect(actual).toEqual(expected)	
 		  }
-		};
-	  };
-    };
+		}
+	  }
+    }
 
-    f["paths"] = [];
+    f["paths"] = []
 	
-	require = f;
+	require = f
 	
-	global = window;
+	global = window
 	
   </script>
 
@@ -40,21 +40,21 @@
 
   <script type="text/javascript">
     (function() {
-      var jasmineEnv = jasmine.getEnv();
-      jasmineEnv.updateInterval = 1000;
+      var jasmineEnv = jasmine.getEnv()
+      jasmineEnv.updateInterval = 1000
 
-      var trivialReporter = new jasmine.TrivialReporter();
+      var trivialReporter = new jasmine.TrivialReporter()
 
-      jasmineEnv.addReporter(trivialReporter);
+      jasmineEnv.addReporter(trivialReporter)
 
       jasmineEnv.specFilter = function(spec) {
-        return trivialReporter.specFilter(spec);
-      };
+        return trivialReporter.specFilter(spec)
+      }
 
       window.onload = function() {
-        jasmineEnv.execute();
-      };
-    })();
+        jasmineEnv.execute()
+      }
+    })()
   </script>
 
 </head>

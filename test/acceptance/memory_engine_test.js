@@ -158,6 +158,32 @@ regarding("In Memory Engine", function () {
     });
           
   });
+  
+  regarding("Selection", function () {
+    
+    xregarding("Predicates", function () {
+    
+      test("basic equality", function (){
+        person.insertSync([
+          [1, 101, "Jane", 5],
+          [2, 101, "Puck", 12],
+          [3, 102, "Fanny", 30]
+        ]);
+      
+        smallerRelation = person.select(person.attributes().get("name").eq("Fanny"));
+
+        assert.equal({
+          name:"person",
+          attributes:["name", "age"],
+          tuples:[
+            [3, 102, "Fanny", 30]
+          ]
+        }, relationContents(smallerRelation));
+      });
+      
+    });
+          
+  });
 
   
 });

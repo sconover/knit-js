@@ -1,3 +1,19 @@
+- do math
+  - selection, projection pushing
+  - conjunction splitting, etc
+ http://en.wikipedia.org/wiki/Relational_algebra#Use_of_algebraic_properties_for_query_optimization
+- then make questions work
+  - isNaturalJoin()
+- redo the object model
+  - class "style"
+  - mixins
+  - should I go to a functional style by default?
+    ra.project(ra.select(r, somePredicate), [name, age])
+- unit test - memory equals, selection, projection, cartesian join (simple tests)
+
+
+===========
+
 Breaking up selections with complex conditions
 
 A selection whose condition is a conjunction of simpler conditions is equivalent to a sequence of selections with those same individual conditions, and selection whose condition is a disjunction is equivalent to a union of selections. These identities can be used to merge selections so that fewer selections need to be evaluated, or to split them so that the component selections may be moved or optimized separately.

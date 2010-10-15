@@ -1,3 +1,33 @@
+...you're replacing one of the relations in the join with one that's now wrapped differently
+
+selection pushing:
+
+join.relationOne = select(join.relationOne, predicate)
+remove outer select
+
+so you're lopping off parts of the predicate.
+
+select with no predicate just returns the inner relation
+
+
+pushing on to the join:
+
+join.cross = predicate
+remove outer select
+
+
+
+6. 1. 3. Selection and cross product
+Cross product is the costliest operator to evaluate. If the input relations have N and M rows, the result will contain  rows. Therefore it is very important to do our best to decrease the size of both operands before applying the cross product operator.
+
+This can be effectively done, if the cross product is followed by a selection operator, e.g. (R × P). Considering the definition of join, this is the most likely case. If the cross product is not followed by a selection operator, we can try to push down a selection from higher levels of the expression tree using the other selection rules.
+
+In the above case we break up condition A into conditions B, C and D using the split rules about complex selection conditions, so that A = B  C  D and B only contains attributes from R, C contains attributes only from P and D contains the part of A that contains attributes from both R and P. Note, that B, C or D are possibly empty. Then the following holds:
+
+
+
+=========
+
 - do math
   - selection, projection pushing
   - conjunction splitting, etc
@@ -213,8 +243,6 @@ projection(rename(relation_a.attribute("age"), "AGE"), relation_b.attribute("hei
 selection(predicate)  #aka restriction
 
 
-
-a Table HAS A relation
 
 relation
   heading

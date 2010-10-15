@@ -1,3 +1,10 @@
+join predicate
+  apply predicate to combined tuple
+  if true then tuple is added to combinations
+     " set of all combinations "
+
+---------
+
 ...you're replacing one of the relations in the join with one that's now wrapped differently
 
 selection pushing:

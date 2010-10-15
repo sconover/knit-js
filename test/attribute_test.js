@@ -33,7 +33,7 @@ regarding("arel.Attributes", function () {
     
     assert.equal(
       ["name", "age"], 
-      new arel.Attributes([name]).concat(new arel.Attributes([age])).names()
+      new arel.Attributes(new arel.Attributes([name]).concat(new arel.Attributes([age]))).names()
     )
   })
 

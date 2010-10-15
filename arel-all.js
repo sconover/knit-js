@@ -260,20 +260,20 @@ var modulr = (function(global) {
 })(this);
 
 (function(require, module) {require.define({
-'arel/attribute': function(require, exports, module) {
-require("arel/core");
+'knit/attribute': function(require, exports, module) {
+require("knit/core");
 
 
-arel.Attribute = function(name, type){
+knit.Attribute = function(name, type){
   this.name = name;
   this.type = type;
 };
 
-arel.Attribute.IntegerType = "integer";
-arel.Attribute.StringType = "string";
+knit.Attribute.IntegerType = "integer";
+knit.Attribute.StringType = "string";
 
 }, 
-'arel/core': function(require, exports, module) {
+'knit/core': function(require, exports, module) {
 require("underscore");
 
 //from node.js
@@ -287,7 +287,7 @@ Object.inherits = function (ctor, superCtor) {
     });
 };
 
-global["arel"] = global.arel || {};
+global["knit"] = global.knit || {};
 }, 
 'underscore': function(require, exports, module) {
 // Underscore.js
@@ -1006,10 +1006,10 @@ global["arel"] = global.arel || {};
 
 }
 });
-require.ensure(['arel/attribute'], function() {
-var arel = {};
+require.ensure(['knit/attribute'], function() {
+var knit = {};
 
-require("arel/attribute");
+require("knit/attribute");
 // require('engines');
 });
 })(modulr.require, modulr.require.main);

@@ -1,11 +1,11 @@
 require("./test_helper.js")
-require("arel/relation")
+require("knit/relation")
 
-regarding("arel.MutableRelation", function () {
+regarding("knit.MutableRelation", function () {
   
   regarding("tuples", function () {
     test("tuples are available only in specialized relations", function (){
-      assert.throws(function(){new arel.MutableRelation("foo").tuples()}, 
+      assert.throws(function(){new knit.MutableRelation("foo").tuples()}, 
                     Error, 
                     "tuples are available only in specialized relations")
     })

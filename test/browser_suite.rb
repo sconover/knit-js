@@ -10,12 +10,12 @@ end
 
 
 source_files = %w{
-  lib/arel.js
+  lib/knit.js
   lib/core.js
-  lib/arel/attributes.js
-  lib/arel/attributes/attribute.js
-  lib/arel/attributes/integer.js
-  lib/arel/attributes/string.js
+  lib/knit/attributes.js
+  lib/knit/attributes/attribute.js
+  lib/knit/attributes/integer.js
+  lib/knit/attributes/string.js
 }
 
 test_files = ["test/test_helper.js"] + Dir["test/**/*_test.js"].to_a.sort

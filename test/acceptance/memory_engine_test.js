@@ -1,25 +1,25 @@
 require("../test_helper.js");
-require("arel")
-require("arel/engines/memory")
+require("knit")
+require("knit/engines/memory")
 
 regarding("In Memory Engine", function () {
     
   beforeEach(function() {
-    memoryEngine = new arel.Engines.Memory();
+    memoryEngine = new knit.Engines.Memory();
     person = memoryEngine.mutableRelation("person")
-              .attr("id", arel.Attribute.IntegerType)
-              .attr("house_id", arel.Attribute.IntegerType)
-              .attr("name", arel.Attribute.StringType)      
-              .attr("age", arel.Attribute.IntegerType);      
+              .attr("id", knit.Attribute.IntegerType)
+              .attr("house_id", knit.Attribute.IntegerType)
+              .attr("name", knit.Attribute.StringType)      
+              .attr("age", knit.Attribute.IntegerType);      
               
     house = memoryEngine.mutableRelation("house")
-              .attr("house_id", arel.Attribute.IntegerType)
-              .attr("address", arel.Attribute.StringType)
-              .attr("city_id", arel.Attribute.IntegerType);
+              .attr("house_id", knit.Attribute.IntegerType)
+              .attr("address", knit.Attribute.StringType)
+              .attr("city_id", knit.Attribute.IntegerType);
 
     city = memoryEngine.mutableRelation("city")
-              .attr("city_id", arel.Attribute.IntegerType)
-              .attr("name", arel.Attribute.StringType);
+              .attr("city_id", knit.Attribute.IntegerType)
+              .attr("name", knit.Attribute.StringType);
   });
 
   function relationContents(relation) {

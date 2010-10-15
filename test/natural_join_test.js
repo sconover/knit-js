@@ -1,20 +1,20 @@
 require("./test_helper.js")
-require("arel/natural_join")
+require("knit/natural_join")
 
-regarding("arel.NaturalJoin", function () {
+regarding("knit.NaturalJoin", function () {
     
   beforeEach(function() {
-    person = new arel.MutableRelation("person")
-              .attr("id", arel.Attribute.IntegerType)
-              .attr("house_id", arel.Attribute.IntegerType)
-              .attr("name", arel.Attribute.StringType)      
-              .attr("age", arel.Attribute.IntegerType)      
+    person = new knit.MutableRelation("person")
+              .attr("id", knit.Attribute.IntegerType)
+              .attr("house_id", knit.Attribute.IntegerType)
+              .attr("name", knit.Attribute.StringType)      
+              .attr("age", knit.Attribute.IntegerType)      
 
-    house = new arel.MutableRelation("house")
-              .attr("house_id", arel.Attribute.IntegerType)
-              .attr("address", arel.Attribute.StringType)
+    house = new knit.MutableRelation("house")
+              .attr("house_id", knit.Attribute.IntegerType)
+              .attr("address", knit.Attribute.StringType)
 
-    join = new arel.NaturalJoin(person, house)
+    join = new knit.NaturalJoin(person, house)
   })
 
   

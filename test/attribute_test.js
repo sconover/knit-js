@@ -1,39 +1,39 @@
 require("./test_helper.js")
-require("arel/attribute")
+require("knit/attribute")
 
-regarding("arel.Attribute", function () {
+regarding("knit.Attribute", function () {
 
   test("an attribute has a name and a type", function () {
-    var name = new arel.Attribute("name", arel.Attribute.StringType)
+    var name = new knit.Attribute("name", knit.Attribute.StringType)
     assert.equal("name", name.name())
-    assert.equal(arel.Attribute.StringType, name.type())
+    assert.equal(knit.Attribute.StringType, name.type())
   })
 
 })
 
-regarding("arel.Attributes", function () {
+regarding("knit.Attributes", function () {
 
   test("names", function () {
-    var name = new arel.Attribute("name", arel.Attribute.StringType)
-    var age = new arel.Attribute("age", arel.Attribute.StringType)
+    var name = new knit.Attribute("name", knit.Attribute.StringType)
+    var age = new knit.Attribute("age", knit.Attribute.StringType)
     
-    assert.equal(["name", "age"], new arel.Attributes([name, age]).names())
+    assert.equal(["name", "age"], new knit.Attributes([name, age]).names())
   })
 
   test("get", function () {
-    var name = new arel.Attribute("name", arel.Attribute.StringType)
-    var age = new arel.Attribute("age", arel.Attribute.StringType)
+    var name = new knit.Attribute("name", knit.Attribute.StringType)
+    var age = new knit.Attribute("age", knit.Attribute.StringType)
     
-    assert.equal(["name"], new arel.Attributes([name, age]).get("name").names())
+    assert.equal(["name"], new knit.Attributes([name, age]).get("name").names())
   })
 
   test("concat", function () {
-    var name = new arel.Attribute("name", arel.Attribute.StringType)
-    var age = new arel.Attribute("age", arel.Attribute.StringType)
+    var name = new knit.Attribute("name", knit.Attribute.StringType)
+    var age = new knit.Attribute("age", knit.Attribute.StringType)
     
     assert.equal(
       ["name", "age"], 
-      new arel.Attributes(new arel.Attributes([name]).concat(new arel.Attributes([age]))).names()
+      new knit.Attributes(new knit.Attributes([name]).concat(new knit.Attributes([age]))).names()
     )
   })
 

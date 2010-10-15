@@ -1,33 +1,33 @@
-require("../test_helper.js");
+require("../test_helper.js")
 require("knit")
 require("knit/engines/memory")
 
 regarding("In Memory Engine", function () {
     
   beforeEach(function() {
-    memoryEngine = new knit.Engines.Memory();
-    person = memoryEngine.mutableRelation("person")
+    engine = new knit.Engines.Memory()
+    person = engine.mutableRelation("person")
               .attr("id", knit.Attribute.IntegerType)
               .attr("house_id", knit.Attribute.IntegerType)
               .attr("name", knit.Attribute.StringType)      
-              .attr("age", knit.Attribute.IntegerType);      
+              .attr("age", knit.Attribute.IntegerType)      
               
-    house = memoryEngine.mutableRelation("house")
+    house = engine.mutableRelation("house")
               .attr("house_id", knit.Attribute.IntegerType)
               .attr("address", knit.Attribute.StringType)
-              .attr("city_id", knit.Attribute.IntegerType);
-
-    city = memoryEngine.mutableRelation("city")
               .attr("city_id", knit.Attribute.IntegerType)
-              .attr("name", knit.Attribute.StringType);
-  });
+
+    city = engine.mutableRelation("city")
+              .attr("city_id", knit.Attribute.IntegerType)
+              .attr("name", knit.Attribute.StringType)
+  })
 
   function relationContents(relation) {
     return {
      name:relation.name(),
      attributes:_.map(relation.attributes(), function(attribute){return attribute.name()}),
      tuples:relation.tuplesSync()
-    };
+    }
   }
 
   regarding("Basics", function () {
@@ -41,7 +41,7 @@ regarding("In Memory Engine", function () {
       assert.equal([
         [1, 101, "Jane", 5],
         [2, 101, "Puck", 12]
-      ], person.tuplesSync());
+      ], person.tuplesSync())
       
       person.insertSync([
         [3, 102, "Fanny", 30]
@@ -51,10 +51,10 @@ regarding("In Memory Engine", function () {
         [1, 101, "Jane", 5],
         [2, 101, "Puck", 12],
         [3, 102, "Fanny", 30]
-      ], person.tuplesSync());
-    });
+      ], person.tuplesSync())
+    })
     
-  });
+  })
 
   
   regarding("Join (cartesian)", function () {
@@ -65,14 +65,14 @@ regarding("In Memory Engine", function () {
         [1, 101, "Jane", 5],
         [2, 101, "Puck", 12],
         [3, 102, "Fanny", 30]
-      ]);
+      ])
       
       house.insertSync([
         [101, "Chimney Hill", 1001],
         [102, "Parnassus", 1002]
-      ]);
+      ])
       
-      allPeopleCombinedWithAllHouses = person.join(house);
+      allPeopleCombinedWithAllHouses = engine.join(person, house)
       
       assert.equal({
         name:"person__house",
@@ -86,9 +86,9 @@ regarding("In Memory Engine", function () {
           [3, 102, "Fanny", 30, 101, "Chimney Hill", 1001],
           [3, 102, "Fanny", 30, 102, "Parnassus", 1002]
         ]
-      }, relationContents(allPeopleCombinedWithAllHouses));
+      }, relationContents(allPeopleCombinedWithAllHouses))
         
-    });
+    })
     
     test("two joins", function (){
 
@@ -96,19 +96,23 @@ regarding("In Memory Engine", function () {
         [1, 101, "Jane", 5],
         [2, 101, "Puck", 12],
         [3, 102, "Fanny", 30]
-      ]);
+      ])
       
       house.insertSync([
         [101, "Chimney Hill", 1001],
         [102, "Parnassus", 1002]
-      ]);
+      ])
 
       city.insertSync([
         [1001, "San Francisco"],
         [1002, "New Orleans"]
-      ]);
+      ])
 
-      allPeopleCombinedWithAllHousesCombinedWithAllCities = person.join(house).join(city);
+      allPeopleCombinedWithAllHousesCombinedWithAllCities = 
+        engine.join(
+          engine.join(person, house), 
+          city
+        )
       
       assert.equal({
         name:"person__house__city",
@@ -129,11 +133,11 @@ regarding("In Memory Engine", function () {
           [3, 102, "Fanny", 30, 102, "Parnassus", 1002, 1001, "San Francisco"],
           [3, 102, "Fanny", 30, 102, "Parnassus", 1002, 1002, "New Orleans"]
         ]
-      }, relationContents(allPeopleCombinedWithAllHousesCombinedWithAllCities));
+      }, relationContents(allPeopleCombinedWithAllHousesCombinedWithAllCities))
 
-    });
+    })
     
-  });
+  })
 
   regarding("Projection", function () {
 
@@ -142,9 +146,9 @@ regarding("In Memory Engine", function () {
         [1, 101, "Jane", 5],
         [2, 101, "Puck", 12],
         [3, 102, "Fanny", 30]
-      ]);
+      ])
       
-      smallerRelation = person.project(person.attributes().get("name", "age"));
+      smallerRelation = engine.project(person, person.attributes().get("name", "age"))
 
       assert.equal({
         name:"person",
@@ -154,10 +158,10 @@ regarding("In Memory Engine", function () {
           ["Puck", 12],
           ["Fanny", 30]
         ]
-      }, relationContents(smallerRelation));
-    });
+      }, relationContents(smallerRelation))
+    })
           
-  });
+  })
   
   regarding("Selection", function () {
     
@@ -168,9 +172,10 @@ regarding("In Memory Engine", function () {
           [1, 101, "Jane", 5],
           [2, 101, "Puck", 12],
           [3, 102, "Fanny", 30]
-        ]);
+        ])
       
-        smallerRelation = person.select(person.attributes().get("name").eq("Fanny"));
+        smallerRelation = 
+          engine.select(person, person.attributes().get("name").eq("Fanny"))
 
         assert.equal({
           name:"person",
@@ -178,13 +183,13 @@ regarding("In Memory Engine", function () {
           tuples:[
             [3, 102, "Fanny", 30]
           ]
-        }, relationContents(smallerRelation));
-      });
+        }, relationContents(smallerRelation))
+      })
       
-    });
+    })
           
-  });
+  })
 
   
-});
+})
 

@@ -3,7 +3,11 @@ join predicate
   if true then tuple is added to combinations
      " set of all combinations "
 
----------
+=======
+relation has a relation has a relation
+  ...i have a join
+
+===========
 
 ...you're replacing one of the relations in the join with one that's now wrapped differently
 

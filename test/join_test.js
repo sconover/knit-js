@@ -1,7 +1,7 @@
 require("./test_helper.js")
-require("knit/natural_join")
+require("knit/join")
 
-regarding("knit.NaturalJoin", function () {
+regarding("knit.Join", function () {
     
   beforeEach(function() {
     person = new knit.MutableRelation("person")
@@ -14,7 +14,7 @@ regarding("knit.NaturalJoin", function () {
               .attr("house_id", knit.Attribute.IntegerType)
               .attr("address", knit.Attribute.StringType)
 
-    join = new knit.NaturalJoin(person, house)
+    join = new knit.Join(person, house)
   })
 
   
@@ -22,7 +22,7 @@ regarding("knit.NaturalJoin", function () {
     assert.equal("person__house", join.name())
   })
     
-  test("combines the attributes of the two relations [THIS IS WRONG, REALLY]", function (){
+  test("combines the attributes of the two relations", function (){
     names = _.map(join.attributes(), function(attr){return attr.name()})
     assert.equal(["id", "house_id", "name", "age", "house_id", "address"], names)
   })

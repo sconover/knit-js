@@ -1,3 +1,16 @@
+
+rawRelationFunction = engine.join(engine.mutableRelation("person"))
+
+rawRelationFunction().tuplesSync()
+
+or
+
+optimizedRelationFunction = rawRelationFunction.optimize()
+
+optimizedRelationFunction()
+
+=========
+
 join predicate
   apply predicate to combined tuple
   if true then tuple is added to combinations

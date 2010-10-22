@@ -9,6 +9,74 @@ optimizedRelationFunction = rawRelationFunction.optimize()
 
 optimizedRelationFunction()
 
+
+so
+
+
+I can take a selectFunction, where f = selectFunction, do
+
+f.push() ==> true/false
+
+or 
+
+f.optimize()
+
+and calling
+
+r = f()
+
+might yield a Join (i.e. noun, object) (known as r)
+  ...or some other relation type I can't predict.  the caller should not know or care.
+
+r.name() == "person__house"
+r.attributes() == ...
+
+r.tuplesSync() ==> tuples
+
+
+then later...
+
+r.toSql() => "select..."
+
+=========
+
+So then...
+
+is there a clear division between the "core" *Function objects, and the more concrete objects they produce?
+
+...however to do any work we need to know the structure of the seed relations...
+  ...attributes, plus original relation...
+
+
+
+personR = engine.mutableRelationFunction("person")
+houseR = engine.mutableRelationFunction("house")
+
+select = knit.select(personR, knit.eq(personR.attr("name"), "Jane"))
+
+relationFunction = select.optimize()
+r = relationFunction()
+r.tuplesSync()
+
+=========
+
+functions are first-class.  we are dealing in functions.
+
+implications:
+
+prove commutativiity:
+
+  join(a,b).equals(join(b,a))
+  join(a,b,a.x eq b.y).equals(join(b,a,b.y eq a.x))
+
+  selection splitting
+    select(r, conjunction(true, false)).
+	  equals(select(select(r, true), false))
+
+
+isEquivalent
+isSame
+
 =========
 
 join predicate

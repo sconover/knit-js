@@ -4,9 +4,9 @@ regarding("function equivalence and sameness", function () {
 
   xregarding("join", function () {
     beforeEach(function() {
-      r1 = knit(function(){return stub("one", [["a", knit.Attribute.IntegerType]])})
-      r2 = knit(function(){return stub("two", [["b", knit.Attribute.IntegerType]])})
-      r3 = knit(function(){return stub("three", [["c", knit.Attribute.IntegerType]])})
+      r1 = knit(function(){return testStub("one", [["a", knit.Attribute.IntegerType]])})
+      r2 = knit(function(){return testStub("two", [["b", knit.Attribute.IntegerType]])})
+      r3 = knit(function(){return testStub("three", [["c", knit.Attribute.IntegerType]])})
     })
 
     test("same", function (){knit(function(){

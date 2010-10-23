@@ -1,4 +1,25 @@
 
+realRelation.doJoin
+ doSelect
+ doProject
+ doRename
+...etc
+
+========
+
+f = function(person, house){
+  return knit(function(){
+    return join(person, house)
+  })
+}
+
+f(memoryPerson, memoryHouse)
+
+
+
+
+=========
+
 rawRelationFunction = engine.join(engine.mutableRelation("person"))
 
 rawRelationFunction().tuplesSync()

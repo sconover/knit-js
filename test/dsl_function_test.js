@@ -14,5 +14,15 @@ regarding("a dsl function presents a set of objects to a user-defined function a
     })
   })
     
+  test("returns the return value of the user function to the caller", function (){
+    var dsl = new DSLFunction()
+    
+    var returnValue = dsl(function(){
+      return "foo"
+    })
+    
+    assert.equal("foo", returnValue)
+  })
+    
 })
 

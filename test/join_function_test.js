@@ -1,7 +1,8 @@
 require("./test_helper.js")
 require("knit/join_function")
+require("knit/relation")
 
-xregarding("knit.JoinFunction", function () {
+regarding("knit.JoinFunction", function () {
     
   beforeEach(function() {
     person = new knit.MutableRelation("person")
@@ -18,7 +19,7 @@ xregarding("knit.JoinFunction", function () {
   })
 
   test("combines the attributes of the two relations", function (){
-    names = _.map(join.attributes(), function(attr){return attr.name()})
+    names = _.map(join.attributes, function(attr){return attr.name()})
     assert.equal(["id", "house_id", "name", "age", "house_id", "address"], names)
   })
 

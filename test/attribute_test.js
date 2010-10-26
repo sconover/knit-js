@@ -11,6 +11,20 @@ regarding("knit.Attribute", function () {
 
 })
 
+regarding("knit.Attribute - same", function () {
+
+  test("two attributes are the same if their names and types are the same", function () {
+    var a1 = new knit.Attribute("a", knit.Attribute.StringType)
+    var a2 = new knit.Attribute("a", knit.Attribute.StringType)
+    var a3 = new knit.Attribute("b", knit.Attribute.StringType)
+    var a4 = new knit.Attribute("a", knit.Attribute.IntegerType)
+    assert.equal(true, a1.isSame(a2))
+    assert.equal(false, a1.isSame(a3))
+    assert.equal(false, a1.isSame(a4))
+  })
+
+})
+
 regarding("knit.Attributes", function () {
 
   test("names", function () {

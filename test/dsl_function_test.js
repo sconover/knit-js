@@ -24,5 +24,15 @@ regarding("a dsl function presents a set of objects to a user-defined function a
     assert.equal("foo", returnValue)
   })
     
+  test("it's fine to do nothing / return nothing", function (){
+    var dsl = new DSLFunction()
+    
+    var returnValue = dsl(function(){
+      //nothing
+    })
+    
+    assert.equal(undefined, returnValue)
+  })
+    
 })
 

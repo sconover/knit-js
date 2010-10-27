@@ -16,6 +16,12 @@ regarding("predicates", function() {
     assert.equal(false, conjunction(TRUE, FALSE).isSame(conjunction(TRUE, TRUE)))
   })})  
   
+  test("shorthand", function (){knit(function(){
+    assert.equal(true, eq(TRUE, FALSE).isSame(equality(TRUE, FALSE)))
+        
+    assert.equal(true, and(TRUE, FALSE).isSame(conjunction(TRUE, FALSE)))
+  })})  
+  
   xtest("splitting", function (){
     join = knit(function(){return join(person, house)})
   })  

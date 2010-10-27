@@ -21,7 +21,16 @@ regarding("predicates", function() {
         
     assert.equal(true, and(TRUE, FALSE).isSame(conjunction(TRUE, FALSE)))
   })})  
-  
+
+  test("inspect", function(){knit(function(){
+    assert.equal("TRUE", TRUE.inspect())
+    assert.equal("FALSE", FALSE.inspect())
+    
+    assert.equal("eq(TRUE,FALSE)", equality(TRUE, FALSE).inspect())
+    
+    assert.equal("and(TRUE,FALSE)", conjunction(TRUE, FALSE).inspect())
+  })})  
+    
   test("associativity - order doesn't matter", function(){knit(function(){
     assert.equal(true, equality(TRUE, FALSE).isEquivalent(equality(FALSE, TRUE)))
     assert.equal(false, equality(TRUE, FALSE).isEquivalent(equality(FALSE, FALSE)))

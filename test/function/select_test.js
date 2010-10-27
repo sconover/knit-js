@@ -18,6 +18,12 @@ regarding("select", function() {
       ["city_id", knit.Attribute.IntegerType]
     ])})
   })
+
+  test("inspect", function (){knit(function(){
+    assert.equal("select(r[id,house_id,name,age],TRUE)", 
+                 select(person, TRUE).inspect())
+  })})
+
   
   regarding("sameness and equivalence", function() {
     
@@ -28,7 +34,7 @@ regarding("select", function() {
       assert.equal(false, select(person, TRUE).isSame(select(house, TRUE)))
     })})
     
-    xtest("commutativity - order of selects doesn't matter (effectively a conjunction)", function (){knit(function(){
+    test("commutativity - order of selects doesn't matter (effectively a conjunction)", function (){knit(function(){
       assert.equal(true, select(select(person, FALSE), TRUE).
                            isEquivalent(select(select(person, TRUE), FALSE)))
       
@@ -39,7 +45,7 @@ regarding("select", function() {
                             isSame(select(select(person, TRUE), FALSE)))
     })})
     
-    xtest("selection splitting", function (){knit(function(){
+    test("selection splitting", function (){knit(function(){
       assert.equal(true, select(person, conjunction(TRUE, FALSE)).
                            isEquivalent(select(select(person, TRUE), FALSE)))
       
@@ -55,7 +61,7 @@ regarding("select", function() {
     
   })
   
-  xregarding("merging and splitting", function() {
+  regarding("merging and splitting", function() {
     
     test("merge a nested selection, becomes a conjunction", function(){knit(function(){      
       assert.equal(true, select(select(person, TRUE), FALSE).

@@ -21,5 +21,11 @@ regarding("test relation sameness", function() {
     
     assert.equal(false, r1.isEquivalent(r3))
   })})
+  
+  test("inspect", function (){knit(function(){
+    var r = testRelation([["a", knit.Attribute.IntegerType], ["b", knit.Attribute.IntegerType]])
+    
+    assert.equal("r[a,b]", r.inspect())
+  })})
 })
 

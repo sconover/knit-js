@@ -2,8 +2,8 @@ require("../test_helper.js")
 require("knit/function/predicate")
 
 regarding("predicates", function() {
-    
-  test("sameness", function (){knit(function(){
+  
+  test("sameness", function(){knit(function(){
     assert.equal(true, TRUE.isSame(TRUE))
     assert.equal(false, TRUE.isSame(FALSE))
     assert.equal(true, FALSE.isSame(FALSE))
@@ -16,15 +16,31 @@ regarding("predicates", function() {
     assert.equal(false, conjunction(TRUE, FALSE).isSame(conjunction(TRUE, TRUE)))
   })})  
   
-  test("shorthand", function (){knit(function(){
+  test("shorthand", function(){knit(function(){
     assert.equal(true, eq(TRUE, FALSE).isSame(equality(TRUE, FALSE)))
         
     assert.equal(true, and(TRUE, FALSE).isSame(conjunction(TRUE, FALSE)))
   })})  
   
-  xtest("splitting", function (){
-    join = knit(function(){return join(person, house)})
-  })  
+  test("associativity - order doesn't matter", function(){knit(function(){
+    assert.equal(true, equality(TRUE, FALSE).isEquivalent(equality(FALSE, TRUE)))
+    assert.equal(false, equality(TRUE, FALSE).isEquivalent(equality(FALSE, FALSE)))
+
+    assert.equal(true, conjunction(TRUE, FALSE).isEquivalent(conjunction(FALSE, TRUE)))
+    assert.equal(false, conjunction(TRUE, FALSE).isEquivalent(conjunction(FALSE, FALSE)))
+
+    assert.equal(true, conjunction(conjunction(TRUE, TRUE), FALSE).
+                        isEquivalent(conjunction(FALSE, conjunction(TRUE, TRUE))))
+    assert.equal(false, conjunction(conjunction(TRUE, TRUE), FALSE).
+                        isEquivalent(conjunction(TRUE, conjunction(TRUE, TRUE))))
+  })})
+  
+  test("associativity - nested equivalence", function(){knit(function(){
+    assert.equal(true, conjunction(equality(TRUE, FALSE), FALSE).
+                        isEquivalent(conjunction(FALSE, equality(FALSE, TRUE))))
+    assert.equal(false, conjunction(equality(TRUE, FALSE), FALSE).
+                        isEquivalent(conjunction(TRUE, equality(FALSE, FALSE))))
+  })})
   
 })
 

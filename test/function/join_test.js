@@ -48,7 +48,15 @@ regarding("join", function() {
       
       assert.equal(false, join(person, house).isEquivalent(join(person, city)))
     })})
+
+    test("nonassociativity - order of operations (inner/outer) matters", function (){knit(function(){
+      assert.equal(true, join(join(person, house), city).isEquivalent(join(join(person, house), city)))
+      
+      assert.equal(false, join(join(person, house), city).isEquivalent(join(person, join(house, city))))
+    })})
     
   })
+  
+  
 })
 

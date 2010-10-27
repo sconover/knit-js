@@ -30,6 +30,11 @@ regarding("join", function() {
     assert.equal(["id", "house_id", "name", "age", "house_id", "address", "city_id"], names)
   })
   
+  test("inspect", function (){knit(function(){
+    assert.equal("join(r[id,house_id,name,age],r[house_id,address,city_id])", 
+                 join(person, house).inspect())
+  })})
+  
   regarding("sameness and equivalence", function() {
     
     test("same", function (){knit(function(){

@@ -45,7 +45,7 @@ regarding("select", function() {
                             isSame(select(select(person, TRUE), FALSE)))
     })})
     
-    test("selection splitting", function (){knit(function(){
+    test("split selects are equivalent", function (){knit(function(){
       assert.equal(true, select(person, conjunction(TRUE, FALSE)).
                            isEquivalent(select(select(person, TRUE), FALSE)))
       
@@ -71,6 +71,37 @@ regarding("select", function() {
     test("merge a fully merged selection does nothing", function(){knit(function(){
       assert.equal(true, select(person, conjunction(TRUE, FALSE)).
                            merge().isSame(select(person, conjunction(TRUE, FALSE))))
+    })})
+      
+      
+    test("split a select having a conjunction, makes separate nested selects", function(){knit(function(){
+      assert.equal(true, select(person, conjunction(TRUE, FALSE)).
+                           split().isSame(select(select(person, TRUE), FALSE)))
+    })})
+
+    test("it's splits (and merges) all the way down", function(){knit(function(){
+      var nested = select(select(person, conjunction(TRUE, TRUE)), conjunction(FALSE, FALSE))
+      
+      assert.equal(true, nested.split().isSame(
+                             select(
+                               select(
+                                 select(
+                                   select(person, TRUE), 
+                                   TRUE
+                                 ),
+                                 FALSE
+                               ),
+                               FALSE
+                             )
+                           )
+                  )
+                  
+      assert.equal(true, nested.isSame(nested.split().merge()))
+    })})
+
+    test("split a fully split selection, does nothing", function(){knit(function(){      
+      assert.equal(true, select(select(person, TRUE), FALSE).
+                           split().isSame(select(select(person, TRUE), FALSE)))
     })})
       
   })

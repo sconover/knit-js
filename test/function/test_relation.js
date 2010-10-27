@@ -14,6 +14,10 @@ _.extend(knit.TestRelationFunction.prototype, {
     return _.isEqual(result, [true])
   },
   
+  split: function(){return this},
+  merge: function(){return this},
+
+  
   inspect: function() {
     return "r[" + 
            _.map(this.attributes, function(attr){return attr.name()}).join(",") + 

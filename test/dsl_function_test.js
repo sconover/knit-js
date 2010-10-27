@@ -33,6 +33,17 @@ regarding("a dsl function presents a set of objects to a user-defined function a
     
     assert.equal(undefined, returnValue)
   })
+
+  test("if a second argument is passed, make it 'this'", function(){
+    var dsl = new DSLFunction()
+    
+    var returnValue = dsl(function(){
+      return this.a
+    }, {a:4})
+    
+    assert.equal(4, returnValue)
+  })
+
     
 })
 

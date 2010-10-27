@@ -1,3 +1,8 @@
+Next:
+
+selects / predicates deal with attributes from relations.  attributes know about what relations they come from.
+
+========
 
 realRelation.doJoin
  doSelect

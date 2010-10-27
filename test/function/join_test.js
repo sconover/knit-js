@@ -62,6 +62,5 @@ regarding("join", function() {
     
   })
   
-  
 })
 

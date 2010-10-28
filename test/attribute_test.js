@@ -9,6 +9,11 @@ regarding("knit.Attribute", function () {
     assert.equal(knit.Attribute.StringType, name.type())
   })
 
+  test("inspect", function () {
+    var name = new knit.Attribute("name", knit.Attribute.StringType)
+    assert.equal("name", name.inspect())
+  })
+
 })
 
 regarding("knit.Attribute - same", function () {

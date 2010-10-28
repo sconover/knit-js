@@ -18,6 +18,11 @@ regarding("select", function() {
       ["address", knit.Attribute.StringType],
       ["city_id", knit.Attribute.IntegerType]
     ])})
+
+    city = knit(function(){return testRelation([
+      ["city_id", knit.Attribute.IntegerType],
+      ["name", knit.Attribute.StringType]
+    ])})
   })
 
   test("inspect", function (){knit(function(){
@@ -108,7 +113,7 @@ regarding("select", function() {
   })
   
   
-  regarding("selection pushing", function() {
+  regarding("selection pushing - basic", function() {
     
     test("a selection can be pushed inside a join if the select contains only primitives and attributes of one of the relations in the join", function (){knit(function(){
       assert.equal(true, select(join(person, house), equality(person.attr("age"), 55)).
@@ -132,6 +137,18 @@ regarding("select", function() {
     })})
     
   })  
+  
+  regarding("selection pushing - deeper join", function() {
+
+    test("keep pushing into nested joins", function (){knit(function(){
+      assert.equal(true, select(join(city, join(person, house)), equality(person.attr("age"), 55)).push().
+                            isSame(join(city, join(select(person, equality(person.attr("age"), 55)), house))))
+      
+      assert.equal(true, select(join(join(person, house), city), equality(person.attr("age"), 55)).push().
+                            isSame(join(join(select(person, equality(person.attr("age"), 55)), house), city)))
+    })})
+
+  })
 
 })
 

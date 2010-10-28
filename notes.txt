@@ -1,6 +1,15 @@
 Next:
 
-selects / predicates deal with attributes from relations.  attributes know about what relations they come from.
+bug: attributes named the same thing but from different relations
+
+selects that "bounce" because they have parts from the two different relations in a join are join predicate candidates
+
+selects that push through other selects into a join
+
+go chop everything down? (or at least, tricky stuff like selection pushing)
+
+isSame should probably be === if possible
+isEquivalent should probably be == if possible
 
 ========
 

@@ -150,5 +150,55 @@ regarding("select", function() {
 
   })
 
+  regarding("selection pushing - deep selects", function() {
+
+    test("push through layers of selects", function (){knit(function(){
+      
+      assert.equal(true, select(
+                           select(
+                             join(person, house), 
+                             equality(person.attr("age"), 55)
+                           ), 
+                           equality(person.attr("name"), "Emily")
+                         ).
+                         push().
+                  isSame(
+                         join(
+                           select(
+                             select(
+                               person, 
+                               equality(person.attr("age"), 55)
+                             ),
+                             equality(person.attr("name"), "Emily")
+                           ),
+                           house
+                         )))
+
+
+      assert.equal(true, select(
+                           select(
+                             join(person, house), 
+                             equality(person.attr("age"), 55)
+                           ),
+                           equality(house.attr("address"), "123 Main")
+                         ).
+                         push().
+                  isSame(
+                         join(
+                           select(
+                             person, 
+                             equality(person.attr("age"), 55)
+                           ),
+                           select(
+                             house, 
+                             equality(house.attr("address"), "123 Main")
+                           )
+                         )))
+
+
+    })})
+
+  })
+
 })
 

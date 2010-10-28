@@ -20,20 +20,20 @@ regarding("select", function() {
   })
 
   test("inspect", function (){knit(function(){
-    assert.equal("select(r[id,house_id,name,age],TRUE)", 
+    assert.equal("select(r[id,house_id,name,age],eq(1,1))", 
                  select(person, TRUE).inspect())
   })})
 
   
   regarding("sameness and equivalence", function() {
     
-    test("same", function (){knit(function(){
+    test("same - simple", function (){knit(function(){
       assert.equal(true, select(person, TRUE).isSame(select(person, TRUE)))
       
       assert.equal(false, select(person, TRUE).isSame(select(person, FALSE)))
       assert.equal(false, select(person, TRUE).isSame(select(house, TRUE)))
     })})
-    
+        
     test("commutativity - order of selects doesn't matter (effectively a conjunction)", function (){knit(function(){
       assert.equal(true, select(select(person, FALSE), TRUE).
                            isEquivalent(select(select(person, TRUE), FALSE)))

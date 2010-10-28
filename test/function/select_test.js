@@ -1,4 +1,5 @@
 require("../test_helper.js")
+require("knit/function/join")
 require("knit/function/select")
 require("./test_relation.js")
 
@@ -105,5 +106,32 @@ regarding("select", function() {
     })})
       
   })
+  
+  
+  regarding("selection pushing", function() {
+    
+    test("a selection can be pushed inside a join if the select contains only primitives and attributes of one of the relations in the join", function (){knit(function(){
+      assert.equal(true, select(join(person, house), equality(person.attr("age"), 55)).
+                            isSame(select(join(person, house), equality(person.attr("age"), 55))))
+      
+      assert.equal(true, select(join(person, house), equality(person.attr("age"), 55)).push().
+                            isSame(join(select(person, equality(person.attr("age"), 55)), house)))
+      
+      assert.equal(true, select(join(person, house), equality(house.attr("address"), "123 Main")).push().
+                            isSame(join(person, select(house, equality(house.attr("address"), "123 Main")))))
+    })})
+    
+    test("selects that have attributes from each join can't be pushed (bounce!)", function (){knit(function(){
+      assert.equal(true, select(join(person, house), equality(person.attr("age"), house.attr("address"))).push().
+                            isSame(select(join(person, house), equality(person.attr("age"), house.attr("address")))))
+    })})
+    
+    test("can't push into a non-join", function (){knit(function(){
+      assert.equal(true, select(person, equality(person.attr("age"), 55)).push().
+                            isSame(select(person, equality(person.attr("age"), 55))))
+    })})
+    
+  })  
+
 })
 

@@ -83,6 +83,46 @@ regarding("predicates", function() {
                         isEquivalent(conjunction(FALSE, equality(1, 2))))
     assert.equal(false, conjunction(equality(1, 2), FALSE).
                         isEquivalent(conjunction(TRUE, equality(2, 2))))
+  })})  
+  
+  test("a predicate may be only concerned with a relation.  that means all attributes are of that relation, and otherwise there are primitives", function(){knit(function(){
+
+    var person = knit(function(){return testRelation([
+      ["id", knit.Attribute.IntegerType],
+      ["house_id", knit.Attribute.IntegerType],
+      ["name", knit.Attribute.StringType],
+      ["age", knit.Attribute.IntegerType]
+    ])})
+    
+    var house = knit(function(){return testRelation([
+      ["house_id", knit.Attribute.IntegerType],
+      ["address", knit.Attribute.StringType],
+      ["city_id", knit.Attribute.IntegerType]
+    ])})
+
+
+    assert.equal(true, equality(1, 2).onlyConcernedWith(person))
+    assert.equal(true, equality(1, 2).onlyConcernedWith(house))
+    
+    assert.equal(true, equality(person.attr("age"), 55).onlyConcernedWith(person))
+    assert.equal(true, equality(55, person.attr("age")).onlyConcernedWith(person))
+    assert.equal(true, equality(person.attr("age"), person.attr("name")).onlyConcernedWith(person))
+    assert.equal(true, equality(house.attr("address"), "123 Main").onlyConcernedWith(house))
+    
+    assert.equal(false, equality(house.attr("address"), "123 Main").onlyConcernedWith(person))
+    assert.equal(false, equality(person.attr("age"), 55).onlyConcernedWith(house))
+    assert.equal(false, equality(55, person.attr("age")).onlyConcernedWith(house))
+    
+    assert.equal(false, equality(person.attr("age"), house.attr("address")).onlyConcernedWith(person))
+    
+    assert.equal(true, conjunction(TRUE, FALSE).onlyConcernedWith(person))
+    
+    assert.equal(true, conjunction(equality(person.attr("age"), 55), 
+                                   equality(person.attr("name"), "Emily")).onlyConcernedWith(person))
+    
+    assert.equal(false, conjunction(equality(person.attr("age"), 55), 
+                                    equality(house.attr("address"), "123 Main")).onlyConcernedWith(person))
+    
   })})
   
 })

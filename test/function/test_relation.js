@@ -8,6 +8,10 @@ knit.TestRelationFunction = function(attrDefs) {
 }
 
 _.extend(knit.TestRelationFunction.prototype, {
+  attr: function(attributeName) {
+    return _.detect(this.attributes, function(attr){return attr.name() == attributeName})
+  },
+  
   isSame: function(other) {
     var zipped = _.zip(this.attributes, other.attributes)
     var result = _.uniq(_.map(zipped, function(row){return _.compact(row).length==2 && row[0].isSame(row[1])}))

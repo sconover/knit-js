@@ -1,5 +1,6 @@
 require("../test_helper.js")
 require("knit/function/predicate")
+require("./test_relation.js")
 
 regarding("predicates", function() {
   
@@ -26,6 +27,24 @@ regarding("predicates", function() {
     assert.equal(false, equality(1, 1).isSame(equality(1, 2)))
     assert.equal(true, equality("a", "a").isSame(equality("a", "a")))
     assert.equal(false, equality("a", "a").isSame(equality("a", "ZZ")))    
+    
+    var person = testRelation([
+      ["id", knit.Attribute.IntegerType],
+      ["house_id", knit.Attribute.IntegerType],
+      ["name", knit.Attribute.StringType],
+      ["age", knit.Attribute.IntegerType]
+    ])
+    
+    assert.equal(true, equality(person.attr("name"), true).isSame(equality(person.attr("name"), true)))
+    assert.equal(true, equality(person.attr("name"), person.attr("age")).
+                         isSame(equality(person.attr("name"), person.attr("age"))))
+
+    assert.equal(false, equality(person.attr("name"), true).
+                          isSame(equality(person.attr("name"), false)))
+    assert.equal(false, equality(person.attr("name"), true).
+                          isSame(equality(true, true)))
+    assert.equal(false, equality(person.attr("name"), person.attr("age")).
+                          isSame(equality(person.attr("name"), person.attr("house_id"))))
   })})  
   
   

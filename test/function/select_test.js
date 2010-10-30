@@ -126,19 +126,19 @@ regarding("select", function() {
                             isSame(join(person, select(house, equality(house.attr("address"), "123 Main")))))
     })})
     
-    xtest("selects that have attributes from each join can't be pushed (bounce!)", function (){knit(function(){
+    test("selects that have attributes from each join can't be pushed (bounce!)", function (){knit(function(){
       assert.equal(true, select(join(person, house), equality(person.attr("age"), house.attr("address"))).push().
                             isSame(select(join(person, house), equality(person.attr("age"), house.attr("address")))))
     })})
     
-    xtest("can't push into a non-join", function (){knit(function(){
+    test("can't push into a non-join", function (){knit(function(){
       assert.equal(true, select(person, equality(person.attr("age"), 55)).push().
                             isSame(select(person, equality(person.attr("age"), 55))))
     })})
     
   })  
   
-  xregarding("selection pushing - deeper join", function() {
+  regarding("selection pushing - deeper join", function() {
 
     test("keep pushing into nested joins", function (){knit(function(){
       assert.equal(true, select(join(city, join(person, house)), equality(person.attr("age"), 55)).push().
@@ -150,7 +150,7 @@ regarding("select", function() {
 
   })
 
-  xregarding("selection pushing - deep selects", function() {
+  regarding("selection pushing - deep selects", function() {
 
     test("push through layers of selects", function (){knit(function(){
       

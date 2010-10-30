@@ -1,12 +1,6 @@
 Next:
 
-bug: attributes named the same thing but from different relations
-  should relations internally generate a unique id upon instansiation that the attributes carry around?
-    or a pointer back to the relation?  <== probably.  might be problematic one day.
-
 selects that "bounce" because they have parts from the two different relations in a join are join predicate candidates
-
-selects that push through other selects into a join
 
 go chop everything down? (or at least, tricky stuff like selection pushing)
 

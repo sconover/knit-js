@@ -40,13 +40,13 @@ knit.locals.testRelation = function(attrDefs) {
 knit.TestAttribute = function(name, type, sourceRelation) {
   this.name = name
   this.type = type
-  this.sourceRelation = sourceRelation
+  this._sourceRelation = sourceRelation
 }
 
 _.extend(knit.TestAttribute.prototype, {
   isSame: function(other) {
     return this.name == other.name &&
-           this.sourceRelation === other.sourceRelation
+           this._sourceRelation === other._sourceRelation
   },
   
   inspect: function() {

@@ -145,14 +145,14 @@ regarding("select", function() {
                             isSame(join(city, join(select(person, equality(person.attr("age"), 55)), house))))
       
       assert.equal(true, select(join(join(person, house), city), equality(person.attr("age"), 55)).push().
-                            isSame(join(join(select(person, equality(person.attr("age"), 55)), house), city)))
+                              isSame(join(join(select(person, equality(person.attr("age"), 55)), house), city)))
     })})
 
   })
 
   regarding("selection pushing - deep selects", function() {
 
-    test("push through layers of selects", function (){knit(function(){
+    test("push through layers of selects", function(){knit(function(){
       
       assert.equal(true, select(
                            select(
@@ -201,7 +201,24 @@ regarding("select", function() {
   })
 
 
-  regarding("selection pushing - becoming a join predicate", function() {
-	})
+  xregarding("selection pushing - a selection becomes a join predicate when there's an attribute present from each side of the join", function(){knit(function(){
+
+    test("push into the join, select disappears", function (){knit(function(){
+      assert.equal(true, select(join(person, house), equality(person.attr("house_id"), house.attr("house_id"))).push().
+                            isSame(select(join(person, house, equality(person.attr("house_id"), house.attr("house_id"))))))
+    })})
+    	
+    test("complex select pushes as well", function (){knit(function(){
+      // assert.equal(true, select(join(person, house), equality(person.attr("house_id"), house.attr("house_id"))).push().
+      //                       isSame(select(join(person, house, equality(person.attr("house_id"), house.attr("house_id"))))))
+    })})
+
+    test("two selects push in and become a conjunction", function (){knit(function(){
+      // assert.equal(true, select(join(person, house), equality(person.attr("house_id"), house.attr("house_id"))).push().
+      //                       isSame(select(join(person, house, equality(person.attr("house_id"), house.attr("house_id"))))))
+    })})
+
+    	
+	})})
 })
 

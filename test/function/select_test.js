@@ -200,5 +200,8 @@ regarding("select", function() {
 
   })
 
+
+  regarding("selection pushing - becoming a join predicate", function() {
+	})
 })
 

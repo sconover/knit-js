@@ -42,10 +42,26 @@ regarding("join", function() {
 
       assert.equal(false, join(person, house).isSame(join(house, city)))
       assert.equal(false, join(house, city).isSame(join(person, house)))
+    })})    
+
+    test("same - with predicate", function (){knit(function(){
+      assert.equal(true, join(person, house, equality(person.attr("house_id"), house.attr("house_id"))).
+                           isSame(join(person, house, equality(person.attr("house_id"), house.attr("house_id")))))
+
+      assert.equal(false, join(person, house, equality(person.attr("name"), house.attr("house_id"))).
+                           isSame(join(person, house, equality(person.attr("house_id"), house.attr("house_id")))))
     })})
 
     test("same implies equivalent", function (){knit(function(){
       assert.equal(true, join(person, house).isEquivalent(join(person, house)))
+    })})
+
+    test("equivalent with predicate", function (){knit(function(){
+      assert.equal(true, join(person, house, equality(person.attr("house_id"), house.attr("house_id"))).
+                           isEquivalent(join(person, house, equality(person.attr("house_id"), house.attr("house_id")))))
+
+      assert.equal(true, join(person, house, equality(house.attr("house_id"), person.attr("house_id"))).
+                           isEquivalent(join(person, house, equality(person.attr("house_id"), house.attr("house_id")))))
     })})
 
     test("commutativity - two join functions are equivalent if the relations are the same but in different order", function (){knit(function(){

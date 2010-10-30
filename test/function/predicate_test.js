@@ -76,6 +76,18 @@ regarding("predicates", function() {
                         isEquivalent(conjunction(FALSE, conjunction(TRUE, TRUE))))
     assert.equal(false, conjunction(conjunction(TRUE, TRUE), FALSE).
                         isEquivalent(conjunction(TRUE, conjunction(TRUE, TRUE))))
+
+    var person = testRelation([
+      ["id", knit.Attribute.IntegerType],
+      ["house_id", knit.Attribute.IntegerType],
+      ["name", knit.Attribute.StringType],
+      ["age", knit.Attribute.IntegerType]
+    ])
+
+    assert.equal(true, equality(person.attr("name"), 2).isEquivalent(equality(2, person.attr("name"))))
+    assert.equal(true, equality(person.attr("name"), person.attr("age")).isEquivalent(equality(person.attr("age"), person.attr("name"))))
+    assert.equal(false, equality(person.attr("name"), 2).isEquivalent(equality(2, person.attr("age"))))
+
   })})
   
   test("associativity - nested equivalence", function(){knit(function(){

@@ -158,9 +158,9 @@ regarding("select", function() {
       assert.equal(true, select(
                            select(
                              join(person, house), 
-                             equality(person.attr("age"), 55)
-                           ), 
-                           equality(person.attr("name"), "Emily")
+                             equality(person.attr("name"), "Emily")  
+                           ),
+                           equality(person.attr("age"), 55) 
                          ).
                          push().
                   isSame(
@@ -217,7 +217,16 @@ regarding("select", function() {
 
     test("two selects push in and become a conjunction", function (){knit(function(){
       assert.equal(true, select(select(join(person, house), equality(person.attr("house_id"), house.attr("house_id"))), equality(person.attr("age"), house.attr("address"))).push().
-                            isSame(join(person, house, conjunction(equality(person.attr("age"), house.attr("address")), equality(person.attr("house_id"), house.attr("house_id"))))))
+                            isSame(join(person, house, conjunction(equality(person.attr("house_id"), house.attr("house_id")), equality(person.attr("age"), house.attr("address"))))))
+    })})
+
+    test("won't merge if there are attributes from other relations", function (){knit(function(){
+      assert.equal(true, select(select(join(person, house), equality(person.attr("house_id"), house.attr("house_id"))), equality(city.attr("name"), house.attr("address"))).push().
+                            isSame(select(
+	                                   join(person, house, equality(person.attr("house_id"), house.attr("house_id"))),
+	                                   equality(city.attr("name"), house.attr("address")) 
+	                                 )
+	                          ))
     })})
 
     	

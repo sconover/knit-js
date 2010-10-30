@@ -8,8 +8,17 @@ go chop everything down? (or at least, tricky stuff like selection pushing)
 need assert.isSame and assert.isEquivalent
   which test these methods and throw a proper assert failed error with the right message...
 
-  or just depend on deep equals - same thing as isSame - and use assert.equal (== deepEqual)
+rename knit.locals to knit.dslLocals
 
+
+organization
+  knit
+    algebra
+    tuples (produce tuples...drives out core relation interface)
+
+
+json-format tests that prove out algebra?
+  .fromJson ...  .fromStruct
 
 ========
 

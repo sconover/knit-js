@@ -33,6 +33,10 @@ regarding("join", function() {
   test("inspect", function (){knit(function(){
     assert.equal("join(r[id,house_id,name,age],r[house_id,address,city_id])", 
                  join(person, house).inspect())
+
+    assert.equal("join(r[id,house_id,name,age],r[house_id,address,city_id],eq(4,5))", 
+               join(person, house, equality(4,5)).inspect())
+
   })})
   
   regarding("sameness and equivalence", function() {
@@ -78,5 +82,19 @@ regarding("join", function() {
     
   })
   
+  regarding("appendToPredicate", function() {
+    test("when there's only a True predicate existing, replace it", function (){knit(function(){
+      assert.equal(true, join(person, house).appendToPredicate(equality(4,5)).
+                           isSame(join(person, house, equality(4,5))))
+      
+      assert.equal(true, join(person, house, TRUE).appendToPredicate(equality(4,5)).
+                           isSame(join(person, house, equality(4,5))))
+    })})	  
+
+    test("when there's any other kind of existing predicate, make a conjunction", function (){knit(function(){
+      assert.equal(true, join(person, house, equality(4,5)).appendToPredicate(equality(6,7)).
+                           isSame(join(person, house, conjunction(equality(4,5), equality(6,7)))))
+    })})	  
+	})
 })
 

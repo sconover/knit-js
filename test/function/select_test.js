@@ -115,7 +115,8 @@ regarding("select", function() {
   
   regarding("selection pushing - basic", function() {
     
-    test("a selection can be pushed inside a join if the select contains only primitives and attributes of one of the relations in the join", function (){knit(function(){
+    test("a selection can be pushed inside a join if the select contains only primitives " +
+         "and attributes of one of the relations in the join", function (){knit(function(){
       assert.equal(true, select(join(person, house), equality(person.attr("age"), 55)).
                             isSame(select(join(person, house), equality(person.attr("age"), 55))))
       
@@ -127,8 +128,8 @@ regarding("select", function() {
     })})
     
     test("selects that have attributes from each join can't be pushed (bounce!)", function (){knit(function(){
-      assert.equal(true, select(join(person, house), equality(person.attr("age"), house.attr("address"))).push().
-                            isSame(select(join(person, house), equality(person.attr("age"), house.attr("address")))))
+      assert.equal(true, select(join(person, house), equality(person.attr("age"), city.attr("name"))).push().
+                            isSame(select(join(person, house), equality(person.attr("age"), city.attr("name")))))
     })})
     
     test("can't push into a non-join", function (){knit(function(){
@@ -201,21 +202,22 @@ regarding("select", function() {
   })
 
 
-  xregarding("selection pushing - a selection becomes a join predicate when there's an attribute present from each side of the join", function(){knit(function(){
+  regarding("selection pushing - a selection becomes a join predicate when there's " + 
+            "an attribute present from each side of the join", function(){knit(function(){
 
     test("push into the join, select disappears", function (){knit(function(){
       assert.equal(true, select(join(person, house), equality(person.attr("house_id"), house.attr("house_id"))).push().
-                            isSame(select(join(person, house, equality(person.attr("house_id"), house.attr("house_id"))))))
+                            isSame(join(person, house, equality(person.attr("house_id"), house.attr("house_id")))))
     })})
     	
     test("complex select pushes as well", function (){knit(function(){
-      // assert.equal(true, select(join(person, house), equality(person.attr("house_id"), house.attr("house_id"))).push().
-      //                       isSame(select(join(person, house, equality(person.attr("house_id"), house.attr("house_id"))))))
+      assert.equal(true, select(join(person, house), conjunction(equality(person.attr("house_id"), 1), equality(house.attr("house_id"), 2))).push().
+                            isSame(join(person, house, conjunction(equality(person.attr("house_id"), 1), equality(house.attr("house_id"), 2)))))
     })})
 
     test("two selects push in and become a conjunction", function (){knit(function(){
-      // assert.equal(true, select(join(person, house), equality(person.attr("house_id"), house.attr("house_id"))).push().
-      //                       isSame(select(join(person, house, equality(person.attr("house_id"), house.attr("house_id"))))))
+      assert.equal(true, select(select(join(person, house), equality(person.attr("house_id"), house.attr("house_id"))), equality(person.attr("age"), house.attr("address"))).push().
+                            isSame(join(person, house, conjunction(equality(person.attr("age"), house.attr("address")), equality(person.attr("house_id"), house.attr("house_id"))))))
     })})
 
     	

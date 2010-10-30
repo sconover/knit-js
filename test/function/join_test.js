@@ -26,7 +26,7 @@ regarding("join", function() {
   
   test("combines the attributes of the two relations", function (){
     join = knit(function(){return join(person, house)})
-    names = _.map(join.attributes, function(attr){return attr.name()})
+    names = _.map(join.attributes, function(attr){return attr.name})
     assert.equal(["id", "house_id", "name", "age", "house_id", "address", "city_id"], names)
   })
   

@@ -2,20 +2,19 @@ require("knit/core")
 require("knit/attribute")
 
 knit.TestRelationFunction = function(attrDefs) {
+	var self = this
   this.attributes = _.map(attrDefs, function(attrDef){
-    return new knit.Attribute(attrDef[0], attrDef[1])
+    return new knit.TestAttribute(attrDef[0], attrDef[1], self)
   })
 }
 
 _.extend(knit.TestRelationFunction.prototype, {
   attr: function(attributeName) {
-    return _.detect(this.attributes, function(attr){return attr.name() == attributeName})
+    return _.detect(this.attributes, function(attr){return attr.name == attributeName})
   },
   
   isSame: function(other) {
-    var zipped = _.zip(this.attributes, other.attributes)
-    var result = _.uniq(_.map(zipped, function(row){return _.compact(row).length==2 && row[0].isSame(row[1])}))
-    return _.isEqual(result, [true])
+	  return this === other
   },
   
   split: function(){return this},
@@ -24,7 +23,7 @@ _.extend(knit.TestRelationFunction.prototype, {
   
   inspect: function() {
     return "r[" + 
-           _.map(this.attributes, function(attr){return attr.name()}).join(",") + 
+           _.map(this.attributes, function(attr){return attr.inspect()}).join(",") + 
            "]" 
   }
 
@@ -35,3 +34,23 @@ knit.TestRelationFunction.prototype.isEquivalent = knit.TestRelationFunction.pro
 knit.locals.testRelation = function(attrDefs) {
   return new knit.TestRelationFunction(attrDefs)
 }
+
+
+
+knit.TestAttribute = function(name, type, sourceRelation) {
+  this.name = name
+  this.type = type
+  this.sourceRelation = sourceRelation
+}
+
+_.extend(knit.TestAttribute.prototype, {
+  isSame: function(other) {
+    return this.name == other.name &&
+           this.sourceRelation === other.sourceRelation
+  },
+  
+  inspect: function() {
+    return this.name
+  }
+
+})

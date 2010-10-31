@@ -1,8 +1,8 @@
 require("../test_helper.js")
 require("knit")
-require("knit/engines/memory")
+// require("knit/engines/memory")
 
-regarding("In Memory Engine", function () {
+xregarding("In Memory Engine", function () {
     
   beforeEach(function() {
     engine = new knit.Engines.Memory()

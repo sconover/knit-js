@@ -1,5 +1,8 @@
 require("knit/core")
-require("knit/attribute")
+
+knit.Attribute = {}
+knit.Attribute.IntegerType = "integer"
+knit.Attribute.StringType = "string"
 
 knit.TestRelationFunction = function(attrDefs) {
 	var self = this

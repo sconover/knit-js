@@ -35,7 +35,7 @@ regarding("join", function() {
                  join(person, house).inspect())
 
     assert.equal("join(r[id,house_id,name,age],r[house_id,address,city_id],eq(4,5))", 
-               join(person, house, equality(4,5)).inspect())
+                 join(person, house, equality(4,5)).inspect())
 
   })})
   

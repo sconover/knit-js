@@ -34,7 +34,7 @@ _.extend(knit.TestRelationFunction.prototype, {
 
 knit.TestRelationFunction.prototype.isEquivalent = knit.TestRelationFunction.prototype.isSame
 
-knit.locals.testRelation = function(attrDefs) {
+knit.dslLocals.testRelation = function(attrDefs) {
   return new knit.TestRelationFunction(attrDefs)
 }
 

@@ -1,11 +1,5 @@
 Next:
 
-need assert.isSame and assert.isEquivalent
-  which test these methods and throw a proper assert failed error with the right message...
-
-rename knit.locals to knit.dslLocals
-
-
 organization
   knit
     algebra

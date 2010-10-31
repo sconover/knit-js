@@ -5,8 +5,8 @@ regarding("a dsl function presents a set of objects to a user-defined function a
 
   test("set what you want available in the user-defined function on 'locals'", function (){
     var dsl = new DSLFunction()
-    dsl.locals.x = 123
-    dsl.locals.hello = function(){return "world"}
+    dsl.dslLocals.x = 123
+    dsl.dslLocals.hello = function(){return "world"}
     
     dsl(function(){
       assert.equal(123, x)

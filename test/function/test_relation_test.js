@@ -10,20 +10,20 @@ regarding("test relation sameness", function() {
 	    r1 = testRelation([["a", knit.Attribute.IntegerType]])
 	    r2 = testRelation([["a", knit.Attribute.IntegerType]])
 	    r3 = testRelation([["b", knit.Attribute.IntegerType]])
-	    assert.equal(true, r1.isSame(r1))
-	
-	    assert.equal(false, r1.isSame(r2))
-	    assert.equal(false, r1.isSame(r3))
+
+	    assert.same(r1, r1)
+	    assert.notSame(r1, r2)
+	    assert.notSame(r1, r3)
 	  })})
 
 	  test("equivalence of test relations is the same as sameness", function (){knit(function(){
 	    r1 = testRelation([["a", knit.Attribute.IntegerType]])
 	    r2 = testRelation([["a", knit.Attribute.IntegerType]])
 	    r3 = testRelation([["b", knit.Attribute.IntegerType]])
-	    assert.equal(true, r1.isEquivalent(r1))
-	
-	    assert.equal(false, r1.isEquivalent(r2))
-	    assert.equal(false, r1.isEquivalent(r3))
+
+	    assert.equivalent(r1, r1)
+	    assert.notEquivalent(r1, r2)
+	    assert.notEquivalent(r1, r3)
 	  })})
  
 	  test("inspect", function (){knit(function(){
@@ -39,10 +39,10 @@ regarding("test relation sameness", function() {
 	  test("sameness.  and attribute is equal to the same attribute from the same relation", function(){knit(function(){
 	    r1 = testRelation([["a", knit.Attribute.IntegerType]])
 	    r2 = testRelation([["a", knit.Attribute.IntegerType], ["b", knit.Attribute.IntegerType]])
-	    assert.equal(true, r1.attr("a").isSame(r1.attr("a")))
-	
-	    assert.equal(false, r1.attr("a").isSame(r2.attr("a")))
-	    assert.equal(false, r1.attr("a").isSame(r2.attr("b")))
+
+	    assert.same(r1.attr("a"), r1.attr("a"))
+	    assert.notSame(r1.attr("a"), r2.attr("a"))
+	    assert.notSame(r1.attr("a"), r2.attr("b"))
 	  })})
 
 	})

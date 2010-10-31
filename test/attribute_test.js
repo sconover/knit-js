@@ -23,9 +23,9 @@ regarding("knit.Attribute - same", function () {
     var a2 = new knit.Attribute("a", knit.Attribute.StringType)
     var a3 = new knit.Attribute("b", knit.Attribute.StringType)
     var a4 = new knit.Attribute("a", knit.Attribute.IntegerType)
-    assert.equal(true, a1.isSame(a2))
-    assert.equal(false, a1.isSame(a3))
-    assert.equal(false, a1.isSame(a4))
+    assert.same(a1, a2)
+    assert.notSame(a1, a3)
+    assert.notSame(a1, a4)
   })
 
 })

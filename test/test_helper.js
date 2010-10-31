@@ -33,8 +33,8 @@ assert.equal = assert.deepEqual
 assert._func = function(func, expected, actual, orientation, term) {
 	assert.ok(func(expected, actual)==orientation, 
 	          term + " failure: " + 
-	          "\n    expected: " + expected.inspect() + 
-            "\n    actual:   " + actual.inspect())
+	          "\n    expected: " + (expected.inspect ? expected.inspect() : "" + expected) + 
+            "\n    actual:   " + (actual.inspect ? actual.inspect() : "" + actual))
 }
 
 assert._equivalent = function(expected, actual, orientation, term) {

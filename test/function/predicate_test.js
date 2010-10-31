@@ -27,28 +27,28 @@ regarding("predicates", function() {
 
   
   test("sameness", function(){knit(function(){
-    assert.equal(true, TRUE.isSame(TRUE))
-    assert.equal(false, TRUE.isSame(FALSE))
-    assert.equal(true, FALSE.isSame(FALSE))
-    assert.equal(false, FALSE.isSame(TRUE))
+    assert.same(TRUE, TRUE)
+    assert.notSame(TRUE, FALSE)
+    assert.same(FALSE, FALSE)
+    assert.notSame(FALSE, TRUE)
 
-    assert.equal(false, TRUE.isSame(1))
-    assert.equal(false, FALSE.isSame(1))
+    assert.notSame(TRUE, 1)
+    assert.notSame(FALSE, 1)
     
-    assert.equal(true, conjunction(TRUE, FALSE).isSame(conjunction(TRUE, FALSE)))
-    assert.equal(false, conjunction(TRUE, FALSE).isSame(conjunction(TRUE, TRUE)))
+    assert.same(conjunction(TRUE, FALSE), conjunction(TRUE, FALSE))
+    assert.notSame(conjunction(TRUE, FALSE), conjunction(TRUE, TRUE))
   })})  
   
   test("sameness - equality - uses primitives and attributes", function(){knit(function(){
-    assert.equal(false, FALSE.isSame(1))
-    assert.equal(false, TRUE.isSame(1))
+    assert.notSame(FALSE, 1)
+    assert.notSame(TRUE, 1)
     
-    assert.equal(true, equality(true, false).isSame(equality(true, false)))
-    assert.equal(false, equality(true, false).isSame(equality(true, true)))
-    assert.equal(true, equality(1, 1).isSame(equality(1, 1)))
-    assert.equal(false, equality(1, 1).isSame(equality(1, 2)))
-    assert.equal(true, equality("a", "a").isSame(equality("a", "a")))
-    assert.equal(false, equality("a", "a").isSame(equality("a", "ZZ")))    
+    assert.same(equality(true, false), equality(true, false))
+    assert.notSame(equality(true, false), equality(true, true))
+    assert.same(equality(1, 1), equality(1, 1))
+    assert.notSame(equality(1, 1), equality(1, 2))
+    assert.same(equality("a", "a"), equality("a", "a"))
+    assert.notSame(equality("a", "a"), equality("a", "ZZ"))
     
     var person = testRelation([
       ["id", knit.Attribute.IntegerType],
@@ -57,23 +57,18 @@ regarding("predicates", function() {
       ["age", knit.Attribute.IntegerType]
     ])
     
-    assert.equal(true, equality(person.attr("name"), true).isSame(equality(person.attr("name"), true)))
-    assert.equal(true, equality(person.attr("name"), person.attr("age")).
-                         isSame(equality(person.attr("name"), person.attr("age"))))
+    assert.same(equality(person.attr("name"), true), equality(person.attr("name"), true))
+    assert.same(equality(person.attr("name"), person.attr("age")), equality(person.attr("name"), person.attr("age")))
 
-    assert.equal(false, equality(person.attr("name"), true).
-                          isSame(equality(person.attr("name"), false)))
-    assert.equal(false, equality(person.attr("name"), true).
-                          isSame(equality(true, true)))
-    assert.equal(false, equality(person.attr("name"), person.attr("age")).
-                          isSame(equality(person.attr("name"), person.attr("house_id"))))
+    assert.notSame(equality(person.attr("name"), true), equality(person.attr("name"), false))
+    assert.notSame(equality(person.attr("name"), true), equality(true, true))
+    assert.notSame(equality(person.attr("name"), person.attr("age")), equality(person.attr("name"), person.attr("house_id")))
   })})  
   
   
   test("shorthand", function(){knit(function(){
-    assert.equal(true, eq(true, false).isSame(equality(true, false)))
-        
-    assert.equal(true, and(TRUE, FALSE).isSame(conjunction(TRUE, FALSE)))
+    assert.same(eq(true, false), equality(true, false))
+    assert.same(and(TRUE, FALSE), conjunction(TRUE, FALSE))
   })})  
 
   test("inspect", function(){knit(function(){
@@ -88,16 +83,14 @@ regarding("predicates", function() {
   })})  
     
   test("associativity - order doesn't matter", function(){knit(function(){
-    assert.equal(true, equality(1, 2).isEquivalent(equality(2, 1)))
-    assert.equal(false, equality(1, 2).isEquivalent(equality(2, 2)))
+    assert.equivalent(equality(1, 2), equality(2, 1))
+    assert.notEquivalent(equality(1, 2), equality(2, 2))
 
-    assert.equal(true, conjunction(TRUE, FALSE).isEquivalent(conjunction(FALSE, TRUE)))
-    assert.equal(false, conjunction(TRUE, FALSE).isEquivalent(conjunction(FALSE, FALSE)))
+    assert.equivalent(conjunction(TRUE, FALSE), conjunction(FALSE, TRUE))
+    assert.notEquivalent(conjunction(TRUE, FALSE), conjunction(FALSE, FALSE))
 
-    assert.equal(true, conjunction(conjunction(TRUE, TRUE), FALSE).
-                        isEquivalent(conjunction(FALSE, conjunction(TRUE, TRUE))))
-    assert.equal(false, conjunction(conjunction(TRUE, TRUE), FALSE).
-                        isEquivalent(conjunction(TRUE, conjunction(TRUE, TRUE))))
+    assert.equivalent(conjunction(conjunction(TRUE, TRUE), FALSE), conjunction(FALSE, conjunction(TRUE, TRUE)))
+    assert.notEquivalent(conjunction(conjunction(TRUE, TRUE), FALSE), conjunction(TRUE, conjunction(TRUE, TRUE)))
 
     var person = testRelation([
       ["id", knit.Attribute.IntegerType],
@@ -106,17 +99,14 @@ regarding("predicates", function() {
       ["age", knit.Attribute.IntegerType]
     ])
 
-    assert.equal(true, equality(person.attr("name"), 2).isEquivalent(equality(2, person.attr("name"))))
-    assert.equal(true, equality(person.attr("name"), person.attr("age")).isEquivalent(equality(person.attr("age"), person.attr("name"))))
-    assert.equal(false, equality(person.attr("name"), 2).isEquivalent(equality(2, person.attr("age"))))
-
+    assert.equivalent(equality(person.attr("name"), 2), equality(2, person.attr("name")))
+    assert.equivalent(equality(person.attr("name"), person.attr("age")), equality(person.attr("age"), person.attr("name")))
+    assert.notEquivalent(equality(person.attr("name"), 2), equality(2, person.attr("age")))
   })})
   
   test("associativity - nested equivalence", function(){knit(function(){
-    assert.equal(true, conjunction(equality(1, 2), FALSE).
-                        isEquivalent(conjunction(FALSE, equality(1, 2))))
-    assert.equal(false, conjunction(equality(1, 2), FALSE).
-                        isEquivalent(conjunction(TRUE, equality(2, 2))))
+    assert.equivalent(conjunction(equality(1, 2), FALSE), conjunction(FALSE, equality(1, 2)))
+    assert.notEquivalent(conjunction(equality(1, 2), FALSE), conjunction(TRUE, equality(2, 2)))
   })})  
   
   test("a predicate may be only concerned with a relation.  that means all attributes are of that relation, and otherwise there are primitives", function(){knit(function(){

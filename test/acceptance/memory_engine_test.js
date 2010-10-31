@@ -5,21 +5,12 @@ require("knit")
 xregarding("In Memory Engine", function () {
     
   beforeEach(function() {
-    engine = new knit.Engines.Memory()
-    person = engine.mutableRelation("person")
-              .attr("id", knit.Attribute.IntegerType)
-              .attr("house_id", knit.Attribute.IntegerType)
-              .attr("name", knit.Attribute.StringType)      
-              .attr("age", knit.Attribute.IntegerType)      
-              
-    house = engine.mutableRelation("house")
-              .attr("house_id", knit.Attribute.IntegerType)
-              .attr("address", knit.Attribute.StringType)
-              .attr("city_id", knit.Attribute.IntegerType)
+    engine = new knit.engine.Memory()
 
-    city = engine.mutableRelation("city")
-              .attr("city_id", knit.Attribute.IntegerType)
-              .attr("name", knit.Attribute.StringType)
+    person = knit(function(){return testRelation(["id", "house_id", "name", "age"])})
+    house = knit(function(){return testRelation(["house_id", "address", "city_id"])})
+    city = knit(function(){return testRelation(["city_id", "name"])})
+
   })
 
   function relationContents(relation) {

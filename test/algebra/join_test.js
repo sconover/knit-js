@@ -5,23 +5,9 @@ require("./test_relation.js")
 regarding("join", function() {
     
   beforeEach(function() {
-    person = knit(function(){return testRelation([
-      ["id", knit.Attribute.IntegerType],
-      ["house_id", knit.Attribute.IntegerType],
-      ["name", knit.Attribute.StringType],
-      ["age", knit.Attribute.IntegerType]
-    ])})
-    
-    house = knit(function(){return testRelation([
-      ["house_id", knit.Attribute.IntegerType],
-      ["address", knit.Attribute.StringType],
-      ["city_id", knit.Attribute.IntegerType]
-    ])})
-    
-    city = knit(function(){return testRelation([
-      ["city_id", knit.Attribute.IntegerType],
-      ["name", knit.Attribute.StringType]
-    ])})
+    person = knit(function(){return testRelation(["id", "house_id", "name", "age"])})
+    house = knit(function(){return testRelation(["house_id", "address", "city_id"])})
+    city = knit(function(){return testRelation(["city_id", "name"])})
   })
   
   test("combines the attributes of the two relations", function (){

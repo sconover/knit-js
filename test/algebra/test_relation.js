@@ -1,13 +1,9 @@
 require("knit/core")
 
-knit.Attribute = {}
-knit.Attribute.IntegerType = "integer"
-knit.Attribute.StringType = "string"
-
-knit.TestRelationFunction = function(attrDefs) {
+knit.TestRelationFunction = function(attributeNames) {
 	var self = this
-  this.attributes = _.map(attrDefs, function(attrDef){
-    return new knit.TestAttribute(attrDef[0], attrDef[1], self)
+  this.attributes = _.map(attributeNames, function(attributeName){
+    return new knit.TestAttribute(attributeName, self)
   })
 }
 
@@ -40,9 +36,8 @@ knit.dslLocals.testRelation = function(attrDefs) {
 
 
 
-knit.TestAttribute = function(name, type, sourceRelation) {
+knit.TestAttribute = function(name, sourceRelation) {
   this.name = name
-  this.type = type
   this._sourceRelation = sourceRelation
 }
 

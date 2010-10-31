@@ -6,23 +6,9 @@ require("./test_relation.js")
 regarding("predicates", function() {
 
   beforeEach(function() {
-    person = knit(function(){return testRelation([
-      ["id", knit.Attribute.IntegerType],
-      ["house_id", knit.Attribute.IntegerType],
-      ["name", knit.Attribute.StringType],
-      ["age", knit.Attribute.IntegerType]
-    ])})
-    
-    house = knit(function(){return testRelation([
-      ["house_id", knit.Attribute.IntegerType],
-      ["address", knit.Attribute.StringType],
-      ["city_id", knit.Attribute.IntegerType]
-    ])})
-    
-    city = knit(function(){return testRelation([
-      ["city_id", knit.Attribute.IntegerType],
-      ["name", knit.Attribute.StringType]
-    ])})
+    person = knit(function(){return testRelation(["id", "house_id", "name", "age"])})
+    house = knit(function(){return testRelation(["house_id", "address", "city_id"])})
+    city = knit(function(){return testRelation(["city_id", "name"])})
   })
 
   
@@ -50,12 +36,7 @@ regarding("predicates", function() {
     assert.same(equality("a", "a"), equality("a", "a"))
     assert.notSame(equality("a", "a"), equality("a", "ZZ"))
     
-    var person = testRelation([
-      ["id", knit.Attribute.IntegerType],
-      ["house_id", knit.Attribute.IntegerType],
-      ["name", knit.Attribute.StringType],
-      ["age", knit.Attribute.IntegerType]
-    ])
+    var person = knit(function(){return testRelation(["id", "house_id", "name", "age"])})
     
     assert.same(equality(person.attr("name"), true), equality(person.attr("name"), true))
     assert.same(equality(person.attr("name"), person.attr("age")), equality(person.attr("name"), person.attr("age")))
@@ -92,12 +73,7 @@ regarding("predicates", function() {
     assert.equivalent(conjunction(conjunction(TRUE, TRUE), FALSE), conjunction(FALSE, conjunction(TRUE, TRUE)))
     assert.notEquivalent(conjunction(conjunction(TRUE, TRUE), FALSE), conjunction(TRUE, conjunction(TRUE, TRUE)))
 
-    var person = testRelation([
-      ["id", knit.Attribute.IntegerType],
-      ["house_id", knit.Attribute.IntegerType],
-      ["name", knit.Attribute.StringType],
-      ["age", knit.Attribute.IntegerType]
-    ])
+    var person = knit(function(){return testRelation(["id", "house_id", "name", "age"])})
 
     assert.equivalent(equality(person.attr("name"), 2), equality(2, person.attr("name")))
     assert.equivalent(equality(person.attr("name"), person.attr("age")), equality(person.attr("age"), person.attr("name")))
@@ -109,7 +85,8 @@ regarding("predicates", function() {
     assert.notEquivalent(conjunction(equality(1, 2), FALSE), conjunction(TRUE, equality(2, 2)))
   })})  
   
-  test("a predicate may be only concerned with a relation.  that means all attributes are of that relation, and otherwise there are primitives", function(){knit(function(){
+  test("a predicate may be only concerned with a relation.  " +
+       "that means all attributes are of that relation, and otherwise there are primitives", function(){knit(function(){
 
     assert.equal(true, equality(1, 2).concernedWithNoOtherRelationsBesides(person))
     assert.equal(true, equality(1, 2).concernedWithNoOtherRelationsBesides(house))

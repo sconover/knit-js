@@ -27,4 +27,37 @@ for(var key in jasmine) {
 
 assert = require('assert')
 
+assert.doubleEqual = assert.equal
 assert.equal = assert.deepEqual
+
+assert._func = function(func, expected, actual, orientation, term) {
+	assert.ok(func(expected, actual)==orientation, 
+	          term + " failure: " + 
+	          "\n    expected: " + expected.inspect() + 
+            "\n    actual:   " + actual.inspect())
+}
+
+assert._equivalent = function(expected, actual, orientation, term) {
+	assert._func(function(expected, actual){return expected.isEquivalent(actual)}, expected, actual, orientation, term)
+}
+
+assert.equivalent = function(expected, actual) {
+	assert._equivalent(expected, actual, true, "is Equivalent")
+}
+
+assert.notEquivalent = function(expected, actual) {
+  assert._equivalent(expected, actual, false, "is Not Equivalent")
+}
+
+assert._same = function(expected, actual, orientation, term) {
+	assert._func(function(expected, actual){return expected.isSame(actual)}, expected, actual, orientation, term)
+}
+
+
+assert.same = function(expected, actual) {
+	assert._same(expected, actual, true, "is Same")
+}
+
+assert.notSame = function(expected, actual) {
+  assert._same(expected, actual, false, "is Not Same")
+}

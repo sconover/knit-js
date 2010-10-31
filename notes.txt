@@ -1,10 +1,5 @@
 Next:
 
-selects that "bounce" because they have parts from the two different relations in a join are join predicate candidates
-
-go chop everything down? (or at least, tricky stuff like selection pushing)
-
-
 need assert.isSame and assert.isEquivalent
   which test these methods and throw a proper assert failed error with the right message...
 

@@ -1,5 +1,5 @@
 require("../test_helper")
-require("knit/function/join")
+require("knit/algebra/join")
 require("./test_relation")
 
 regarding("test relation sameness", function() {

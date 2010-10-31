@@ -1,5 +1,5 @@
 require("../test_helper.js")
-require("knit/function/join")
+require("knit/algebra/join")
 require("./test_relation.js")
 
 regarding("join", function() {

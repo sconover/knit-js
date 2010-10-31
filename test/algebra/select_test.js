@@ -1,6 +1,6 @@
 require("../test_helper.js")
-require("knit/function/join")
-require("knit/function/select")
+require("knit/algebra/join")
+require("knit/algebra/select")
 require("./test_relation.js")
 
 regarding("select", function() {

@@ -1,6 +1,6 @@
 require("../test_helper.js")
-require("knit/function/predicate")
-require("knit/function/join")
+require("knit/algebra/predicate")
+require("knit/algebra/join")
 require("./test_relation.js")
 
 regarding("predicates", function() {

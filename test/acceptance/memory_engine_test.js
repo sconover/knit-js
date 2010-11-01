@@ -1,11 +1,6 @@
 require("../test_helper.js")
 require("knit/engine/memory")
 
-
-//test cost...a relative measure.  prove this out, then test joining.  
-//should be able to to a naive implementation of natural join,
-//then throw in relation optimization, and cost asserts should go green
-
 regarding("In Memory Engine", function () {
     
   beforeEach(function() {
@@ -14,6 +9,23 @@ regarding("In Memory Engine", function () {
     person = engine.createRelation("person", ["id", "house_id", "name", "age"])
     house = engine.createRelation("house", ["house_id", "address", "city_id"])
     city = engine.createRelation("city", ["city_id", "name"])
+
+    person.insertSync([
+      [1, 101, "Jane", 5],
+      [2, 101, "Puck", 12],
+      [3, 102, "Fanny", 30]
+    ])
+    
+    house.insertSync([
+      [101, "Chimney Hill", 1001],
+      [102, "Parnassus", 1002]
+    ])
+
+    city.insertSync([
+      [1001, "San Francisco"],
+      [1002, "New Orleans"]
+    ])
+
   })
 
   function relationContents(relation) {
@@ -27,24 +39,22 @@ regarding("In Memory Engine", function () {
   regarding("Basics", function () {
 
     test("insert, read", function (){
-      person.insertSync([
-        [1, 101, "Jane", 5],
-        [2, 101, "Puck", 12]
-      ])
       
       assert.equal([
-        [1, 101, "Jane", 5],
-        [2, 101, "Puck", 12]
+	      [1, 101, "Jane", 5],
+	      [2, 101, "Puck", 12],
+	      [3, 102, "Fanny", 30]
       ], person.tuplesSync())
       
       person.insertSync([
-        [3, 102, "Fanny", 30]
+        [4, 102, "Amy", 5]
       ])
 
       assert.equal([
         [1, 101, "Jane", 5],
         [2, 101, "Puck", 12],
-        [3, 102, "Fanny", 30]
+        [3, 102, "Fanny", 30],
+				[4, 102, "Amy", 5]
       ], person.tuplesSync())
     })
     
@@ -55,12 +65,6 @@ regarding("In Memory Engine", function () {
     regarding("Predicates", function () {
     
       test("basic equality", function (){
-        person.insertSync([
-          [1, 101, "Jane", 5],
-          [2, 101, "Puck", 12],
-          [3, 102, "Fanny", 30]
-        ])
-      	
 				var smallerRelation = 
 					knit(function(){
 						return select(person, equality(person.attr("name"), "Fanny"))
@@ -86,17 +90,6 @@ regarding("In Memory Engine", function () {
 
     test("combine each row on the left with each row on the right (cartesian product)", function (){
       
-      person.insertSync([
-        [1, 101, "Jane", 5],
-        [2, 101, "Puck", 12],
-        [3, 102, "Fanny", 30]
-      ])
-      
-      house.insertSync([
-        [101, "Chimney Hill", 1001],
-        [102, "Parnassus", 1002]
-      ])
-      
       allPeopleCombinedWithAllHouses = knit(function(){
 	      return join(person, house)
 	    }).apply()
@@ -118,22 +111,6 @@ regarding("In Memory Engine", function () {
     })
     
     test("two joins", function (){
-
-      person.insertSync([
-        [1, 101, "Jane", 5],
-        [2, 101, "Puck", 12],
-        [3, 102, "Fanny", 30]
-      ])
-      
-      house.insertSync([
-        [101, "Chimney Hill", 1001],
-        [102, "Parnassus", 1002]
-      ])
-
-      city.insertSync([
-        [1001, "San Francisco"],
-        [1002, "New Orleans"]
-      ])
 
       allPeopleCombinedWithAllHousesCombinedWithAllCities = knit(function(){
 	      return join(join(person, house), city)
@@ -165,17 +142,6 @@ regarding("In Memory Engine", function () {
 
     test("join predicate (YAY!)", function (){
       
-      person.insertSync([
-        [1, 101, "Jane", 5],
-        [2, 101, "Puck", 12],
-        [3, 102, "Fanny", 30]
-      ])
-      
-      house.insertSync([
-        [101, "Chimney Hill", 1001],
-        [102, "Parnassus", 1002]
-      ])
-      
       allPeopleCombinedWithAllHouses = knit(function(){
 	      return join(person, house, equality(person.attr("house_id"), house.attr("house_id")))
 	    }).apply()
@@ -200,17 +166,6 @@ regarding("In Memory Engine", function () {
   regarding("Selection pushing and cost", function () {
 		test("pushing in a select is less costly than leaving it outside, unnecessarily", function (){
       
-      person.insertSync([
-        [1, 999, "Jane", 5],
-        [2, 999, "Puck", 12],
-        [3, 999, "Fanny", 30]
-      ])
-      
-      house.insertSync([
-        [101, "Chimney Hill", 1001],
-        [102, "Parnassus", 1002]
-      ])
-      
 			expression = knit(function(){
 	      return select(join(person, house), equality(house.attr("address"), "Chimney Hill"))
 	    })
@@ -220,9 +175,9 @@ regarding("In Memory Engine", function () {
         attributes:["id", "house_id", "name", "age", 
                     "house_id", "address", "city_id"],
         tuples:[
-          [1, 999, "Jane", 5, 101, "Chimney Hill", 1001],
-          [2, 999, "Puck", 12, 101, "Chimney Hill", 1001],
-          [3, 999, "Fanny", 30, 101, "Chimney Hill", 1001]
+          [1, 101, "Jane", 5, 101, "Chimney Hill", 1001],
+          [2, 101, "Puck", 12, 101, "Chimney Hill", 1001],
+          [3, 102, "Fanny", 30, 101, "Chimney Hill", 1001]
         ]
       }
 
@@ -233,18 +188,7 @@ regarding("In Memory Engine", function () {
     })
 
     test("pushing in a select and making it into a join predicate is less costly than just leaving the select outside", function (){
-      
-      person.insertSync([
-        [1, 101, "Jane", 5],
-        [2, 101, "Puck", 12],
-        [3, 102, "Fanny", 30]
-      ])
-      
-      house.insertSync([
-        [101, "Chimney Hill", 1001],
-        [102, "Parnassus", 1002]
-      ])
-      
+
 			expression = knit(function(){
 	      return select(join(person, house), equality(house.attr("house_id"), person.attr("house_id")))
 	    })
@@ -272,12 +216,7 @@ regarding("In Memory Engine", function () {
   xregarding("Projection", function () {
 
     test("project a subset of attributes over the relation", function (){
-      person.insertSync([
-        [1, 101, "Jane", 5],
-        [2, 101, "Puck", 12],
-        [3, 102, "Fanny", 30]
-      ])
-      
+
       smallerRelation = engine.project(person, person.attributes().get("name", "age"))
 
       assert.equal({

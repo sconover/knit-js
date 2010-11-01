@@ -229,8 +229,44 @@ regarding("In Memory Engine", function () {
       assert.equal(expected, relationContents(expression.apply()))
       assert.equal(expected, relationContents(expression.push().apply()))
 
-			assert.equal(expression.apply().cost / 2, expression.push().apply().cost)
+			assert.equal(true, expression.apply().cost > expression.push().apply().cost)
     })
+
+    test("pushing in a select and making it into a join predicate is less costly than just leaving the select outside", function (){
+      
+      person.insertSync([
+        [1, 101, "Jane", 5],
+        [2, 101, "Puck", 12],
+        [3, 102, "Fanny", 30]
+      ])
+      
+      house.insertSync([
+        [101, "Chimney Hill", 1001],
+        [102, "Parnassus", 1002]
+      ])
+      
+			expression = knit(function(){
+	      return select(join(person, house), equality(house.attr("house_id"), person.attr("house_id")))
+	    })
+      
+			expected = {
+        name:"person__house",
+        attributes:["id", "house_id", "name", "age", 
+                    "house_id", "address", "city_id"],
+        tuples:[
+          [1, 101, "Jane", 5, 101, "Chimney Hill", 1001],
+          [2, 101, "Puck", 12, 101, "Chimney Hill", 1001],
+          [3, 102, "Fanny", 30, 102, "Parnassus", 1002]
+        ]
+      }
+
+      assert.equal(expected, relationContents(expression.apply()))
+      assert.equal(expected, relationContents(expression.push().apply()))
+
+			assert.equal(true, expression.apply().cost > expression.push().apply().cost)
+    })
+		
+
 	})
 
   xregarding("Projection", function () {

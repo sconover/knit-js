@@ -59,5 +59,34 @@ regarding("memory", function() {
 			assert.equal(6, select(select(r, TRUE), TRUE).apply().cost)
 		})})
 		
+		test("join cost usually depends greatly on whether a good join predicate is available", function(){knit(function(){
+			var person = engine.createRelation("person", ["id", "house_id", "name", "age"])
+	    var house = engine.createRelation("house", ["house_id", "address", "city_id"])
+	    var city = engine.createRelation("city", ["city_id", "name"])
+	    
+	    person.insertSync([
+        [1, 101, "Jane", 5],
+        [2, 101, "Puck", 12],
+        [3, 102, "Fanny", 30]
+      ])
+      
+      house.insertSync([
+        [101, "Chimney Hill", 1001],
+        [102, "Parnassus", 1002]
+      ])
+
+      city.insertSync([
+        [1001, "San Francisco"],
+        [1002, "New Orleans"]
+      ])
+			
+			assert.equal(6, join(person, house).apply().cost)
+			assert.equal(6 + 12, join(join(person, house), city).apply().cost)
+			
+			assert.equal(3, join(person, house, equality(person.attr("house_id"), house.attr("house_id"))).apply().cost)
+			assert.equal(3 + 3, join(join(person, house, equality(person.attr("house_id"), house.attr("house_id"))),
+			                         city, equality(house.attr("city_id"), city.attr("city_id"))).apply().cost)
+		})})
+		
 	})
 })

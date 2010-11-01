@@ -82,7 +82,7 @@ regarding("In Memory Engine", function () {
 
 
   
-  xregarding("Join (cartesian)", function () {
+  regarding("Join (cartesian)", function () {
 
     test("combine each row on the left with each row on the right (cartesian product)", function (){
       
@@ -99,7 +99,7 @@ regarding("In Memory Engine", function () {
       
       allPeopleCombinedWithAllHouses = knit(function(){
 	      return join(person, house)
-	    }).tuplesSync()
+	    }).apply()
       
       assert.equal({
         name:"person__house",
@@ -137,7 +137,7 @@ regarding("In Memory Engine", function () {
 
       allPeopleCombinedWithAllHousesCombinedWithAllCities = knit(function(){
 	      return join(join(person, house), city)
-	    }).tuplesSync()
+	    }).apply()
       
       
       assert.equal({

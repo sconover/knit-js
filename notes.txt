@@ -1,9 +1,19 @@
 Next:
 
-organization
-  knit
-    algebra
-    tuples (produce tuples...drives out core relation interface)
+fill out predicates...
+  gt, gte, lt, lte, disjunction/or, in, etc
+
+project
+
+order
+
+other set ops
+
+...or...go straight to sql engine / AST?
+  extract acceptance tests
+  sqlite/node
+  
+
 
 
 json-format tests that prove out algebra?

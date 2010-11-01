@@ -162,6 +162,38 @@ regarding("In Memory Engine", function () {
       }, relationContents(allPeopleCombinedWithAllHousesCombinedWithAllCities))
 
     })
+
+    test("join predicate (YAY!)", function (){
+      
+      person.insertSync([
+        [1, 101, "Jane", 5],
+        [2, 101, "Puck", 12],
+        [3, 102, "Fanny", 30]
+      ])
+      
+      house.insertSync([
+        [101, "Chimney Hill", 1001],
+        [102, "Parnassus", 1002]
+      ])
+      
+      allPeopleCombinedWithAllHouses = knit(function(){
+	      return join(person, house, equality(person.attr("house_id"), house.attr("house_id")))
+	    }).apply()
+      
+      assert.equal({
+        name:"person__house",
+        attributes:["id", "house_id", "name", "age", 
+                    "house_id", "address", "city_id"],
+        tuples:[
+          [1, 101, "Jane", 5, 101, "Chimney Hill", 1001],
+          [2, 101, "Puck", 12, 101, "Chimney Hill", 1001],
+          [3, 102, "Fanny", 30, 102, "Parnassus", 1002]
+        ]
+      }, relationContents(allPeopleCombinedWithAllHouses))
+        
+    })
+
+
     
   })
 

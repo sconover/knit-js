@@ -14,7 +14,17 @@ other set ops
   sqlite/node
   
 
+expand pushing and splitting...
+  they pass through joins and other stuff
+  optimize = split + push (everything, all the way down)
 
+constraints
+  a language about the language
+  what sorts of things are allowable in a given context
+    you can have as many selects and projects as you want
+    but no joins
+    etc
+  can I define relation constraints in such a way that they cross language?
 
 json-format tests that prove out algebra?
   .fromJson ...  .fromStruct

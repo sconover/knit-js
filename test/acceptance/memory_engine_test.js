@@ -1,22 +1,25 @@
 require("../test_helper.js")
-require("knit")
-// require("knit/engines/memory")
+require("knit/engine/memory")
 
-xregarding("In Memory Engine", function () {
+
+//test cost...a relative measure.  prove this out, then test joining.  
+//should be able to to a naive implementation of natural join,
+//then throw in relation optimization, and cost asserts should go green
+
+regarding("In Memory Engine", function () {
     
   beforeEach(function() {
     engine = new knit.engine.Memory()
 
-    person = knit(function(){return testRelation(["id", "house_id", "name", "age"])})
-    house = knit(function(){return testRelation(["house_id", "address", "city_id"])})
-    city = knit(function(){return testRelation(["city_id", "name"])})
-
+    person = engine.createRelation("person", ["id", "house_id", "name", "age"])
+    house = engine.createRelation("house", ["house_id", "address", "city_id"])
+    city = engine.createRelation("city", ["city_id", "name"])
   })
 
   function relationContents(relation) {
     return {
-     name:relation.name(),
-     attributes:_.map(relation.attributes(), function(attribute){return attribute.name()}),
+     name:relation.name,
+     attributes:_.map(relation.attributes, function(attribute){return attribute.name}),
      tuples:relation.tuplesSync()
     }
   }
@@ -47,8 +50,39 @@ xregarding("In Memory Engine", function () {
     
   })
 
+  regarding("Selection", function () {
+    
+    regarding("Predicates", function () {
+    
+      test("basic equality", function (){
+        person.insertSync([
+          [1, 101, "Jane", 5],
+          [2, 101, "Puck", 12],
+          [3, 102, "Fanny", 30]
+        ])
+      	
+				var smallerRelation = 
+					knit(function(){
+						return select(person, equality(person.attr("name"), "Fanny"))
+					}).apply()
+					
+        assert.equal({
+          name:"person",
+          attributes:["id", "house_id", "name", "age"],
+          tuples:[
+            [3, 102, "Fanny", 30]
+          ]
+        }, relationContents(smallerRelation))
+      })
+      
+    })
+          
+  })
+
+
+
   
-  regarding("Join (cartesian)", function () {
+  xregarding("Join (cartesian)", function () {
 
     test("combine each row on the left with each row on the right (cartesian product)", function (){
       
@@ -63,7 +97,9 @@ xregarding("In Memory Engine", function () {
         [102, "Parnassus", 1002]
       ])
       
-      allPeopleCombinedWithAllHouses = engine.join(person, house)
+      allPeopleCombinedWithAllHouses = knit(function(){
+	      return join(person, house)
+	    }).tuplesSync()
       
       assert.equal({
         name:"person__house",
@@ -99,11 +135,10 @@ xregarding("In Memory Engine", function () {
         [1002, "New Orleans"]
       ])
 
-      allPeopleCombinedWithAllHousesCombinedWithAllCities = 
-        engine.join(
-          engine.join(person, house), 
-          city
-        )
+      allPeopleCombinedWithAllHousesCombinedWithAllCities = knit(function(){
+	      return join(join(person, house), city)
+	    }).tuplesSync()
+      
       
       assert.equal({
         name:"person__house__city",
@@ -130,7 +165,9 @@ xregarding("In Memory Engine", function () {
     
   })
 
-  regarding("Projection", function () {
+
+
+  xregarding("Projection", function () {
 
     test("project a subset of attributes over the relation", function (){
       person.insertSync([
@@ -154,33 +191,6 @@ xregarding("In Memory Engine", function () {
           
   })
   
-  regarding("Selection", function () {
-    
-    xregarding("Predicates", function () {
-    
-      test("basic equality", function (){
-        person.insertSync([
-          [1, 101, "Jane", 5],
-          [2, 101, "Puck", 12],
-          [3, 102, "Fanny", 30]
-        ])
-      
-        smallerRelation = 
-          engine.select(person, person.attributes().get("name").eq("Fanny"))
-
-        assert.equal({
-          name:"person",
-          attributes:["name", "age"],
-          tuples:[
-            [3, 102, "Fanny", 30]
-          ]
-        }, relationContents(smallerRelation))
-      })
-      
-    })
-          
-  })
-
   
 })
 

@@ -16,7 +16,7 @@ regarding("join", function() {
     assert.equal(["id", "house_id", "name", "age", "house_id", "address", "city_id"], names)
   })
   
-  test("inspect", function (){knit(function(){
+  test("inspect", function(){knit(function(){
     assert.equal("join(r[id,house_id,name,age],r[house_id,address,city_id])", 
                  join(person, house).inspect())
 

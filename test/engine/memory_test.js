@@ -38,4 +38,26 @@ regarding("memory", function() {
 													  match([[r.attr("a"),999], [r.attr("b"),1]]))
 		})})
 	})
+	
+	
+	regarding("the 'cost' of an apply using the memory engine is the sum of all the tuples of all relations created", function() {
+
+		test("just applying a relation and doing nothing else is zero cost", function(){knit(function(){
+			assert.equal(0, r.apply().cost)
+		})})
+		
+		test("the size of the select result is the cost", function(){knit(function(){
+			r.insertSync([
+				[1, 98],
+				[2, 98],
+				[3, 99]
+			])
+			
+			assert.equal(1, select(r, equality(r.attr("a"), 1)).apply().cost)
+			assert.equal(2, select(r, equality(r.attr("b"), 98)).apply().cost)
+			assert.equal(3, select(r, TRUE).apply().cost)
+			assert.equal(6, select(select(r, TRUE), TRUE).apply().cost)
+		})})
+		
+	})
 })

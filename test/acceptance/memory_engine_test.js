@@ -197,7 +197,41 @@ regarding("In Memory Engine", function () {
     
   })
 
+  regarding("Selection pushing and cost", function () {
+		test("pushing in a select is less costly than leaving it outside, unnecessarily", function (){
+      
+      person.insertSync([
+        [1, 999, "Jane", 5],
+        [2, 999, "Puck", 12],
+        [3, 999, "Fanny", 30]
+      ])
+      
+      house.insertSync([
+        [101, "Chimney Hill", 1001],
+        [102, "Parnassus", 1002]
+      ])
+      
+			expression = knit(function(){
+	      return select(join(person, house), equality(house.attr("address"), "Chimney Hill"))
+	    })
+      
+			expected = {
+        name:"person__house",
+        attributes:["id", "house_id", "name", "age", 
+                    "house_id", "address", "city_id"],
+        tuples:[
+          [1, 999, "Jane", 5, 101, "Chimney Hill", 1001],
+          [2, 999, "Puck", 12, 101, "Chimney Hill", 1001],
+          [3, 999, "Fanny", 30, 101, "Chimney Hill", 1001]
+        ]
+      }
 
+      assert.equal(expected, relationContents(expression.apply()))
+      assert.equal(expected, relationContents(expression.push().apply()))
+
+			assert.equal(expression.apply().cost / 2, expression.push().apply().cost)
+    })
+	})
 
   xregarding("Projection", function () {
 

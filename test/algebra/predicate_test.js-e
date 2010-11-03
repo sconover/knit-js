@@ -113,33 +113,33 @@ regarding("predicates", function() {
   })})
   
   test("concerned with no other relation ... works with compound relations", function(){knit(function(){
-    assert.equal(true, equality(person.attr("age"), 55).concernedWithNoOtherRelationsBesides(join(person, house)))
-    assert.equal(true, conjunction(equality(person.attr("age"), 55), equality(house.attr("address"), "123 Main")).
-                         concernedWithNoOtherRelationsBesides(join(person, house)))
-    
-    assert.equal(false, equality(person.attr("age"), 55).concernedWithNoOtherRelationsBesides(join(house, city)))
-    assert.equal(false, conjunction(equality(person.attr("age"), 55), equality(house.attr("address"), "123 Main")).
-                          concernedWithNoOtherRelationsBesides(join(house, city)))
+	  assert.equal(true, equality(person.attr("age"), 55).concernedWithNoOtherRelationsBesides(join(person, house)))
+	  assert.equal(true, conjunction(equality(person.attr("age"), 55), equality(house.attr("address"), "123 Main")).
+	                       concernedWithNoOtherRelationsBesides(join(person, house)))
+	  
+	  assert.equal(false, equality(person.attr("age"), 55).concernedWithNoOtherRelationsBesides(join(house, city)))
+	  assert.equal(false, conjunction(equality(person.attr("age"), 55), equality(house.attr("address"), "123 Main")).
+	                        concernedWithNoOtherRelationsBesides(join(house, city)))
   })})
 
   test("only concerned with...more than one relation", function(){knit(function(){
-    assert.equal(true, equality(person.attr("age"), 55).concernedWithNoOtherRelationsBesides(person, house))
-    assert.equal(true, equality(person.attr("age"), house.attr("address")).concernedWithNoOtherRelationsBesides(person, house))
-    
-    assert.equal(false, conjunction(equality(person.attr("age"), house.attr("address")), equality(city.attr("city_id"), 1)).
-                         concernedWithNoOtherRelationsBesides(person, house))
+		assert.equal(true, equality(person.attr("age"), 55).concernedWithNoOtherRelationsBesides(person, house))
+		assert.equal(true, equality(person.attr("age"), house.attr("address")).concernedWithNoOtherRelationsBesides(person, house))
+		
+		assert.equal(false, conjunction(equality(person.attr("age"), house.attr("address")), equality(city.attr("city_id"), 1)).
+												 concernedWithNoOtherRelationsBesides(person, house))
   })})
 
   test("concerned with all of - somewhere in the predicate we're concerned with the relation(s)", function(){knit(function(){
-    assert.equal(true, equality(person.attr("age"), 55).concernedWithAllOf(person))
-    assert.equal(true, equality(person.attr("age"), house.attr("address")).concernedWithAllOf(person))
-    assert.equal(true, conjunction(equality(person.attr("age"), house.attr("address")), 
-                                   equality(city.attr("city_id"), 1)).
-                         concernedWithAllOf(person, house))
-    assert.equal(true, conjunction(equality(person.attr("age"), house.attr("address")), equality(city.attr("city_id"), 1)).
-                         concernedWithAllOf(person, house, city))
-                        
-    assert.equal(false, equality(person.attr("age"), 55).concernedWithAllOf(person, house))
+		assert.equal(true, equality(person.attr("age"), 55).concernedWithAllOf(person))
+		assert.equal(true, equality(person.attr("age"), house.attr("address")).concernedWithAllOf(person))
+		assert.equal(true, conjunction(equality(person.attr("age"), house.attr("address")), 
+																   equality(city.attr("city_id"), 1)).
+												 concernedWithAllOf(person, house))
+		assert.equal(true, conjunction(equality(person.attr("age"), house.attr("address")), equality(city.attr("city_id"), 1)).
+												 concernedWithAllOf(person, house, city))
+												
+		assert.equal(false, equality(person.attr("age"), 55).concernedWithAllOf(person, house))
   })})
 })
 

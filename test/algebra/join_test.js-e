@@ -70,12 +70,12 @@ regarding("join", function() {
     test("when there's only a True predicate existing, replace it", function (){knit(function(){
       assert.same(join(person, house).appendToPredicate(equality(4,5)), join(person, house, equality(4,5)))
       assert.same(join(person, house, TRUE).appendToPredicate(equality(4,5)), join(person, house, equality(4,5)))
-    })})    
+    })})	  
 
     test("when there's any other kind of existing predicate, make a conjunction", function (){knit(function(){
       assert.same(join(person, house, equality(4,5)).appendToPredicate(equality(6,7)),
                   join(person, house, conjunction(equality(4,5), equality(6,7))))
-    })})    
-  })
+    })})	  
+	})
 })
 

@@ -175,7 +175,7 @@ regarding("select", function() {
       assert.same(select(join(person, house), equality(person.attr("house_id"), house.attr("house_id"))).push(),
                   join(person, house, equality(person.attr("house_id"), house.attr("house_id"))))
     })})
-      
+    	
     test("complex select pushes as well", function (){knit(function(){
       assert.same(select(join(person, house), conjunction(equality(person.attr("house_id"), 1), equality(house.attr("house_id"), 2))).push(),
                   join(person, house, conjunction(equality(person.attr("house_id"), 1), equality(house.attr("house_id"), 2))))
@@ -195,7 +195,7 @@ regarding("select", function() {
                  )
     })})
 
-      
-  })})
+    	
+	})})
 })
 

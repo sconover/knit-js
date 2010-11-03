@@ -9,17 +9,17 @@ knit.algebra.Join = function(relationOne, relationTwo, predicate) {
 }
 
 _.extend(knit.algebra.Join.prototype, {
-  _predicateIsDefault: function() {
-    return this.predicate.isSame(new knit.algebra.predicate.True())
-  },
-  
+	_predicateIsDefault: function() {
+		return this.predicate.isSame(new knit.algebra.predicate.True())
+	},
+	
   appendToPredicate: function(additionalPredicate) {
-    if (this._predicateIsDefault()) {
-      this.predicate = additionalPredicate
-    } else {
-      this.predicate = new knit.algebra.predicate.Conjunction(this.predicate, additionalPredicate)
-    }
-    return this
+	  if (this._predicateIsDefault()) {
+		  this.predicate = additionalPredicate
+	  } else {
+		  this.predicate = new knit.algebra.predicate.Conjunction(this.predicate, additionalPredicate)
+	  }
+	  return this
   },
 
   isSame: function(other) {
@@ -34,8 +34,8 @@ _.extend(knit.algebra.Join.prototype, {
              other.constructor == knit.algebra.Join && 
   
              ((this.relationOne.isSame(other.relationOne) &&
-              this.relationTwo.isSame(other.relationTwo)) ||
-  
+	            this.relationTwo.isSame(other.relationTwo)) ||
+	
              (this.relationOne.isSame(other.relationTwo) &&
               this.relationTwo.isSame(other.relationOne))) &&
 
@@ -46,14 +46,14 @@ _.extend(knit.algebra.Join.prototype, {
   merge: function(){return this},
   
   inspect: function(){
-    var inspectStr = "join(" + this.relationOne.inspect() + "," + this.relationTwo.inspect()
-    
-    if (!this._predicateIsDefault()) {
-      inspectStr += "," + this.predicate.inspect()
-    }
-    
-    inspectStr += ")"
-    return inspectStr
+	  var inspectStr = "join(" + this.relationOne.inspect() + "," + this.relationTwo.inspect()
+	  
+	  if (!this._predicateIsDefault()) {
+	    inspectStr += "," + this.predicate.inspect()
+	  }
+		
+		inspectStr += ")"
+		return inspectStr
   }
 })
 

@@ -47,46 +47,46 @@ _.extend(knit.algebra.Select.prototype, {
         return join
       } else if (this.criteria.concernedWithNoOtherRelationsBesides(join.relationOne, join.relationTwo) &&
                  this.criteria.concernedWithAllOf(join.relationOne, join.relationTwo)) {
-        join.appendToPredicate(this.criteria)
-        return join
+	      join.appendToPredicate(this.criteria)
+	      return join
       } else {
         return this
       }
     } else if (this.relation.push) {
-  
-      var innerPushResult = this.relation.push()
-      if (innerPushResult===this.relation) { //bounce
-        // me(
-        //   you(
-        //     yourRelation,
-        //    [yourStuff]
-        //   ),
-        //  [myStuff]
-        // )
-        
-        //becomes
-        
-        // you(
-        //   me(
-        //     yourRelation,
-        //    [yourStuff]
-        //   ),
-        //  [myStuff]
-        // )
-        
-        var me = this
-        
-        var you = this.relation
-        var yourRelation = this.relation.relation
-        
-        me.relation = yourRelation
-        you.relation = me.push()
-        
-        return you
-      } else {
-        this.relation = innerPushResult
-        return this.push()
-      }
+	
+	    var innerPushResult = this.relation.push()
+	    if (innerPushResult===this.relation) { //bounce
+				// me(
+				// 	you(
+				// 		yourRelation,
+				//    [yourStuff]
+				// 	),
+				//  [myStuff]
+				// )
+				
+				//becomes
+				
+				// you(
+				// 	me(
+				// 		yourRelation,
+				//    [yourStuff]
+				// 	),
+				//  [myStuff]
+				// )
+				
+				var me = this
+				
+				var you = this.relation
+				var yourRelation = this.relation.relation
+				
+				me.relation = yourRelation
+				you.relation = me.push()
+				
+				return you
+	    } else {
+		    this.relation = innerPushResult
+		    return this.push()
+	    }
     } else {
       return this
     }

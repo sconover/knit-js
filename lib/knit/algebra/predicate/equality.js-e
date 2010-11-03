@@ -6,43 +6,43 @@ knit.algebra.predicate.Equality = function(leftAtom, rightAtom) { //har
 }
 
 _.extend(knit.algebra.predicate.Equality.prototype, {
-  _isAttribute: function(thing) {
-    return thing.name
-  },
-  
+	_isAttribute: function(thing) {
+		return thing.name
+	},
+	
   _attributesReferredTo: function() {
-    var attributes = []
+	  var attributes = []
     if (this._isAttribute(this.leftAtom)) { 
-      attributes.push(this.leftAtom)
+	    attributes.push(this.leftAtom)
     } 
     if (this._isAttribute(this.rightAtom)) { 
-      attributes.push(this.rightAtom)
+	    attributes.push(this.rightAtom)
     } 
     return attributes
   },
   
   _attributesFromRelations: function(relations) {
-    var attributesFromRelations = []
-    _.each(relations, function(r){attributesFromRelations = attributesFromRelations.concat(r.attributes)})
-    return attributesFromRelations
+	  var attributesFromRelations = []
+	  _.each(relations, function(r){attributesFromRelations = attributesFromRelations.concat(r.attributes)})
+	  return attributesFromRelations
   },
 
   concernedWithNoOtherRelationsBesides: function() {
-    var expectedExclusiveRelations = _.toArray(arguments)
-     var argsForWithout = [this._attributesReferredTo()].concat(this._attributesFromRelations(expectedExclusiveRelations))
-    return _.isEmpty(_.without.apply(this, argsForWithout))
+	  var expectedExclusiveRelations = _.toArray(arguments)
+ 	  var argsForWithout = [this._attributesReferredTo()].concat(this._attributesFromRelations(expectedExclusiveRelations))
+	  return _.isEmpty(_.without.apply(this, argsForWithout))
   },
     
   concernedWithAllOf: function() {
-    var expectedRelations = _.toArray(arguments)
+	  var expectedRelations = _.toArray(arguments)
     var myAttributes = this._attributesReferredTo()
 
-    var self = this
-    var expectedRelationsWithNotAttributesFoundHere = _.select(expectedRelations, function(relation){
-      return _.isEmpty(_.intersect(relation.attributes, myAttributes))
-    })
-  
-    return _.isEmpty(expectedRelationsWithNotAttributesFoundHere)
+	  var self = this
+	  var expectedRelationsWithNotAttributesFoundHere = _.select(expectedRelations, function(relation){
+		  return _.isEmpty(_.intersect(relation.attributes, myAttributes))
+	  })
+	
+	  return _.isEmpty(expectedRelationsWithNotAttributesFoundHere)
   },
     
 
@@ -64,8 +64,8 @@ _.extend(knit.algebra.predicate.Equality.prototype, {
   },
 
   _inspectPrimitive: function(value) {
-    if (this._isAttribute(value)) {
-      return value.inspect()
+	  if (this._isAttribute(value)) {
+			return value.inspect()
     } else if (typeof value == "string") {
       return "'" + value + "'"
     } else {

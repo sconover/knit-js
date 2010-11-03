@@ -1,7 +1,7 @@
 require("knit/core")
 
 knit.TestRelationFunction = function(attributeNames) {
-  var self = this
+	var self = this
   this.attributes = _.map(attributeNames, function(attributeName){
     return new knit.TestAttribute(attributeName, self)
   })
@@ -13,7 +13,7 @@ _.extend(knit.TestRelationFunction.prototype, {
   },
   
   isSame: function(other) {
-    return this === other
+	  return this === other
   },
   
   split: function(){return this},

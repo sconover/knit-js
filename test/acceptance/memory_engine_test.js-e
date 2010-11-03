@@ -41,9 +41,9 @@ regarding("In Memory Engine", function () {
     test("insert, read", function (){
       
       assert.equal([
-        [1, 101, "Jane", 5],
-        [2, 101, "Puck", 12],
-        [3, 102, "Fanny", 30]
+	      [1, 101, "Jane", 5],
+	      [2, 101, "Puck", 12],
+	      [3, 102, "Fanny", 30]
       ], person.tuplesSync())
       
       person.insertSync([
@@ -54,7 +54,7 @@ regarding("In Memory Engine", function () {
         [1, 101, "Jane", 5],
         [2, 101, "Puck", 12],
         [3, 102, "Fanny", 30],
-        [4, 102, "Amy", 5]
+				[4, 102, "Amy", 5]
       ], person.tuplesSync())
     })
     
@@ -65,11 +65,11 @@ regarding("In Memory Engine", function () {
     regarding("Predicates", function () {
     
       test("basic equality", function (){
-        var smallerRelation = 
-          knit(function(){
-            return select(person, equality(person.attr("name"), "Fanny"))
-          }).apply()
-          
+				var smallerRelation = 
+					knit(function(){
+						return select(person, equality(person.attr("name"), "Fanny"))
+					}).apply()
+					
         assert.equal({
           name:"person",
           attributes:["id", "house_id", "name", "age"],
@@ -91,8 +91,8 @@ regarding("In Memory Engine", function () {
     test("combine each row on the left with each row on the right (cartesian product)", function (){
       
       allPeopleCombinedWithAllHouses = knit(function(){
-        return join(person, house)
-      }).apply()
+	      return join(person, house)
+	    }).apply()
       
       assert.equal({
         name:"person__house",
@@ -113,8 +113,8 @@ regarding("In Memory Engine", function () {
     test("two joins", function (){
 
       allPeopleCombinedWithAllHousesCombinedWithAllCities = knit(function(){
-        return join(join(person, house), city)
-      }).apply()
+	      return join(join(person, house), city)
+	    }).apply()
       
       
       assert.equal({
@@ -143,8 +143,8 @@ regarding("In Memory Engine", function () {
     test("join predicate (YAY!)", function (){
       
       allPeopleCombinedWithAllHouses = knit(function(){
-        return join(person, house, equality(person.attr("house_id"), house.attr("house_id")))
-      }).apply()
+	      return join(person, house, equality(person.attr("house_id"), house.attr("house_id")))
+	    }).apply()
       
       assert.equal({
         name:"person__house",
@@ -164,13 +164,13 @@ regarding("In Memory Engine", function () {
   })
 
   regarding("Selection pushing and cost", function () {
-    test("pushing in a select is less costly than leaving it outside, unnecessarily", function (){
+		test("pushing in a select is less costly than leaving it outside, unnecessarily", function (){
       
-      expression = knit(function(){
-        return select(join(person, house), equality(house.attr("address"), "Chimney Hill"))
-      })
+			expression = knit(function(){
+	      return select(join(person, house), equality(house.attr("address"), "Chimney Hill"))
+	    })
       
-      expected = {
+			expected = {
         name:"person__house",
         attributes:["id", "house_id", "name", "age", 
                     "house_id", "address", "city_id"],
@@ -184,16 +184,16 @@ regarding("In Memory Engine", function () {
       assert.equal(expected, relationContents(expression.apply()))
       assert.equal(expected, relationContents(expression.push().apply()))
 
-      assert.equal(true, expression.apply().cost > expression.push().apply().cost)
+			assert.equal(true, expression.apply().cost > expression.push().apply().cost)
     })
 
     test("pushing in a select and making it into a join predicate is less costly than just leaving the select outside", function (){
 
-      expression = knit(function(){
-        return select(join(person, house), equality(house.attr("house_id"), person.attr("house_id")))
-      })
+			expression = knit(function(){
+	      return select(join(person, house), equality(house.attr("house_id"), person.attr("house_id")))
+	    })
       
-      expected = {
+			expected = {
         name:"person__house",
         attributes:["id", "house_id", "name", "age", 
                     "house_id", "address", "city_id"],
@@ -207,11 +207,11 @@ regarding("In Memory Engine", function () {
       assert.equal(expected, relationContents(expression.apply()))
       assert.equal(expected, relationContents(expression.push().apply()))
 
-      assert.equal(true, expression.apply().cost > expression.push().apply().cost)
+			assert.equal(true, expression.apply().cost > expression.push().apply().cost)
     })
-    
+		
 
-  })
+	})
 
   xregarding("Projection", function () {
 

@@ -39,7 +39,7 @@ regarding("sql", function() {
       ["age", knit.engine.sql.IntegerType]
     ])
     
-    assert.equal("person", person.name)
+    assert.equal("person", person.name())
     assert.equal(["id", "house_id", "name", "age"], 
                  _.map(person.attributes(), function(attr){return attr.name}))
   })

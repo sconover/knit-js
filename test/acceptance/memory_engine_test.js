@@ -30,7 +30,7 @@ regarding("In Memory Engine", function () {
 
   function relationContents(relation) {
     return {
-     name:relation.name,
+     name:relation.name(),
      attributes:_.map(relation.attributes(), function(attribute){return attribute.name}),
      tuples:relation.tuplesSync()
     }

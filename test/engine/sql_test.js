@@ -1,6 +1,6 @@
 require("../test_helper")
 require("knit/engine/sql")
-require("knit/engine/sql/sqlite")
+require("knit/engine/sql/db/sqlite")
 
 regarding("sql", function() {
   beforeEach(function(){

@@ -1,5 +1,5 @@
-require("../../test_helper")
-require("knit/engine/sql/sqlite")
+require("../../../test_helper")
+require("knit/engine/sql/db/sqlite")
 require("knit/engine/sql/statements")
 
 regarding("sqlite db", function() {

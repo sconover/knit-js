@@ -1,6 +1,6 @@
 Next:
 
-code formatting is ugly what is the deal?
+name and attributes - functions, not properties
 
 fill out predicates...
   gt, gte, lt, lte, disjunction/or, in, etc

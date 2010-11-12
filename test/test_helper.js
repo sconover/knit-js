@@ -1,5 +1,6 @@
 require.paths.push("test")
 require.paths.push("lib")
+require.paths.push("../node-sqlite")
 
 require("../../jasmine-node/lib/jasmine")
 

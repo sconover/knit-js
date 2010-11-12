@@ -1,6 +1,7 @@
 Next:
 
 name and attributes - functions, not properties
+tables have columns, not attributes (attributes alias is fine though)
 
 fill out predicates...
   gt, gte, lt, lte, disjunction/or, in, etc

@@ -2,14 +2,16 @@ require("knit/core")
 
 knit.TestRelationFunction = function(attributeNames) {
   var self = this
-  this.attributes = _.map(attributeNames, function(attributeName){
+  this._attributes = _.map(attributeNames, function(attributeName){
     return new knit.TestAttribute(attributeName, self)
   })
 }
 
 _.extend(knit.TestRelationFunction.prototype, {
+  attributes: function(){ return this._attributes },
+  
   attr: function(attributeName) {
-    return _.detect(this.attributes, function(attr){return attr.name == attributeName})
+    return _.detect(this.attributes(), function(attr){return attr.name == attributeName})
   },
   
   isSame: function(other) {
@@ -22,7 +24,7 @@ _.extend(knit.TestRelationFunction.prototype, {
   
   inspect: function() {
     return "r[" + 
-           _.map(this.attributes, function(attr){return attr.inspect()}).join(",") + 
+           _.map(this.attributes(), function(attr){return attr.inspect()}).join(",") + 
            "]" 
   }
 

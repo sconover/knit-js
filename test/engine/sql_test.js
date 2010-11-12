@@ -41,7 +41,7 @@ regarding("sql", function() {
     
     assert.equal("person", person.name)
     assert.equal(["id", "house_id", "name", "age"], 
-                 _.map(person.attributes, function(attr){return attr.name}))
+                 _.map(person.attributes(), function(attr){return attr.name}))
   })
   
   // test("attribute equality", function(){

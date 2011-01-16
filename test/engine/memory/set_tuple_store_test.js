@@ -37,4 +37,30 @@ regarding("set tuple store - backed by a set", function() {
        [3,"c"]], tupleStore.all())
   })
 
+  test("compound key", function(){
+    var tupleStore = new knit.engine.Memory.SetTupleStore([0, 2], [])
+    
+    tupleStore.mergeSync(
+      [[1,"a", true],
+       [1,"A", false],
+       [2,"b", false],
+       [2,"B", false],
+       [3,"c", true],
+       [3,"C", true]]
+    )
+    
+    tupleStore.mergeSync(
+      [[1,"AA", true],
+       [2,"BB", false]]
+    )
+    
+    assert.equal(
+      [[1,"AA", true],
+       [1,"A", false],
+       [2,"b", false],
+       [2,"BB", false],
+       [3,"c", true],
+       [3,"C", true]], tupleStore.all())
+  })
+
 })

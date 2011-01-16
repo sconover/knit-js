@@ -1,11 +1,11 @@
 require("../../test_helper")
 require("knit/engine/memory")
-require("knit/engine/memory/tuple_store/set")
+require("knit/engine/memory/tuple_store/primary_key_based")
 
 regarding("set tuple store - backed by a set", function() {
   
   test("stores rows, sends them all back using 'all'", function(){
-    var tupleStore = new knit.engine.Memory.SetTupleStore([], [])
+    var tupleStore = new knit.engine.Memory.PrimaryKeyBasedTupleStore([], [])
     
     tupleStore.mergeSync(
       [[1,2],
@@ -18,7 +18,7 @@ regarding("set tuple store - backed by a set", function() {
   })
 
   test("with no key, just append new rows", function(){
-    var tupleStore = new knit.engine.Memory.SetTupleStore([], [])
+    var tupleStore = new knit.engine.Memory.PrimaryKeyBasedTupleStore([], [])
     
     tupleStore.mergeSync(
       [[1,2],
@@ -40,7 +40,7 @@ regarding("set tuple store - backed by a set", function() {
   })
 
   test("can have a key.  overwrites a row with a new row if the keys match.", function(){
-    var tupleStore = new knit.engine.Memory.SetTupleStore([0], [])
+    var tupleStore = new knit.engine.Memory.PrimaryKeyBasedTupleStore([0], [])
     
     tupleStore.mergeSync(
       [[1,"a"],
@@ -60,7 +60,7 @@ regarding("set tuple store - backed by a set", function() {
   })
 
   test("compound key", function(){
-    var tupleStore = new knit.engine.Memory.SetTupleStore([0, 2], [])
+    var tupleStore = new knit.engine.Memory.PrimaryKeyBasedTupleStore([0, 2], [])
     
     tupleStore.mergeSync(
       [[1,"a", true],

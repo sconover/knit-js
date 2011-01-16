@@ -1,4 +1,5 @@
 require("../../test_helper")
+require("knit/engine/memory")
 require("knit/engine/memory/tuple_store/simple")
 
 regarding("simple tuple store - array-based", function() {
@@ -7,7 +8,7 @@ regarding("simple tuple store - array-based", function() {
   })
   
   test("stores rows, sends them all back using 'all'", function(){
-    tupleStore.insertSync(
+    tupleStore.mergeSync(
       [[1,2],
        [3,4]]
     )

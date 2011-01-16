@@ -58,6 +58,32 @@ regarding("In Memory Engine", function () {
       ], person.tuplesSync())
     })
     
+    test("primary key - replace rows a row if it's a dup", function (){
+      var person2 = engine.createRelation("person", ["id", "house_id", "name", "age"], ["id"])
+
+      person2.mergeSync([
+        [1, 101, "Jane", 5],
+        [2, 101, "Puck", 12],
+        [3, 102, "Fanny", 30]
+      ])
+      
+      assert.equal([
+        [1, 101, "Jane", 5],
+        [2, 101, "Puck", 12],
+        [3, 102, "Fanny", 30]
+      ], person2.tuplesSync())
+      
+      person2.mergeSync([
+        [1, 101, "Jeanne", 6]
+      ])
+
+      assert.equal([
+        [1, 101, "Jeanne", 6],
+        [2, 101, "Puck", 12],
+        [3, 102, "Fanny", 30]
+      ], person2.tuplesSync())
+    })
+    
   })
 
   regarding("Selection", function () {

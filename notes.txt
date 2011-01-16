@@ -1,3 +1,11 @@
+knit statement to struct
+
+struct result to knit tuples
+
+
+
+
+=========
 Next:
 
 name and attributes - functions, not properties

@@ -17,6 +17,28 @@ regarding("set tuple store - backed by a set", function() {
        [3,4]], tupleStore.all())
   })
 
+  test("with no key, just append new rows", function(){
+    var tupleStore = new knit.engine.Memory.SetTupleStore([], [])
+    
+    tupleStore.mergeSync(
+      [[1,2],
+       [3,4]]
+    )
+    
+    tupleStore.mergeSync(
+      [[1,2],
+       [3,4],
+       [5,6]]
+    )
+    
+    assert.equal(
+      [[1,2],
+       [3,4],
+       [1,2],
+       [3,4],
+       [5,6]], tupleStore.all())
+  })
+
   test("can have a key.  overwrites a row with a new row if the keys match.", function(){
     var tupleStore = new knit.engine.Memory.SetTupleStore([0], [])
     

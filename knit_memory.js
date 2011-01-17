@@ -1,4 +1,5 @@
-// modulr (c) 2010 codespeaks sàrl
+
+(function() {// modulr (c) 2010 codespeaks sàrl
 // Freely distributable under the terms of the MIT license.
 // For details, see:
 //   http://github.com/codespeaks/modulr/blob/master/LICENSE
@@ -259,35 +260,135 @@ var modulr = (function(global) {
   };
 })(this);
 
-(function(require, module) {require.define({
-'knit/attribute': function(require, exports, module) {
-require("knit/core");
+var require = modulr.require, module = require.main;
+require.define({
+'knit/engine/memory': function(require, exports, module) {
+require("knit/algebra")
+require("knit/apply")
+
+knit.engine.Memory = function() {
+}
+
+_.extend(knit.engine.Memory.prototype, {
+  createRelation: function(name, attributeNames, primaryKey) {
+    return new knit.engine.Memory.MutableRelation(name, attributeNames, primaryKey)
+  }
+})
+
+require("knit/engine/memory/attribute")
+require("knit/engine/memory/relation")
+require("knit/engine/memory/predicate")
 
 
-knit.Attribute = function(name, type){
-  this.name = name;
-  this.type = type;
-};
 
-knit.Attribute.IntegerType = "integer";
-knit.Attribute.StringType = "string";
+
+
+
+
+
+
+}, 
+'knit/algebra': function(require, exports, module) {
+require("knit/algebra/join")
+require("knit/algebra/predicate")
+require("knit/algebra/select")
+
+}, 
+'knit/algebra/join': function(require, exports, module) {
+require("knit/core")
+require("knit/algebra/predicate")
+
+knit.algebra.Join = function(relationOne, relationTwo, predicate) {
+  this._attributes = relationOne.attributes().concat(relationTwo.attributes())
+  this.relationOne = relationOne
+  this.relationTwo = relationTwo
+  this.predicate = predicate || new knit.algebra.predicate.True()
+}
+
+_.extend(knit.algebra.Join.prototype, {
+  attributes: function(){ return this._attributes },
+  
+  _predicateIsDefault: function() {
+    return this.predicate.isSame(new knit.algebra.predicate.True())
+  },
+  
+  appendToPredicate: function(additionalPredicate) {
+    if (this._predicateIsDefault()) {
+      this.predicate = additionalPredicate
+    } else {
+      this.predicate = new knit.algebra.predicate.Conjunction(this.predicate, additionalPredicate)
+    }
+    return this
+  },
+
+  isSame: function(other) {
+    return other.constructor == knit.algebra.Join && 
+           this.relationOne.isSame(other.relationOne) &&
+           this.relationTwo.isSame(other.relationTwo) &&
+           this.predicate.isSame(other.predicate)
+  },
+ 
+  isEquivalent: function(other) {
+    return this.isSame(other) ||
+             other.constructor == knit.algebra.Join && 
+  
+             ((this.relationOne.isSame(other.relationOne) &&
+              this.relationTwo.isSame(other.relationTwo)) ||
+  
+             (this.relationOne.isSame(other.relationTwo) &&
+              this.relationTwo.isSame(other.relationOne))) &&
+
+             this.predicate.isEquivalent(other.predicate)
+  },
+  
+  split: function(){return this},
+  merge: function(){return this},
+  
+  inspect: function(){
+    var inspectStr = "join(" + this.relationOne.inspect() + "," + this.relationTwo.inspect()
+    
+    if (!this._predicateIsDefault()) {
+      inspectStr += "," + this.predicate.inspect()
+    }
+    
+    inspectStr += ")"
+    return inspectStr
+  }
+})
+
+
+knit.dslLocals.join = function(relationOne, relationTwo, predicate) {
+  return new knit.algebra.Join(relationOne, relationTwo, predicate)
+}
 
 }, 
 'knit/core': function(require, exports, module) {
-require("underscore");
+require("underscore")
+require("knit/dsl_function")
 
-//from node.js
-Object.inherits = function (ctor, superCtor) {
-    ctor.super_ = superCtor;
-    ctor.prototype = Object.create(superCtor.prototype, {
-        constructor: {
-            value: ctor,
-            enumerable: false
-        }
-    });
-};
+global["knit"] = new DSLFunction()
+global.knit.algebra = {}
+global.knit.algebra.predicate = {}
+global.knit.engine = {}
+global.knit.engine.sql = {}
+global.knit.engine.sql.statement = {}
 
-global["knit"] = global.knit || {};
+knit.createObject = function() {
+  var o = arguments[0]
+  
+  function F() {}
+  F.prototype = o
+  var newObj = new F()
+  
+  if (arguments.length==2) {
+    var additions = arguments[1]
+    _.extend(newObj, additions)
+  }
+  
+  return newObj
+}
+
+
 }, 
 'underscore': function(require, exports, module) {
 // Underscore.js
@@ -1004,12 +1105,523 @@ global["knit"] = global.knit || {};
 
 })();
 
+}, 
+'knit/dsl_function': function(require, exports, module) {
+require("underscore")
+
+//see http://alexyoung.org/2009/10/22/javascript-dsl/
+
+DSLFunction = function() {
+  var dslLocals = {}
+  var outerFunction = function(userFunction, whatThisIsSupposedToBe){
+    if (whatThisIsSupposedToBe == undefined) {
+      whatThisIsSupposedToBe = this
+    }
+    
+    var localNames = []
+    var localValues = []
+    _.each(_.keys(dslLocals), function(key){
+      localNames.push(key)
+      localValues.push(dslLocals[key])
+    })
+    
+    var userFunctionBody = "(_.bind(" + userFunction.toString().replace(/\s+$/, "") + ",this))()"
+    var wrappingFunctionBody = "(function(" + localNames.join(",") + "){return " + userFunctionBody + "})"
+    return eval(wrappingFunctionBody).apply(whatThisIsSupposedToBe, localValues)
+  }
+  outerFunction.dslLocals = dslLocals
+  return outerFunction
+}
+
+
+}, 
+'knit/algebra/predicate': function(require, exports, module) {
+require("knit/algebra/predicate/true_false")
+require("knit/algebra/predicate/equality")
+require("knit/algebra/predicate/conjunction")
+
+}, 
+'knit/algebra/predicate/true_false': function(require, exports, module) {
+require("knit/core")
+require("knit/algebra/predicate/equality")
+
+knit.algebra.predicate.True = function() {
+  return new knit.algebra.predicate.Equality(1,1)
+}
+
+knit.dslLocals.TRUE = new knit.algebra.predicate.True()
+
+
+knit.algebra.predicate.False = function() {
+  return new knit.algebra.predicate.Equality(1,2)
+}
+
+knit.dslLocals.FALSE = new knit.algebra.predicate.False()
+
+}, 
+'knit/algebra/predicate/equality': function(require, exports, module) {
+require("knit/core")
+
+knit.algebra.predicate.Equality = function(leftAtom, rightAtom) { //har
+  this.leftAtom = leftAtom
+  this.rightAtom = rightAtom
+}
+
+_.extend(knit.algebra.predicate.Equality.prototype, {
+  _isAttribute: function(thing) {
+    return thing.name
+  },
+  
+  _attributesReferredTo: function() {
+    var attributes = []
+    if (this._isAttribute(this.leftAtom)) { 
+      attributes.push(this.leftAtom)
+    } 
+    if (this._isAttribute(this.rightAtom)) { 
+      attributes.push(this.rightAtom)
+    } 
+    return attributes
+  },
+  
+  _attributesFromRelations: function(relations) {
+    var attributesFromRelations = []
+    _.each(relations, function(r){attributesFromRelations = attributesFromRelations.concat(r.attributes())})
+    return attributesFromRelations
+  },
+
+  concernedWithNoOtherRelationsBesides: function() {
+    var expectedExclusiveRelations = _.toArray(arguments)
+     var argsForWithout = [this._attributesReferredTo()].concat(this._attributesFromRelations(expectedExclusiveRelations))
+    return _.isEmpty(_.without.apply(this, argsForWithout))
+  },
+    
+  concernedWithAllOf: function() {
+    var expectedRelations = _.toArray(arguments)
+    var myAttributes = this._attributesReferredTo()
+
+    var self = this
+    var expectedRelationsWithNotAttributesFoundHere = _.select(expectedRelations, function(relation){
+      return _.isEmpty(_.intersect(relation.attributes(), myAttributes))
+    })
+  
+    return _.isEmpty(expectedRelationsWithNotAttributesFoundHere)
+  },
+    
+
+  _areTheseTwoThingsTheSame: function(a, b) {
+    return a.isSame && b.isSame && a.isSame(b) || a == b
+  },
+  
+  isSame: function(other) {  
+    return other.constructor == knit.algebra.predicate.Equality && 
+           this._areTheseTwoThingsTheSame(this.leftAtom, other.leftAtom) &&
+           this._areTheseTwoThingsTheSame(this.rightAtom, other.rightAtom)
+  },
+  
+  isEquivalent: function(other) {
+    return this.isSame(other) ||
+             other.constructor == knit.algebra.predicate.Equality && 
+             this._areTheseTwoThingsTheSame(this.leftAtom, other.rightAtom) &&
+             this._areTheseTwoThingsTheSame(this.rightAtom, other.leftAtom)
+  },
+
+  _inspectPrimitive: function(value) {
+    if (this._isAttribute(value)) {
+      return value.inspect()
+    } else if (typeof value == "string") {
+      return "'" + value + "'"
+    } else {
+      return "" + value
+    }
+  },
+  
+  inspect: function() {return "eq(" + this._inspectPrimitive(this.leftAtom) + "," + 
+                                      this._inspectPrimitive(this.rightAtom) + ")" }
+})
+
+knit.dslLocals.equality = function(leftAtom, rightAtom) {
+  return new knit.algebra.predicate.Equality(leftAtom, rightAtom)
+}
+
+knit.dslLocals.eq = knit.dslLocals.equality
+
+}, 
+'knit/algebra/predicate/conjunction': function(require, exports, module) {
+require("knit/core")
+
+knit.algebra.predicate.Conjunction = function(leftPredicate, rightPredicate) { //har
+  this.leftPredicate = leftPredicate
+  this.rightPredicate = rightPredicate
+}
+
+_.extend(knit.algebra.predicate.Conjunction.prototype, {
+  
+  concernedWithNoOtherRelationsBesides: function() {
+    var expectedExclusiveRelations = _.toArray(arguments)
+    return this.leftPredicate.concernedWithNoOtherRelationsBesides.apply(this.leftPredicate, expectedExclusiveRelations) &&
+           this.rightPredicate.concernedWithNoOtherRelationsBesides.apply(this.rightPredicate, expectedExclusiveRelations)
+  },
+  
+  concernedWithAllOf: function() {
+    var expectedRelations = _.toArray(arguments)
+    
+    var self = this
+    var remainingRelations = _.reject(expectedRelations, function(relation){
+      return self.leftPredicate.concernedWithAllOf(relation) || self.rightPredicate.concernedWithAllOf(relation)
+    })
+  
+    return _.isEmpty(remainingRelations)
+  },
+  
+    
+  isSame: function(other) {
+    return other.constructor == knit.algebra.predicate.Conjunction && 
+           this.leftPredicate.isSame(other.leftPredicate) &&
+           this.rightPredicate.isSame(other.rightPredicate)
+  },
+  
+  isEquivalent: function(other) {
+    return this.isSame(other) ||
+             other.constructor == knit.algebra.predicate.Conjunction && 
+             this.leftPredicate.isEquivalent(other.rightPredicate) &&
+             this.rightPredicate.isEquivalent(other.leftPredicate)
+  },
+  
+  inspect: function() {return "and(" + this.leftPredicate.inspect() + "," + 
+                                       this.rightPredicate.inspect() + ")" }
+})
+
+knit.dslLocals.conjunction = function(leftPredicate, rightPredicate) {
+  return new knit.algebra.predicate.Conjunction(leftPredicate, rightPredicate)
+}
+
+knit.dslLocals.and = knit.dslLocals.conjunction
+
+}, 
+'knit/algebra/select': function(require, exports, module) {
+require("knit/core")
+require("knit/algebra/predicate")
+
+knit.algebra.Select = function(relation, criteria) {
+  this._attributes = relation.attributes()
+  this.relation = relation
+  this.criteria = criteria
+}
+
+_.extend(knit.algebra.Select.prototype, {
+  attributes: function(){ return this._attributes },
+  
+  merge: function() {
+    if (this.relation.criteria) {
+      return knit(function(){
+        return select(this.relation.relation.merge(), conjunction(this.relation.criteria, this.criteria))
+      }, this)
+    } else {
+      return this
+    }
+  },
+  
+  split: function() {
+    if (this.criteria instanceof knit.algebra.predicate.Conjunction) {
+      return knit(function(){
+        return select(
+          select(this.relation.split(), this.criteria.leftPredicate),
+          this.criteria.rightPredicate
+        )
+      }, this)
+    } else {
+      return this
+    }
+  },
+  
+  _doPush: function(relation) {
+    return new knit.algebra.Select(relation, this.criteria).push()
+  },
+  
+  push: function() {
+    if (this.relation instanceof knit.algebra.Join) {
+      var join = this.relation
+      
+      if (this.criteria.concernedWithNoOtherRelationsBesides(join.relationOne)) {
+        join.relationOne = this._doPush(join.relationOne)
+        return join
+      } else if (this.criteria.concernedWithNoOtherRelationsBesides(join.relationTwo)) {
+        join.relationTwo = this._doPush(join.relationTwo)
+        return join
+      } else if (this.criteria.concernedWithNoOtherRelationsBesides(join.relationOne, join.relationTwo) &&
+                 this.criteria.concernedWithAllOf(join.relationOne, join.relationTwo)) {
+        join.appendToPredicate(this.criteria)
+        return join
+      } else {
+        return this
+      }
+    } else if (this.relation.push) {
+  
+      var innerPushResult = this.relation.push()
+      if (innerPushResult===this.relation) { //bounce
+        // me(
+        //   you(
+        //     yourRelation,
+        //    [yourStuff]
+        //   ),
+        //  [myStuff]
+        // )
+        
+        //becomes
+        
+        // you(
+        //   me(
+        //     yourRelation,
+        //    [yourStuff]
+        //   ),
+        //  [myStuff]
+        // )
+        
+        var me = this
+        
+        var you = this.relation
+        var yourRelation = this.relation.relation
+        
+        me.relation = yourRelation
+        you.relation = me.push()
+        
+        return you
+      } else {
+        this.relation = innerPushResult
+        return this.push()
+      }
+    } else {
+      return this
+    }
+  },
+  
+  isSame: function(other) {
+    return other instanceof knit.algebra.Select && 
+           this.relation.isSame(other.relation) &&
+           this.criteria.isSame(other.criteria)
+  },
+  
+  isEquivalent: function(other) {
+    if (other instanceof knit.algebra.Select) {
+      var thisMerged = this.merge()
+      var otherMerged = other.merge()
+    
+      return thisMerged.isSame(otherMerged) ||
+               thisMerged.relation.isEquivalent(otherMerged.relation) &&
+               thisMerged.criteria.isEquivalent(otherMerged.criteria)
+    } else {
+      return false
+    }
+  },
+  
+  inspect: function(){return "select(" + this.relation.inspect() + "," + this.criteria.inspect() + ")"}
+})
+
+knit.dslLocals.select = function(relation, criteria) {
+  return new knit.algebra.Select(relation, criteria)
+}
+
+}, 
+'knit/apply': function(require, exports, module) {
+require("knit/algebra")
+
+_.extend(knit.algebra.Select.prototype, {
+  apply: function() {
+    return this.relation.apply().applySelect(this.criteria)
+  }
+})
+
+_.extend(knit.algebra.Join.prototype, {
+  apply: function() {
+    var joinedRelation = this.relationOne.apply().applyJoin(this.relationTwo.apply(), this.predicate)
+    joinedRelation._attributes = this._attributes
+    return joinedRelation
+  }
+})
+
+}, 
+'knit/engine/memory/attribute': function(require, exports, module) {
+knit.engine.Memory.Attribute = function(name, sourceRelation) {
+  this.name = name
+  this._sourceRelation = sourceRelation
+}
+
+_.extend(knit.engine.Memory.Attribute.prototype, {
+  isSame: function(other) {
+    return this.name == other.name &&
+           this._sourceRelation === other._sourceRelation
+  },
+  
+  inspect: function() {
+    return this.name
+  }
+
+})
+
+}, 
+'knit/engine/memory/relation': function(require, exports, module) {
+knit.engine.Memory.Relation = function(name, attributeNames, primaryKey, tuples, costSoFar) {
+  this._name = name
+  var self = this
+  this._attributes = _.map(attributeNames, function(attr){
+    return attr.name ? attr : new knit.engine.Memory.Attribute(attr, self)
+  })
+  
+  this._pkAttributeNames = primaryKey || []
+  var pkPositions = 
+    _.map(this._pkAttributeNames, function(pkAttributeName){
+      var position = -1
+      _.each(attributeNames, function(attributeName, i){
+        if (pkAttributeName == attributeName) {
+          position = i
+        }
+      })
+      return position
+    })
+  
+  this._tupleStore = new knit.engine.Memory.StandardTupleStore(pkPositions, tuples || [])
+  this.cost = costSoFar || 0
+}
+
+_.extend(knit.engine.Memory.Relation.prototype, {
+  name: function(){ return this._name },
+  attributes: function(){ return this._attributes },
+  
+  attr: function(attributeName) {
+    return _.detect(this.attributes(), function(attr){return attr.name == attributeName})
+  },
+  
+  isSame: function(other) {
+    return this === other
+  },
+
+  inspect: function() {
+    return this.name() + "[" + 
+           _.map(this.attributes(), function(attr){return attr.inspect()}).join(",") + 
+           "]" 
+  },
+
+  tuplesSync: function() {
+    return this._tupleStore.all()
+  },
+  
+  apply: function() {
+    return this
+  },
+  
+  _tupleWithAttributes: function(tuple, attributes) {
+    var tupleWithAttributes = []
+    for (var i=0; i<attributes.length; i++) {
+      tupleWithAttributes.push([attributes[i], tuple[i]])
+    }
+    return tupleWithAttributes
+  },
+  
+  _tuplesWithAttributes: function() {
+    var self = this
+    return _.map(this._tupleStore.all(), function(tuple){
+      return self._tupleWithAttributes(tuple, self.attributes())
+    })
+  },
+  
+  applySelect: function(criteria) {
+    
+    var matchingAttributesToTuples = 
+      _.select(this._tuplesWithAttributes(), function(tupleWithAttributes){return criteria.match(tupleWithAttributes)})
+    
+    var matchingTuples = 
+      _.map(matchingAttributesToTuples, 
+            function(attributeToValueTuple){
+              return _.map(attributeToValueTuple, function(attributeToValue){return attributeToValue[1]})
+            })
+
+    return this._newRelation(matchingTuples) 
+  },
+
+  applyJoin: function(relationTwo, predicate) {
+    var tuples = this.tuplesSync()
+    var otherTuples = relationTwo.tuplesSync()
+    var combinedAttributes = [].concat(this.attributes()).concat(relationTwo.attributes())
+    var joinTuples = []
+    var self = this
+    
+    _.each(tuples, function(tuple){
+      _.each(otherTuples, function(otherTuple){
+        var candidateJoinTuple = [].concat(tuple).concat(otherTuple)
+        if (predicate.match(self._tupleWithAttributes(candidateJoinTuple, combinedAttributes))) {
+          joinTuples.push(candidateJoinTuple)
+        }
+      })
+    })
+
+    return this._newRelation(joinTuples, this.name() + "__" + relationTwo.name()) 
+  },
+
+  _newRelation: function(tuples, name) {
+    var newName = name || this.name()
+    
+    //curry?
+    return new knit.engine.Memory.Relation(newName, this.attributes(), this._pkAttributeNames, tuples, this.cost + tuples.length) 
+  }
+})
+
+knit.engine.Memory.Relation.prototype.isEquivalent = knit.engine.Memory.Relation.prototype.isSame
+
+
+knit.engine.Memory.MutableRelation = function(name, attributeNames, primaryKey) {
+  return knit.createObject(new knit.engine.Memory.Relation(name, attributeNames, primaryKey), {
+    mergeSync: function(tuplesToAdd) {
+      this._tupleStore.mergeSync(tuplesToAdd)
+      return this
+    }
+  })
+}
+
+}, 
+'knit/engine/memory/predicate': function(require, exports, module) {
+_.extend(knit.algebra.predicate.True.prototype, {
+  match: function(attributeToValue) {
+    return true
+  }
+})
+
+_.extend(knit.algebra.predicate.False.prototype, {
+  match: function(attributeToValue) {
+    return false
+  }
+})
+
+_.extend(knit.algebra.predicate.Equality.prototype, {
+  _getValueForAttribute: function(attribute, attributeToValue) {
+    var pair = _.detect(attributeToValue, function(pair){
+      var attr = pair[0]
+      var value = pair[1]
+      return attr.isSame(attribute)
+    })
+    
+    return pair ? pair[1] : null
+  },
+  
+  _getValue: function(atom, attributeToValue) {
+    return this._isAttribute(atom) ? this._getValueForAttribute(atom, attributeToValue) : atom
+  },
+  
+  match: function(attributeToValue) {
+    var left = this._getValue(this.leftAtom, attributeToValue)
+    var right = this._getValue(this.rightAtom, attributeToValue)
+    return left == right
+  }
+})
+
+_.extend(knit.algebra.predicate.Conjunction.prototype, {
+  match: function(attributeToValue) {
+    return this.leftPredicate.match(attributeToValue) && this.rightPredicate.match(attributeToValue)
+  }  
+})
+
 }
 });
-require.ensure(['knit/attribute'], function() {
-var knit = {};
-
-require("knit/attribute");
-// require('engines');
+require.ensure(['knit/engine/memory'], function() {
+require("knit/engine/memory")
 });
-})(modulr.require, modulr.require.main);
+})();

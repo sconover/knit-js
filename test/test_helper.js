@@ -2,6 +2,8 @@ require.paths.push("test")
 require.paths.push("lib")
 require.paths.push("../node-sqlite")
 
+require("underscore")
+
 require("../../jasmine-node/lib/jasmine")
 
 jasmine.Env.prototype.regarding = jasmine.Env.prototype.describe

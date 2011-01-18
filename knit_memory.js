@@ -262,10 +262,83 @@ var modulr = (function(global) {
 
 var require = modulr.require, module = require.main;
 require.define({
+'knit': function(require, exports, module) {
+require("knit/core")
+require("knit/algebra")
+}, 
+'knit/core': function(require, exports, module) {
+if (!(typeof window === 'undefined')) global=window
+
+require("knit/dsl_function")
+
+global.knit = function(){
+  this.algebra = {predicate:{}}
+  this.engine = {}
+  
+  //hrm.  begone.
+  this.engine.sql = {statement:{}}
+  
+  //see http://javascript.crockford.com/prototypal.html
+  this.createObject = function() {
+    var o = arguments[0]
+
+    function F() {}
+    F.prototype = o
+    var newObj = new F()
+
+    if (arguments.length==2) {
+      var additions = arguments[1]
+      _.extend(newObj, additions)
+    }
+
+    return newObj
+  }
+  
+  return this
+}.apply(new DSLFunction())
+}, 
+'knit/dsl_function': function(require, exports, module) {
+//see http://alexyoung.org/2009/10/22/javascript-dsl/
+
+DSLFunction = function() {
+  var dslLocals = {}
+  var outerFunction = function(userFunction, what_theKeywordThis_IsSupposedToBe){
+    if (what_theKeywordThis_IsSupposedToBe == undefined) {
+      what_theKeywordThis_IsSupposedToBe = this
+    }
+    
+    var localNames = []
+    var localValues = []
+    _.each(_.keys(dslLocals), function(key){
+      localNames.push(key)
+      localValues.push(dslLocals[key])
+    })
+    
+    var userFunctionBody = "(_.bind(" + userFunction.toString().replace(/\s+$/, "") + ",this))()"
+    var wrappingFunctionBody = "(function(" + localNames.join(",") + "){return " + userFunctionBody + "})"
+    return eval(wrappingFunctionBody).apply(what_theKeywordThis_IsSupposedToBe, localValues)
+  }
+  
+  outerFunction.dslLocals = dslLocals
+  
+  outerFunction.specialize = function(childDslLocals) {
+    var allDslLocals = _.extend({}, outerFunction.dslLocals)
+    var allDslLocals = _.extend(allDslLocals, childDslLocals)
+    var childDslFunction = new DSLFunction()
+    _.extend(childDslFunction.dslLocals, allDslLocals)
+    return childDslFunction
+  }
+  
+  return outerFunction
+}
+
+
+}, 
 'knit/algebra': function(require, exports, module) {
 require("knit/algebra/join")
 require("knit/algebra/predicate")
 require("knit/algebra/select")
+require("knit/algebra/order")
 
 }, 
 'knit/algebra/join': function(require, exports, module) {
@@ -336,74 +409,6 @@ knit.dslLocals.join = function(relationOne, relationTwo, predicate) {
 }
 
 }, 
-'knit/core': function(require, exports, module) {
-if (!(typeof window === 'undefined')) global=window
-
-require("knit/dsl_function")
-
-global.knit = function(){
-  this.algebra = {predicate:{}}
-  this.engine = {}
-  
-  //hrm.  begone.
-  this.engine.sql = {statement:{}}
-  
-  //see http://javascript.crockford.com/prototypal.html
-  this.createObject = function() {
-    var o = arguments[0]
-
-    function F() {}
-    F.prototype = o
-    var newObj = new F()
-
-    if (arguments.length==2) {
-      var additions = arguments[1]
-      _.extend(newObj, additions)
-    }
-
-    return newObj
-  }
-  
-  return this
-}.apply(new DSLFunction())
-}, 
-'knit/dsl_function': function(require, exports, module) {
-//see http://alexyoung.org/2009/10/22/javascript-dsl/
-
-DSLFunction = function() {
-  var dslLocals = {}
-  var outerFunction = function(userFunction, what_theKeywordThis_IsSupposedToBe){
-    if (what_theKeywordThis_IsSupposedToBe == undefined) {
-      what_theKeywordThis_IsSupposedToBe = this
-    }
-    
-    var localNames = []
-    var localValues = []
-    _.each(_.keys(dslLocals), function(key){
-      localNames.push(key)
-      localValues.push(dslLocals[key])
-    })
-    
-    var userFunctionBody = "(_.bind(" + userFunction.toString().replace(/\s+$/, "") + ",this))()"
-    var wrappingFunctionBody = "(function(" + localNames.join(",") + "){return " + userFunctionBody + "})"
-    return eval(wrappingFunctionBody).apply(what_theKeywordThis_IsSupposedToBe, localValues)
-  }
-  
-  outerFunction.dslLocals = dslLocals
-  
-  outerFunction.specialize = function(childDslLocals) {
-    var allDslLocals = _.extend({}, outerFunction.dslLocals)
-    var allDslLocals = _.extend(allDslLocals, childDslLocals)
-    var childDslFunction = new DSLFunction()
-    _.extend(childDslFunction.dslLocals, allDslLocals)
-    return childDslFunction
-  }
-  
-  return outerFunction
-}
-
-
-}, 
 'knit/algebra/predicate': function(require, exports, module) {
 require("knit/algebra/predicate/true_false")
 require("knit/algebra/predicate/equality")
@@ -431,7 +436,7 @@ knit.dslLocals.FALSE = new knit.algebra.predicate.False()
 'knit/algebra/predicate/equality': function(require, exports, module) {
 require("knit/core")
 
-knit.algebra.predicate.Equality = function(leftAtom, rightAtom) { //har
+knit.algebra.predicate.Equality = function(leftAtom, rightAtom) {
   this.leftAtom = leftAtom
   this.rightAtom = rightAtom
 }
@@ -691,6 +696,44 @@ knit.dslLocals.select = function(relation, criteria) {
 }
 
 }, 
+'knit/algebra/order': function(require, exports, module) {
+require("knit/core")
+
+knit.algebra.Order = function(relation, orderAttribute, direction) {
+  this._attributes = relation.attributes()
+  this.relation = relation
+  this.orderAttribute = orderAttribute
+  this.direction = direction
+}
+
+_.extend(knit.algebra.Order.prototype, {
+  attributes: function(){ return this._attributes },
+  
+  isSame: function(other) {
+    return other instanceof knit.algebra.Order && 
+           this.relation.isSame(other.relation) &&
+           this.orderAttribute.isSame(other.orderAttribute) &&
+           this.direction == other.direction
+  },
+  
+  inspect: function(){return "order." + this.direction + "(" + this.relation.inspect() + "," + this.orderAttribute.inspect() + ")"}
+})
+
+knit.algebra.Order.prototype.isEquivalent = knit.algebra.Order.prototype.isSame
+
+knit.algebra.Order.ASC = "asc"
+knit.algebra.Order.DESC = "desc"
+
+knit.dslLocals.order = {
+  asc: function(relation, orderAttribute) {
+    return new knit.algebra.Order(relation, orderAttribute, knit.algebra.Order.ASC)
+  },
+
+  desc: function(relation, orderAttribute) {
+    return new knit.algebra.Order(relation, orderAttribute, knit.algebra.Order.DESC)
+  }
+}
+}, 
 'knit/engine/memory': function(require, exports, module) {
 require("knit/algebra")
 require("knit/apply")
@@ -735,6 +778,12 @@ _.extend(knit.algebra.Join.prototype, {
   }
 })
 
+_.extend(knit.algebra.Order.prototype, {
+  apply: function() {
+    return this.relation.apply().applyOrder(this.orderAttribute, this.direction)
+  }
+})
+
 }, 
 'knit/engine/memory/attribute': function(require, exports, module) {
 knit.engine.Memory.Attribute = function(name, sourceRelation) {
@@ -756,7 +805,7 @@ _.extend(knit.engine.Memory.Attribute.prototype, {
 
 }, 
 'knit/engine/memory/relation': function(require, exports, module) {
-knit.engine.Memory.Relation = function(name, attributeNames, primaryKey, tuples, costSoFar) {
+knit.engine.Memory.Relation = function(name, attributeNames, primaryKey, rows, costSoFar) {
   this._name = name
   var self = this
   this._attributes = _.map(attributeNames, function(attr){
@@ -775,7 +824,7 @@ knit.engine.Memory.Relation = function(name, attributeNames, primaryKey, tuples,
       return position
     })
   
-  this._tupleStore = new knit.engine.Memory.StandardTupleStore(pkPositions, tuples || [])
+  this._rowStore = new knit.engine.Memory.StandardTupleStore(pkPositions, rows || [])
   this.cost = costSoFar || 0
 }
 
@@ -798,12 +847,12 @@ _.extend(knit.engine.Memory.Relation.prototype, {
   },
 
   rows: function() {
-    return this._tupleStore.rows()
+    return this._rowStore.rows()
   },
   
   objects: function() {
     var self = this
-    return _.map(this._tupleStore.rows(), function(row){
+    return _.map(this._rowStore.rows(), function(row){
       var object = {}
       _.each(row, function(value, columnPosition){
         var propertyName = self._attributes[columnPosition].name
@@ -817,59 +866,66 @@ _.extend(knit.engine.Memory.Relation.prototype, {
     return this
   },
   
-  _tupleWithAttributes: function(tuple, attributes) {
-    var tupleWithAttributes = []
+  _rowWithAttributes: function(row, attributes) {
+    var rowWithAttributes = []
     for (var i=0; i<attributes.length; i++) {
-      tupleWithAttributes.push([attributes[i], tuple[i]])
+      rowWithAttributes.push([attributes[i], row[i]])
     }
-    return tupleWithAttributes
+    return rowWithAttributes
   },
   
-  _tuplesWithAttributes: function() {
+  _rowsWithAttributes: function() {
     var self = this
-    return _.map(this._tupleStore.rows(), function(tuple){
-      return self._tupleWithAttributes(tuple, self.attributes())
+    return _.map(this._rowStore.rows(), function(row){
+      return self._rowWithAttributes(row, self.attributes())
     })
   },
   
   applySelect: function(criteria) {
     
-    var matchingAttributesToTuples = 
-      _.select(this._tuplesWithAttributes(), function(tupleWithAttributes){return criteria.match(tupleWithAttributes)})
+    var matchingAttributesToRows = 
+      _.select(this._rowsWithAttributes(), function(rowWithAttributes){return criteria.match(rowWithAttributes)})
     
-    var matchingTuples = 
-      _.map(matchingAttributesToTuples, 
-            function(attributeToValueTuple){
-              return _.map(attributeToValueTuple, function(attributeToValue){return attributeToValue[1]})
+    var matchingRows = 
+      _.map(matchingAttributesToRows, 
+            function(attributeToValueRow){
+              return _.map(attributeToValueRow, function(attributeToValue){return attributeToValue[1]})
             })
 
-    return this._newRelation(matchingTuples) 
+    return this._newRelation(matchingRows) 
   },
 
   applyJoin: function(relationTwo, predicate) {
-    var tuples = this.rows()
-    var otherTuples = relationTwo.rows()
+    var rows = this.rows()
+    var otherRows = relationTwo.rows()
     var combinedAttributes = [].concat(this.attributes()).concat(relationTwo.attributes())
-    var joinTuples = []
+    var joinRows = []
     var self = this
     
-    _.each(tuples, function(tuple){
-      _.each(otherTuples, function(otherTuple){
-        var candidateJoinTuple = [].concat(tuple).concat(otherTuple)
-        if (predicate.match(self._tupleWithAttributes(candidateJoinTuple, combinedAttributes))) {
-          joinTuples.push(candidateJoinTuple)
+    _.each(rows, function(row){
+      _.each(otherRows, function(otherRow){
+        var candidateJoinRow = [].concat(row).concat(otherRow)
+        if (predicate.match(self._rowWithAttributes(candidateJoinRow, combinedAttributes))) {
+          joinRows.push(candidateJoinRow)
         }
       })
     })
 
-    return this._newRelation(joinTuples, this.name() + "__" + relationTwo.name()) 
+    return this._newRelation(joinRows, this.name() + "__" + relationTwo.name()) 
   },
 
-  _newRelation: function(tuples, name) {
+  applyOrder: function(orderAttribute, direction) {
+    var columnNumber = _.indexOf(this.attributes(), orderAttribute)
+    var sortedRows = _.sortBy(this.rows(), function(row){ return row[columnNumber] });
+    if (direction == knit.algebra.Order.DESC) sortedRows.reverse()
+    return this._newRelation(sortedRows) 
+  },
+
+  _newRelation: function(rows, name) {
     var newName = name || this.name()
     
     //curry?
-    return new knit.engine.Memory.Relation(newName, this.attributes(), this._pkAttributeNames, tuples, this.cost + tuples.length) 
+    return new knit.engine.Memory.Relation(newName, this.attributes(), this._pkAttributeNames, rows, this.cost + rows.length) 
   }
 })
 
@@ -878,8 +934,8 @@ knit.engine.Memory.Relation.prototype.isEquivalent = knit.engine.Memory.Relation
 
 knit.engine.Memory.MutableRelation = function(name, attributeNames, primaryKey) {
   return knit.createObject(new knit.engine.Memory.Relation(name, attributeNames, primaryKey), {
-    merge: function(tuplesToAdd) {
-      this._tupleStore.merge(tuplesToAdd)
+    merge: function(rowsToAdd) {
+      this._rowStore.merge(rowsToAdd)
       return this
     }
   })
@@ -984,8 +1040,8 @@ _.extend(knit.engine.Memory.StandardTupleStore.prototype, {
 })
 }
 });
-require.ensure(['knit/algebra', 'knit/engine/memory'], function() {
-require("knit/algebra")
+require.ensure(['knit', 'knit/engine/memory'], function() {
+require("knit")
 require("knit/engine/memory")
 });
 })();

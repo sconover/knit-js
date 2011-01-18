@@ -60,9 +60,9 @@ regarding("memory", function() {
     })})
     
     test("join cost usually depends greatly on whether a good join predicate is available", function(){knit(function(){
-      var person = engine.createRelation("person", ["id", "house_id", "name", "age"])
-      var house = engine.createRelation("house", ["house_id", "address", "city_id"])
-      var city = engine.createRelation("city", ["city_id", "name"])
+      var person = engine.createRelation("person", ["id", "houseId", "name", "age"])
+      var house = engine.createRelation("house", ["houseId", "address", "cityId"])
+      var city = engine.createRelation("city", ["cityId", "name"])
       
       person.merge([
         [1, 101, "Jane", 5],
@@ -83,9 +83,9 @@ regarding("memory", function() {
       assert.equal(6, join(person, house).apply().cost)
       assert.equal(6 + 12, join(join(person, house), city).apply().cost)
       
-      assert.equal(3, join(person, house, equality(person.attr("house_id"), house.attr("house_id"))).apply().cost)
-      assert.equal(3 + 3, join(join(person, house, equality(person.attr("house_id"), house.attr("house_id"))),
-                               city, equality(house.attr("city_id"), city.attr("city_id"))).apply().cost)
+      assert.equal(3, join(person, house, equality(person.attr("houseId"), house.attr("houseId"))).apply().cost)
+      assert.equal(3 + 3, join(join(person, house, equality(person.attr("houseId"), house.attr("houseId"))),
+                               city, equality(house.attr("cityId"), city.attr("cityId"))).apply().cost)
     })})
     
   })

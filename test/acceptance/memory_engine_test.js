@@ -6,9 +6,9 @@ regarding("In Memory Engine", function () {
   beforeEach(function() {
     engine = new knit.engine.Memory()
 
-    person = engine.createRelation("person", ["id", "house_id", "name", "age"])
-    house = engine.createRelation("house", ["house_id", "address", "city_id"])
-    city = engine.createRelation("city", ["city_id", "name"])
+    person = engine.createRelation("person", ["id", "houseId", "name", "age"])
+    house = engine.createRelation("house", ["houseId", "address", "cityId"])
+    city = engine.createRelation("city", ["cityId", "name"])
 
     person.merge([
       [1, 101, "Jane", 5],
@@ -59,7 +59,7 @@ regarding("In Memory Engine", function () {
     })
     
     test("primary key - replace rows a row if it's a dup", function (){
-      var person2 = engine.createRelation("person", ["id", "house_id", "name", "age"], ["id"])
+      var person2 = engine.createRelation("person", ["id", "houseId", "name", "age"], ["id"])
 
       person2.merge([
         [1, 101, "Jane", 5],
@@ -83,6 +83,17 @@ regarding("In Memory Engine", function () {
         [3, 102, "Fanny", 30]
       ], person2.rows())
     })
+
+    xtest("return results in js object / associative array style", function (){
+      
+      assert.equal([
+        [1, 101, "Jane", 5],
+        [2, 101, "Puck", 12],
+        [3, 102, "Fanny", 30]
+      ], person.objects())
+      
+    })
+
     
   })
 
@@ -98,7 +109,7 @@ regarding("In Memory Engine", function () {
           
         assert.equal({
           name:"person",
-          attributes:["id", "house_id", "name", "age"],
+          attributes:["id", "houseId", "name", "age"],
           tuples:[
             [3, 102, "Fanny", 30]
           ]
@@ -122,8 +133,8 @@ regarding("In Memory Engine", function () {
       
       assert.equal({
         name:"person__house",
-        attributes:["id", "house_id", "name", "age", 
-                    "house_id", "address", "city_id"],
+        attributes:["id", "houseId", "name", "age", 
+                    "houseId", "address", "cityId"],
         tuples:[
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001],
           [1, 101, "Jane", 5, 102, "Parnassus", 1002],
@@ -145,9 +156,9 @@ regarding("In Memory Engine", function () {
       
       assert.equal({
         name:"person__house__city",
-        attributes:["id", "house_id", "name", "age", 
-                    "house_id", "address", "city_id",
-                    "city_id", "name"],
+        attributes:["id", "houseId", "name", "age", 
+                    "houseId", "address", "cityId",
+                    "cityId", "name"],
         tuples:[
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001, 1001, "San Francisco"],
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001, 1002, "New Orleans"],
@@ -169,13 +180,13 @@ regarding("In Memory Engine", function () {
     test("join predicate (YAY!)", function (){
       
       allPeopleCombinedWithAllHouses = knit(function(){
-        return join(person, house, equality(person.attr("house_id"), house.attr("house_id")))
+        return join(person, house, equality(person.attr("houseId"), house.attr("houseId")))
       }).apply()
       
       assert.equal({
         name:"person__house",
-        attributes:["id", "house_id", "name", "age", 
-                    "house_id", "address", "city_id"],
+        attributes:["id", "houseId", "name", "age", 
+                    "houseId", "address", "cityId"],
         tuples:[
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001],
           [2, 101, "Puck", 12, 101, "Chimney Hill", 1001],
@@ -198,8 +209,8 @@ regarding("In Memory Engine", function () {
       
       expected = {
         name:"person__house",
-        attributes:["id", "house_id", "name", "age", 
-                    "house_id", "address", "city_id"],
+        attributes:["id", "houseId", "name", "age", 
+                    "houseId", "address", "cityId"],
         tuples:[
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001],
           [2, 101, "Puck", 12, 101, "Chimney Hill", 1001],
@@ -216,13 +227,13 @@ regarding("In Memory Engine", function () {
     test("pushing in a select and making it into a join predicate is less costly than just leaving the select outside", function (){
 
       expression = knit(function(){
-        return select(join(person, house), equality(house.attr("house_id"), person.attr("house_id")))
+        return select(join(person, house), equality(house.attr("houseId"), person.attr("houseId")))
       })
       
       expected = {
         name:"person__house",
-        attributes:["id", "house_id", "name", "age", 
-                    "house_id", "address", "city_id"],
+        attributes:["id", "houseId", "name", "age", 
+                    "houseId", "address", "cityId"],
         tuples:[
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001],
           [2, 101, "Puck", 12, 101, "Chimney Hill", 1001],

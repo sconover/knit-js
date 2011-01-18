@@ -47,21 +47,21 @@ regarding("select statement", function() {
 
       select.modify(function(){
         from("person")
-        join("house", eq("person.house_id", "house.house_id"))
+        join("house", eq("person.houseId", "house.houseId"))
       })
 
-      assert.equal({sql:"select * from person join house on person.house_id = house.house_id", values:[]}, select.toSql())
+      assert.equal({sql:"select * from person join house on person.houseId = house.houseId", values:[]}, select.toSql())
     })
 
     test("multiple joins", function(){
 
       select.modify(function(){
         from("person")
-        join("house", eq("person.house_id", "house.house_id"))
+        join("house", eq("person.houseId", "house.houseId"))
         join("city")
       })
 
-      assert.equal({sql:"select * from person join house on person.house_id = house.house_id join city", values:[]}, 
+      assert.equal({sql:"select * from person join house on person.houseId = house.houseId join city", values:[]}, 
                    select.toSql())
     })
 

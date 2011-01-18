@@ -294,10 +294,10 @@ r2 = person.project("name", "age") / r2 = project(person, "name", "age")
 
 r2 = person
   .join(house)
-    .on("house_id", "id")
+    .on("houseId", "id")
   .end 
 / 
-r2 = join(person, "house_id", house, "id")
+r2 = join(person, "houseId", house, "id")
 
 r2 = sort(person, ["name",ASC])
 
@@ -306,7 +306,7 @@ engine.relation("person").join(engine.relation("house"))
 
 person
   .join(house)
-    .on("house_id", "id")
+    .on("houseId", "id")
   .end 
 
 

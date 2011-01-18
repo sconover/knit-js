@@ -8,19 +8,19 @@ xregarding("Sql Engine", function () {
 
     person = engine.createRelation("person", [
       ["id", knit.engine.sql.IntegerType]
-      ["house_id", knit.engine.sql.IntegerType],
+      ["houseId", knit.engine.sql.IntegerType],
       ["name", knit.engine.Sql.StringType],
       ["age", knit.engine.sql.IntegerType]
     ])
     
     house = engine.createRelation("house", [
-      ["house_id", knit.engine.sql.IntegerType],
+      ["houseId", knit.engine.sql.IntegerType],
       ["address", knit.engine.Sql.StringType],
-      ["city_id", knit.engine.sql.IntegerType]
+      ["cityId", knit.engine.sql.IntegerType]
     ])
     
     city = engine.createRelation("city", [
-      ["city_id", knit.engine.sql.IntegerType],
+      ["cityId", knit.engine.sql.IntegerType],
       ["name", knit.engine.Sql.StringType]
     ])
 
@@ -86,7 +86,7 @@ xregarding("Sql Engine", function () {
           
         assert.equal({
           name:"person",
-          attributes:["id", "house_id", "name", "age"],
+          attributes:["id", "houseId", "name", "age"],
           tuples:[
             [3, 102, "Fanny", 30]
           ]
@@ -110,8 +110,8 @@ xregarding("Sql Engine", function () {
       
       assert.equal({
         name:"person__house",
-        attributes:["id", "house_id", "name", "age", 
-                    "house_id", "address", "city_id"],
+        attributes:["id", "houseId", "name", "age", 
+                    "houseId", "address", "cityId"],
         tuples:[
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001],
           [1, 101, "Jane", 5, 102, "Parnassus", 1002],
@@ -133,9 +133,9 @@ xregarding("Sql Engine", function () {
       
       assert.equal({
         name:"person__house__city",
-        attributes:["id", "house_id", "name", "age", 
-                    "house_id", "address", "city_id",
-                    "city_id", "name"],
+        attributes:["id", "houseId", "name", "age", 
+                    "houseId", "address", "cityId",
+                    "cityId", "name"],
         tuples:[
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001, 1001, "San Francisco"],
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001, 1002, "New Orleans"],
@@ -157,13 +157,13 @@ xregarding("Sql Engine", function () {
     test("join predicate (YAY!)", function (){
       
       allPeopleCombinedWithAllHouses = knit(function(){
-        return join(person, house, equality(person.attr("house_id"), house.attr("house_id")))
+        return join(person, house, equality(person.attr("houseId"), house.attr("houseId")))
       }).apply()
       
       assert.equal({
         name:"person__house",
-        attributes:["id", "house_id", "name", "age", 
-                    "house_id", "address", "city_id"],
+        attributes:["id", "houseId", "name", "age", 
+                    "houseId", "address", "cityId"],
         tuples:[
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001],
           [2, 101, "Puck", 12, 101, "Chimney Hill", 1001],
@@ -186,8 +186,8 @@ xregarding("Sql Engine", function () {
       
       expected = {
         name:"person__house",
-        attributes:["id", "house_id", "name", "age", 
-                    "house_id", "address", "city_id"],
+        attributes:["id", "houseId", "name", "age", 
+                    "houseId", "address", "cityId"],
         tuples:[
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001],
           [2, 101, "Puck", 12, 101, "Chimney Hill", 1001],
@@ -204,13 +204,13 @@ xregarding("Sql Engine", function () {
     test("pushing in a select and making it into a join predicate is less costly than just leaving the select outside", function (){
 
       expression = knit(function(){
-        return select(join(person, house), equality(house.attr("house_id"), person.attr("house_id")))
+        return select(join(person, house), equality(house.attr("houseId"), person.attr("houseId")))
       })
       
       expected = {
         name:"person__house",
-        attributes:["id", "house_id", "name", "age", 
-                    "house_id", "address", "city_id"],
+        attributes:["id", "houseId", "name", "age", 
+                    "houseId", "address", "cityId"],
         tuples:[
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001],
           [2, 101, "Puck", 12, 101, "Chimney Hill", 1001],

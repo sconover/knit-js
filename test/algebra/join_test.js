@@ -5,22 +5,22 @@ require("./test_relation.js")
 regarding("join", function() {
     
   beforeEach(function() {
-    person = knit(function(){return testRelation(["id", "house_id", "name", "age"])})
-    house = knit(function(){return testRelation(["house_id", "address", "city_id"])})
-    city = knit(function(){return testRelation(["city_id", "name"])})
+    person = knit(function(){return testRelation(["id", "houseId", "name", "age"])})
+    house = knit(function(){return testRelation(["houseId", "address", "cityId"])})
+    city = knit(function(){return testRelation(["cityId", "name"])})
   })
   
   test("combines the attributes of the two relations", function (){
     join = knit(function(){return join(person, house)})
     names = _.map(join.attributes(), function(attr){return attr.name})
-    assert.equal(["id", "house_id", "name", "age", "house_id", "address", "city_id"], names)
+    assert.equal(["id", "houseId", "name", "age", "houseId", "address", "cityId"], names)
   })
   
   test("inspect", function(){knit(function(){
-    assert.equal("join(r[id,house_id,name,age],r[house_id,address,city_id])", 
+    assert.equal("join(r[id,houseId,name,age],r[houseId,address,cityId])", 
                  join(person, house).inspect())
 
-    assert.equal("join(r[id,house_id,name,age],r[house_id,address,city_id],eq(4,5))", 
+    assert.equal("join(r[id,houseId,name,age],r[houseId,address,cityId],eq(4,5))", 
                  join(person, house, equality(4,5)).inspect())
 
   })})
@@ -35,11 +35,11 @@ regarding("join", function() {
     })})    
 
     test("same - with predicate", function (){knit(function(){
-      assert.same(join(person, house, equality(person.attr("house_id"), house.attr("house_id"))),
-                  join(person, house, equality(person.attr("house_id"), house.attr("house_id"))))
+      assert.same(join(person, house, equality(person.attr("houseId"), house.attr("houseId"))),
+                  join(person, house, equality(person.attr("houseId"), house.attr("houseId"))))
 
-      assert.notSame(join(person, house, equality(person.attr("name"), house.attr("house_id"))),
-                     join(person, house, equality(person.attr("house_id"), house.attr("house_id"))))
+      assert.notSame(join(person, house, equality(person.attr("name"), house.attr("houseId"))),
+                     join(person, house, equality(person.attr("houseId"), house.attr("houseId"))))
     })})
 
     test("same implies equivalent", function (){knit(function(){
@@ -47,11 +47,11 @@ regarding("join", function() {
     })})
 
     test("equivalent with predicate", function (){knit(function(){
-      assert.equivalent(join(person, house, equality(person.attr("house_id"), house.attr("house_id"))),
-                        join(person, house, equality(person.attr("house_id"), house.attr("house_id"))))
+      assert.equivalent(join(person, house, equality(person.attr("houseId"), house.attr("houseId"))),
+                        join(person, house, equality(person.attr("houseId"), house.attr("houseId"))))
 
-      assert.equivalent(join(person, house, equality(house.attr("house_id"), person.attr("house_id"))),
-                        join(person, house, equality(person.attr("house_id"), house.attr("house_id"))))
+      assert.equivalent(join(person, house, equality(house.attr("houseId"), person.attr("houseId"))),
+                        join(person, house, equality(person.attr("houseId"), house.attr("houseId"))))
     })})
 
     test("commutativity - two join functions are equivalent if the relations are the same but in different order", function (){knit(function(){

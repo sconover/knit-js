@@ -10,13 +10,13 @@ regarding("sql - table", function() {
 
     db.executeSync(new knit.engine.sql.statement.CreateTable("person", [
       ["id", knit.engine.sql.IntegerType],
-      ["house_id", knit.engine.sql.IntegerType],
+      ["houseId", knit.engine.sql.IntegerType],
       ["name", knit.engine.sql.StringType],
       ["age", knit.engine.sql.IntegerType]
     ]))
 
     db.executeSync(new knit.engine.sql.statement.CreateTable("house", [
-      ["house_id", knit.engine.sql.IntegerType]
+      ["houseId", knit.engine.sql.IntegerType]
     ]))
   })
   
@@ -43,6 +43,6 @@ regarding("sql - table", function() {
   
   test("inspect", function(){
     var person = new knit.engine.sql.Table("person", db)
-    assert.equal("person[id,house_id,name,age]", person.inspect())
+    assert.equal("person[id,houseId,name,age]", person.inspect())
   })
 })

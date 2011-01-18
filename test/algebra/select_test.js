@@ -6,13 +6,13 @@ require("./test_relation.js")
 regarding("select", function() {
     
   beforeEach(function() {
-    person = knit(function(){return testRelation(["id", "house_id", "name", "age"])})
-    house = knit(function(){return testRelation(["house_id", "address", "city_id"])})
-    city = knit(function(){return testRelation(["city_id", "name"])})
+    person = knit(function(){return testRelation(["id", "houseId", "name", "age"])})
+    house = knit(function(){return testRelation(["houseId", "address", "cityId"])})
+    city = knit(function(){return testRelation(["cityId", "name"])})
   })
 
   test("inspect", function (){knit(function(){
-    assert.equal("select(r[id,house_id,name,age],eq(1,1))", 
+    assert.equal("select(r[id,houseId,name,age],eq(1,1))", 
                  select(person, TRUE).inspect())
   })})
 
@@ -172,24 +172,24 @@ regarding("select", function() {
             "an attribute present from each side of the join", function(){knit(function(){
 
     test("push into the join, select disappears", function (){knit(function(){
-      assert.same(select(join(person, house), equality(person.attr("house_id"), house.attr("house_id"))).push(),
-                  join(person, house, equality(person.attr("house_id"), house.attr("house_id"))))
+      assert.same(select(join(person, house), equality(person.attr("houseId"), house.attr("houseId"))).push(),
+                  join(person, house, equality(person.attr("houseId"), house.attr("houseId"))))
     })})
       
     test("complex select pushes as well", function (){knit(function(){
-      assert.same(select(join(person, house), conjunction(equality(person.attr("house_id"), 1), equality(house.attr("house_id"), 2))).push(),
-                  join(person, house, conjunction(equality(person.attr("house_id"), 1), equality(house.attr("house_id"), 2))))
+      assert.same(select(join(person, house), conjunction(equality(person.attr("houseId"), 1), equality(house.attr("houseId"), 2))).push(),
+                  join(person, house, conjunction(equality(person.attr("houseId"), 1), equality(house.attr("houseId"), 2))))
     })})
 
     test("two selects push in and become a conjunction", function (){knit(function(){
-      assert.same(select(select(join(person, house), equality(person.attr("house_id"), house.attr("house_id"))), equality(person.attr("age"), house.attr("address"))).push(),
-                  join(person, house, conjunction(equality(person.attr("house_id"), house.attr("house_id")), equality(person.attr("age"), house.attr("address")))))
+      assert.same(select(select(join(person, house), equality(person.attr("houseId"), house.attr("houseId"))), equality(person.attr("age"), house.attr("address"))).push(),
+                  join(person, house, conjunction(equality(person.attr("houseId"), house.attr("houseId")), equality(person.attr("age"), house.attr("address")))))
     })})
 
     test("won't merge if there are attributes from other relations", function (){knit(function(){
-      assert.same(select(select(join(person, house), equality(person.attr("house_id"), house.attr("house_id"))), equality(city.attr("name"), house.attr("address"))).push(),
+      assert.same(select(select(join(person, house), equality(person.attr("houseId"), house.attr("houseId"))), equality(city.attr("name"), house.attr("address"))).push(),
                   select(
-                          join(person, house, equality(person.attr("house_id"), house.attr("house_id"))),
+                          join(person, house, equality(person.attr("houseId"), house.attr("houseId"))),
                           equality(city.attr("name"), house.attr("address")) 
                         )
                  )

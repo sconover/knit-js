@@ -6,9 +6,9 @@ require("./test_relation.js")
 regarding("predicates", function() {
 
   beforeEach(function() {
-    person = knit(function(){return testRelation(["id", "house_id", "name", "age"])})
-    house = knit(function(){return testRelation(["house_id", "address", "city_id"])})
-    city = knit(function(){return testRelation(["city_id", "name"])})
+    person = knit(function(){return testRelation(["id", "houseId", "name", "age"])})
+    house = knit(function(){return testRelation(["houseId", "address", "cityId"])})
+    city = knit(function(){return testRelation(["cityId", "name"])})
   })
 
   
@@ -36,14 +36,14 @@ regarding("predicates", function() {
     assert.same(equality("a", "a"), equality("a", "a"))
     assert.notSame(equality("a", "a"), equality("a", "ZZ"))
     
-    var person = knit(function(){return testRelation(["id", "house_id", "name", "age"])})
+    var person = knit(function(){return testRelation(["id", "houseId", "name", "age"])})
     
     assert.same(equality(person.attr("name"), true), equality(person.attr("name"), true))
     assert.same(equality(person.attr("name"), person.attr("age")), equality(person.attr("name"), person.attr("age")))
 
     assert.notSame(equality(person.attr("name"), true), equality(person.attr("name"), false))
     assert.notSame(equality(person.attr("name"), true), equality(true, true))
-    assert.notSame(equality(person.attr("name"), person.attr("age")), equality(person.attr("name"), person.attr("house_id")))
+    assert.notSame(equality(person.attr("name"), person.attr("age")), equality(person.attr("name"), person.attr("houseId")))
   })})  
   
   
@@ -73,7 +73,7 @@ regarding("predicates", function() {
     assert.equivalent(conjunction(conjunction(TRUE, TRUE), FALSE), conjunction(FALSE, conjunction(TRUE, TRUE)))
     assert.notEquivalent(conjunction(conjunction(TRUE, TRUE), FALSE), conjunction(TRUE, conjunction(TRUE, TRUE)))
 
-    var person = knit(function(){return testRelation(["id", "house_id", "name", "age"])})
+    var person = knit(function(){return testRelation(["id", "houseId", "name", "age"])})
 
     assert.equivalent(equality(person.attr("name"), 2), equality(2, person.attr("name")))
     assert.equivalent(equality(person.attr("name"), person.attr("age")), equality(person.attr("age"), person.attr("name")))
@@ -126,7 +126,7 @@ regarding("predicates", function() {
     assert.equal(true, equality(person.attr("age"), 55).concernedWithNoOtherRelationsBesides(person, house))
     assert.equal(true, equality(person.attr("age"), house.attr("address")).concernedWithNoOtherRelationsBesides(person, house))
     
-    assert.equal(false, conjunction(equality(person.attr("age"), house.attr("address")), equality(city.attr("city_id"), 1)).
+    assert.equal(false, conjunction(equality(person.attr("age"), house.attr("address")), equality(city.attr("cityId"), 1)).
                          concernedWithNoOtherRelationsBesides(person, house))
   })})
 
@@ -134,9 +134,9 @@ regarding("predicates", function() {
     assert.equal(true, equality(person.attr("age"), 55).concernedWithAllOf(person))
     assert.equal(true, equality(person.attr("age"), house.attr("address")).concernedWithAllOf(person))
     assert.equal(true, conjunction(equality(person.attr("age"), house.attr("address")), 
-                                   equality(city.attr("city_id"), 1)).
+                                   equality(city.attr("cityId"), 1)).
                          concernedWithAllOf(person, house))
-    assert.equal(true, conjunction(equality(person.attr("age"), house.attr("address")), equality(city.attr("city_id"), 1)).
+    assert.equal(true, conjunction(equality(person.attr("age"), house.attr("address")), equality(city.attr("cityId"), 1)).
                          concernedWithAllOf(person, house, city))
                         
     assert.equal(false, equality(person.attr("age"), 55).concernedWithAllOf(person, house))

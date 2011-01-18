@@ -16,7 +16,7 @@ regarding("sql", function() {
   test("creating a relation means create the table", function(){
     engine.createRelation("person", [
       ["id", knit.engine.sql.IntegerType],
-      ["house_id", knit.engine.sql.IntegerType],
+      ["houseId", knit.engine.sql.IntegerType],
       ["name", knit.engine.sql.StringType],
       ["age", knit.engine.sql.IntegerType]
     ])
@@ -24,7 +24,7 @@ regarding("sql", function() {
     assert.equal(["person"], db.listTables())
     assert.equal(new knit.engine.sql.statement.CreateTable("person", [
                    ["id", knit.engine.sql.IntegerType],
-                   ["house_id", knit.engine.sql.IntegerType],
+                   ["houseId", knit.engine.sql.IntegerType],
                    ["name", knit.engine.sql.StringType],
                    ["age", knit.engine.sql.IntegerType]
                  ]), 
@@ -34,28 +34,28 @@ regarding("sql", function() {
   test("you get a table object back, which is a kind of relation", function(){
     var person = engine.createRelation("person", [
       ["id", knit.engine.sql.IntegerType],
-      ["house_id", knit.engine.sql.IntegerType],
+      ["houseId", knit.engine.sql.IntegerType],
       ["name", knit.engine.sql.StringType],
       ["age", knit.engine.sql.IntegerType]
     ])
     
     assert.equal("person", person.name())
-    assert.equal(["id", "house_id", "name", "age"], 
+    assert.equal(["id", "houseId", "name", "age"], 
                  _.map(person.attributes(), function(attr){return attr.name}))
   })
   
   // test("attribute equality", function(){
   //   var person = engine.createRelation("person", [
   //     ["id", knit.engine.sql.IntegerType],
-  //     ["house_id", knit.engine.sql.IntegerType]
+  //     ["houseId", knit.engine.sql.IntegerType]
   //   ])
   //   
   //   var house = engine.createRelation("house", [
-  //     ["house_id", knit.engine.sql.IntegerType]
+  //     ["houseId", knit.engine.sql.IntegerType]
   //   ])
   //   
-  //   assert.same(person.attr("house_id"), person.attr("house_id"))
-  //   assert.notSame(person.attr("house_id"), house.attr("house_id"))
+  //   assert.same(person.attr("houseId"), person.attr("houseId"))
+  //   assert.notSame(person.attr("houseId"), house.attr("houseId"))
   // })
   // 
 })

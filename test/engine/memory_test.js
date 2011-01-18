@@ -88,5 +88,17 @@ regarding("memory", function() {
                                city, equality(house.attr("cityId"), city.attr("cityId"))).apply().cost)
     })})
     
+    test("the numbers of rows involved in an order is the cost", function(){knit(function(){
+      r.merge([
+        [1, 98],
+        [2, 98],
+        [3, 99]
+      ])
+      
+      assert.equal(3, order.asc(r, r.attr("a")).apply().cost)
+      assert.equal(3, order.desc(r, r.attr("a")).apply().cost)
+
+      assert.equal(6, order.asc(order.asc(r, r.attr("a")), r.attr("b")).apply().cost)
+    })})
   })
 })

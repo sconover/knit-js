@@ -84,12 +84,12 @@ regarding("In Memory Engine", function () {
       ], person2.rows())
     })
 
-    xtest("return results in js object / associative array style", function (){
+    test("return results in js object / associative array style", function (){
       
       assert.equal([
-        [1, 101, "Jane", 5],
-        [2, 101, "Puck", 12],
-        [3, 102, "Fanny", 30]
+        {id:1, houseId:101, name:"Jane", age:5},
+        {id:2, houseId:101, name:"Puck", age:12},
+        {id:3, houseId:102, name:"Fanny", age:30}
       ], person.objects())
       
     })

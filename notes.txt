@@ -1,9 +1,12 @@
-knit statement to struct
-
-struct result to knit tuples
-
 what's the point of knit.engine.Memory?
 
+need to rename "apply" to something else appropriate...
+
+what about order push / split / merge?
+
+order adds to cost
+
+what's a sensible way to break apart memory relation?
 
 =========
 Next:

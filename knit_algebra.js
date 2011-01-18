@@ -263,40 +263,44 @@ var modulr = (function(global) {
 var require = modulr.require, module = require.main;
 require.define({
 'knit/core': function(require, exports, module) {
+if (!(typeof window === 'undefined')) global=window
+
 require("knit/dsl_function")
 
-global["knit"] = new DSLFunction()
-global.knit.algebra = {}
-global.knit.algebra.predicate = {}
-global.knit.engine = {}
-global.knit.engine.sql = {}
-global.knit.engine.sql.statement = {}
+global.knit = function(){
+  this.algebra = {predicate:{}}
+  this.engine = {}
+  
+  //hrm.  begone.
+  this.engine.sql = {statement:{}}
+  
+  //see http://javascript.crockford.com/prototypal.html
+  this.createObject = function() {
+    var o = arguments[0]
 
-knit.createObject = function() {
-  var o = arguments[0]
-  
-  function F() {}
-  F.prototype = o
-  var newObj = new F()
-  
-  if (arguments.length==2) {
-    var additions = arguments[1]
-    _.extend(newObj, additions)
+    function F() {}
+    F.prototype = o
+    var newObj = new F()
+
+    if (arguments.length==2) {
+      var additions = arguments[1]
+      _.extend(newObj, additions)
+    }
+
+    return newObj
   }
   
-  return newObj
-}
-
-
+  return this
+}.apply(new DSLFunction())
 }, 
 'knit/dsl_function': function(require, exports, module) {
 //see http://alexyoung.org/2009/10/22/javascript-dsl/
 
 DSLFunction = function() {
   var dslLocals = {}
-  var outerFunction = function(userFunction, whatThisIsSupposedToBe){
-    if (whatThisIsSupposedToBe == undefined) {
-      whatThisIsSupposedToBe = this
+  var outerFunction = function(userFunction, what_theKeywordThis_IsSupposedToBe){
+    if (what_theKeywordThis_IsSupposedToBe == undefined) {
+      what_theKeywordThis_IsSupposedToBe = this
     }
     
     var localNames = []
@@ -308,9 +312,19 @@ DSLFunction = function() {
     
     var userFunctionBody = "(_.bind(" + userFunction.toString().replace(/\s+$/, "") + ",this))()"
     var wrappingFunctionBody = "(function(" + localNames.join(",") + "){return " + userFunctionBody + "})"
-    return eval(wrappingFunctionBody).apply(whatThisIsSupposedToBe, localValues)
+    return eval(wrappingFunctionBody).apply(what_theKeywordThis_IsSupposedToBe, localValues)
   }
+  
   outerFunction.dslLocals = dslLocals
+  
+  outerFunction.specialize = function(childDslLocals) {
+    var allDslLocals = _.extend({}, outerFunction.dslLocals)
+    var allDslLocals = _.extend(allDslLocals, childDslLocals)
+    var childDslFunction = new DSLFunction()
+    _.extend(childDslFunction.dslLocals, allDslLocals)
+    return childDslFunction
+  }
+  
   return outerFunction
 }
 

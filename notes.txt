@@ -68,7 +68,7 @@ f(memoryPerson, memoryHouse)
 
 rawRelationFunction = engine.join(engine.mutableRelation("person"))
 
-rawRelationFunction().all()
+rawRelationFunction().rows()
 
 or
 
@@ -98,7 +98,7 @@ might yield a Join (i.e. noun, object) (known as r)
 r.name() == "person__house"
 r.attributes() == ...
 
-r.all() ==> tuples
+r.rows() ==> tuples
 
 
 then later...
@@ -123,7 +123,7 @@ select = knit.select(personR, knit.eq(personR.attr("name"), "Jane"))
 
 relationFunction = select.optimize()
 r = relationFunction()
-r.all()
+r.rows()
 
 =========
 

@@ -14,7 +14,7 @@ regarding("set tuple store - backed by a set", function() {
     
     assert.equal(
       [[1,2],
-       [3,4]], tupleStore.all())
+       [3,4]], tupleStore.rows())
   })
 
   test("with no key, just append new rows", function(){
@@ -36,7 +36,7 @@ regarding("set tuple store - backed by a set", function() {
        [3,4],
        [1,2],
        [3,4],
-       [5,6]], tupleStore.all())
+       [5,6]], tupleStore.rows())
   })
 
   test("can have a key.  overwrites a row with a new row if the keys match.", function(){
@@ -56,7 +56,7 @@ regarding("set tuple store - backed by a set", function() {
     assert.equal(
       [[1,"A"],
        [2,"B"],
-       [3,"c"]], tupleStore.all())
+       [3,"c"]], tupleStore.rows())
   })
 
   test("compound key", function(){
@@ -82,7 +82,7 @@ regarding("set tuple store - backed by a set", function() {
        [2,"b", false],
        [2,"BB", false],
        [3,"c", true],
-       [3,"C", true]], tupleStore.all())
+       [3,"C", true]], tupleStore.rows())
   })
 
 })

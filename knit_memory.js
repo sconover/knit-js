@@ -1501,7 +1501,7 @@ _.extend(knit.engine.Memory.Relation.prototype, {
            "]" 
   },
 
-  all: function() {
+  rows: function() {
     return this._tupleStore.all()
   },
   

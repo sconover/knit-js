@@ -32,7 +32,7 @@ regarding("In Memory Engine", function () {
     return {
      name:relation.name(),
      attributes:_.map(relation.attributes(), function(attribute){return attribute.name}),
-     tuples:relation.all()
+     tuples:relation.rows()
     }
   }
 
@@ -44,7 +44,7 @@ regarding("In Memory Engine", function () {
         [1, 101, "Jane", 5],
         [2, 101, "Puck", 12],
         [3, 102, "Fanny", 30]
-      ], person.all())
+      ], person.rows())
       
       person.merge([
         [4, 102, "Amy", 5]
@@ -55,7 +55,7 @@ regarding("In Memory Engine", function () {
         [2, 101, "Puck", 12],
         [3, 102, "Fanny", 30],
         [4, 102, "Amy", 5]
-      ], person.all())
+      ], person.rows())
     })
     
     test("primary key - replace rows a row if it's a dup", function (){
@@ -71,7 +71,7 @@ regarding("In Memory Engine", function () {
         [1, 101, "Jane", 5],
         [2, 101, "Puck", 12],
         [3, 102, "Fanny", 30]
-      ], person2.all())
+      ], person2.rows())
       
       person2.merge([
         [1, 101, "Jeanne", 6]
@@ -81,7 +81,7 @@ regarding("In Memory Engine", function () {
         [1, 101, "Jeanne", 6],
         [2, 101, "Puck", 12],
         [3, 102, "Fanny", 30]
-      ], person2.all())
+      ], person2.rows())
     })
     
   })

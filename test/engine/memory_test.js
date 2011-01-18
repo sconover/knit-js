@@ -16,6 +16,21 @@ regarding("memory", function() {
     })
   })
 
+  regarding(".rows / .objects", function() {
+    test("they cause the relation to be applied", function(){knit(function(){
+      r.merge([
+        [1, 98],
+        [2, 98],
+        [3, 99]
+      ])
+      
+      assert.equal([
+        [1, 98],
+        [2, 98]
+      ], select(r, equality(r.attr("b"), 98)).rows())
+    })
+  })})
+
   regarding("memory predicate - match", function() {
   
     test("true false match", function(){knit(function(){

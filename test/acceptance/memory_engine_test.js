@@ -10,18 +10,18 @@ regarding("In Memory Engine", function () {
     house = engine.createRelation("house", ["house_id", "address", "city_id"])
     city = engine.createRelation("city", ["city_id", "name"])
 
-    person.mergeSync([
+    person.merge([
       [1, 101, "Jane", 5],
       [2, 101, "Puck", 12],
       [3, 102, "Fanny", 30]
     ])
     
-    house.mergeSync([
+    house.merge([
       [101, "Chimney Hill", 1001],
       [102, "Parnassus", 1002]
     ])
 
-    city.mergeSync([
+    city.merge([
       [1001, "San Francisco"],
       [1002, "New Orleans"]
     ])
@@ -32,7 +32,7 @@ regarding("In Memory Engine", function () {
     return {
      name:relation.name(),
      attributes:_.map(relation.attributes(), function(attribute){return attribute.name}),
-     tuples:relation.tuplesSync()
+     tuples:relation.all()
     }
   }
 
@@ -44,9 +44,9 @@ regarding("In Memory Engine", function () {
         [1, 101, "Jane", 5],
         [2, 101, "Puck", 12],
         [3, 102, "Fanny", 30]
-      ], person.tuplesSync())
+      ], person.all())
       
-      person.mergeSync([
+      person.merge([
         [4, 102, "Amy", 5]
       ])
 
@@ -55,13 +55,13 @@ regarding("In Memory Engine", function () {
         [2, 101, "Puck", 12],
         [3, 102, "Fanny", 30],
         [4, 102, "Amy", 5]
-      ], person.tuplesSync())
+      ], person.all())
     })
     
     test("primary key - replace rows a row if it's a dup", function (){
       var person2 = engine.createRelation("person", ["id", "house_id", "name", "age"], ["id"])
 
-      person2.mergeSync([
+      person2.merge([
         [1, 101, "Jane", 5],
         [2, 101, "Puck", 12],
         [3, 102, "Fanny", 30]
@@ -71,9 +71,9 @@ regarding("In Memory Engine", function () {
         [1, 101, "Jane", 5],
         [2, 101, "Puck", 12],
         [3, 102, "Fanny", 30]
-      ], person2.tuplesSync())
+      ], person2.all())
       
-      person2.mergeSync([
+      person2.merge([
         [1, 101, "Jeanne", 6]
       ])
 
@@ -81,7 +81,7 @@ regarding("In Memory Engine", function () {
         [1, 101, "Jeanne", 6],
         [2, 101, "Puck", 12],
         [3, 102, "Fanny", 30]
-      ], person2.tuplesSync())
+      ], person2.all())
     })
     
   })

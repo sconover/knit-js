@@ -7,7 +7,7 @@ regarding("set tuple store - backed by a set", function() {
   test("stores rows, sends them all back using 'all'", function(){
     var tupleStore = new knit.engine.Memory.StandardTupleStore([], [])
     
-    tupleStore.mergeSync(
+    tupleStore.merge(
       [[1,2],
        [3,4]]
     )
@@ -20,12 +20,12 @@ regarding("set tuple store - backed by a set", function() {
   test("with no key, just append new rows", function(){
     var tupleStore = new knit.engine.Memory.StandardTupleStore([], [])
     
-    tupleStore.mergeSync(
+    tupleStore.merge(
       [[1,2],
        [3,4]]
     )
     
-    tupleStore.mergeSync(
+    tupleStore.merge(
       [[1,2],
        [3,4],
        [5,6]]
@@ -42,13 +42,13 @@ regarding("set tuple store - backed by a set", function() {
   test("can have a key.  overwrites a row with a new row if the keys match.", function(){
     var tupleStore = new knit.engine.Memory.StandardTupleStore([0], [])
     
-    tupleStore.mergeSync(
+    tupleStore.merge(
       [[1,"a"],
        [2,"b"],
        [3,"c"]]
     )
     
-    tupleStore.mergeSync(
+    tupleStore.merge(
       [[1,"A"],
        [2,"B"]]
     )
@@ -62,7 +62,7 @@ regarding("set tuple store - backed by a set", function() {
   test("compound key", function(){
     var tupleStore = new knit.engine.Memory.StandardTupleStore([0, 2], [])
     
-    tupleStore.mergeSync(
+    tupleStore.merge(
       [[1,"a", true],
        [1,"A", false],
        [2,"b", false],
@@ -71,7 +71,7 @@ regarding("set tuple store - backed by a set", function() {
        [3,"C", true]]
     )
     
-    tupleStore.mergeSync(
+    tupleStore.merge(
       [[1,"AA", true],
        [2,"BB", false]]
     )

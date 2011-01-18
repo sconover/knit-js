@@ -24,18 +24,18 @@ xregarding("Sql Engine", function () {
       ["name", knit.engine.Sql.StringType]
     ])
 
-    person.mergeSync([
+    person.merge([
       [1, 101, "Jane", 5],
       [2, 101, "Puck", 12],
       [3, 102, "Fanny", 30]
     ])
     
-    house.mergeSync([
+    house.merge([
       [101, "Chimney Hill", 1001],
       [102, "Parnassus", 1002]
     ])
 
-    city.mergeSync([
+    city.merge([
       [1001, "San Francisco"],
       [1002, "New Orleans"]
     ])
@@ -46,7 +46,7 @@ xregarding("Sql Engine", function () {
     return {
      name:relation.name(),
      attributes:_.map(relation.attributes(), function(attribute){return attribute.name}),
-     tuples:relation.tuplesSync()
+     tuples:relation.all()
     }
   }
 
@@ -58,9 +58,9 @@ xregarding("Sql Engine", function () {
         [1, 101, "Jane", 5],
         [2, 101, "Puck", 12],
         [3, 102, "Fanny", 30]
-      ], person.tuplesSync())
+      ], person.all())
       
-      person.mergeSync([
+      person.merge([
         [4, 102, "Amy", 5]
       ])
 
@@ -69,7 +69,7 @@ xregarding("Sql Engine", function () {
         [2, 101, "Puck", 12],
         [3, 102, "Fanny", 30],
         [4, 102, "Amy", 5]
-      ], person.tuplesSync())
+      ], person.all())
     })
     
   })

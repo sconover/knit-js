@@ -47,3 +47,37 @@ regarding("a dsl function presents a set of objects to a user-defined function a
     
 })
 
+regarding("you can specialize a dsl function. " +
+          "that is, you can take some existing dsl function and add your own locals", function (){
+
+  test("specialize a dsl function without affecting the original", function(){
+    var dslParent = new DSLFunction()
+    dslParent.dslLocals.x = 123
+    dslParent.dslLocals.hello = function(){return "world"}
+
+    dslParent(function(){
+      assert.equal(123, x)
+      assert.equal("world", hello())
+    })
+
+
+    
+    var dslChild = dslParent.specialize({
+      bye: function(){return "bye bye"}
+    })
+    
+    dslParent(function(){
+      assert.equal(123, x)
+      assert.equal("world", hello())
+      assert.equal(true, typeof bye === 'undefined')
+    })
+    
+    dslChild(function(){
+      assert.equal(123, x)
+      assert.equal("world", hello())
+      assert.equal("bye bye", bye())
+    })
+    
+  })
+
+})

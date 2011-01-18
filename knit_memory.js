@@ -750,7 +750,7 @@ _.extend(knit.engine.Memory.prototype, {
 require("knit/engine/memory/attribute")
 require("knit/engine/memory/relation")
 require("knit/engine/memory/predicate")
-require("knit/engine/memory/standard_tuple_store")
+require("knit/engine/memory/standard_row_store")
 
 
 
@@ -824,7 +824,7 @@ knit.engine.Memory.Relation = function(name, attributeNames, primaryKey, rows, c
       return position
     })
   
-  this._rowStore = new knit.engine.Memory.StandardTupleStore(pkPositions, rows || [])
+  this._rowStore = new knit.engine.Memory.StandardRowStore(pkPositions, rows || [])
   this.cost = costSoFar || 0
 }
 
@@ -984,14 +984,14 @@ _.extend(knit.algebra.predicate.Conjunction.prototype, {
 })
 
 }, 
-'knit/engine/memory/standard_tuple_store': function(require, exports, module) {
-knit.engine.Memory.StandardTupleStore = function(keyColumns, initialTuples) {
+'knit/engine/memory/standard_row_store': function(require, exports, module) {
+knit.engine.Memory.StandardRowStore = function(keyColumns, initialRows) {
   this._keyColumns = keyColumns
-  this._tuples = initialTuples || []
+  this._rows = initialRows || []
 }
 
-_.extend(knit.engine.Memory.StandardTupleStore.prototype, {
-  merge: function(moreTuples) {
+_.extend(knit.engine.Memory.StandardRowStore.prototype, {
+  merge: function(moreRows) {
     
     var self = this
     
@@ -999,44 +999,44 @@ _.extend(knit.engine.Memory.StandardTupleStore.prototype, {
       return self._keyColumns.length >= 1
     }
     
-    function treatAsSet(moreTuples) {
+    function treatAsSet(moreRows) {
       //pretty bad perf...
         //future...cost-aware array?
         //test-drive to lower cost...
-        //this._tuples.with(function(arr){
+        //this._rows.with(function(arr){
         //   ...tracks cost of all iterating you do in here  
         //})
         //
         //Also, cost-aware map
           //check out js map
-      var keyToTuple = {}
+      var keyToRow = {}
       var keyToArrayIndex = {}
       
-      _.each(self._tuples, function(tuple, i){
-        var key = _.map(self._keyColumns, function(arrayIndex){return "" + tuple[arrayIndex]}).join("_")
-        keyToTuple[key] = tuple
+      _.each(self._rows, function(row, i){
+        var key = _.map(self._keyColumns, function(arrayIndex){return "" + row[arrayIndex]}).join("_")
+        keyToRow[key] = row
         keyToArrayIndex[key] = i
       })
     
-      _.each(moreTuples, function(newTuple){
-        var newKey = _.map(self._keyColumns, function(arrayIndex){return "" + newTuple[arrayIndex]}).join("_")
-        if (keyToTuple[newKey]) {
+      _.each(moreRows, function(newRow){
+        var newKey = _.map(self._keyColumns, function(arrayIndex){return "" + newRow[arrayIndex]}).join("_")
+        if (keyToRow[newKey]) {
           var i = keyToArrayIndex[newKey]
-          self._tuples[i] = newTuple
+          self._rows[i] = newRow
         } else {
-          self._tuples.push(newTuple)
+          self._rows.push(newRow)
         }
       })
     }
     
     if (hasKey()) {
-      treatAsSet(moreTuples)
+      treatAsSet(moreRows)
     } else {
-      self._tuples = self._tuples.concat(moreTuples)
+      self._rows = self._rows.concat(moreRows)
     }
   },
   
-  rows: function(){ return this._tuples }
+  rows: function(){ return this._rows }
 })
 }
 });

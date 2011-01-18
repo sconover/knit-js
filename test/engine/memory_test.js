@@ -40,7 +40,7 @@ regarding("memory", function() {
   })
   
   
-  regarding("the 'cost' of an apply using the memory engine is the sum of all the tuples of all relations created", function() {
+  regarding("the 'cost' of an apply using the memory engine is the sum of all the rows of all relations created", function() {
 
     test("just applying a relation and doing nothing else is zero cost", function(){knit(function(){
       assert.equal(0, r.apply().cost)

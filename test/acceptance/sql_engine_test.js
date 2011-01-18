@@ -46,7 +46,7 @@ xregarding("Sql Engine", function () {
     return {
      name:relation.name(),
      attributes:_.map(relation.attributes(), function(attribute){return attribute.name}),
-     tuples:relation.rows()
+     rows:relation.rows()
     }
   }
 
@@ -87,7 +87,7 @@ xregarding("Sql Engine", function () {
         assert.equal({
           name:"person",
           attributes:["id", "houseId", "name", "age"],
-          tuples:[
+          rows:[
             [3, 102, "Fanny", 30]
           ]
         }, relationContents(smallerRelation))
@@ -112,7 +112,7 @@ xregarding("Sql Engine", function () {
         name:"person__house",
         attributes:["id", "houseId", "name", "age", 
                     "houseId", "address", "cityId"],
-        tuples:[
+        rows:[
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001],
           [1, 101, "Jane", 5, 102, "Parnassus", 1002],
           [2, 101, "Puck", 12, 101, "Chimney Hill", 1001],
@@ -136,7 +136,7 @@ xregarding("Sql Engine", function () {
         attributes:["id", "houseId", "name", "age", 
                     "houseId", "address", "cityId",
                     "cityId", "name"],
-        tuples:[
+        rows:[
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001, 1001, "San Francisco"],
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001, 1002, "New Orleans"],
           [1, 101, "Jane", 5, 102, "Parnassus", 1002, 1001, "San Francisco"],
@@ -164,7 +164,7 @@ xregarding("Sql Engine", function () {
         name:"person__house",
         attributes:["id", "houseId", "name", "age", 
                     "houseId", "address", "cityId"],
-        tuples:[
+        rows:[
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001],
           [2, 101, "Puck", 12, 101, "Chimney Hill", 1001],
           [3, 102, "Fanny", 30, 102, "Parnassus", 1002]
@@ -188,7 +188,7 @@ xregarding("Sql Engine", function () {
         name:"person__house",
         attributes:["id", "houseId", "name", "age", 
                     "houseId", "address", "cityId"],
-        tuples:[
+        rows:[
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001],
           [2, 101, "Puck", 12, 101, "Chimney Hill", 1001],
           [3, 102, "Fanny", 30, 101, "Chimney Hill", 1001]
@@ -211,7 +211,7 @@ xregarding("Sql Engine", function () {
         name:"person__house",
         attributes:["id", "houseId", "name", "age", 
                     "houseId", "address", "cityId"],
-        tuples:[
+        rows:[
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001],
           [2, 101, "Puck", 12, 101, "Chimney Hill", 1001],
           [3, 102, "Fanny", 30, 102, "Parnassus", 1002]
@@ -236,7 +236,7 @@ xregarding("Sql Engine", function () {
       assert.equal({
         name:"person",
         attributes:["name", "age"],
-        tuples:[
+        rows:[
           ["Jane", 5],
           ["Puck", 12],
           ["Fanny", 30]

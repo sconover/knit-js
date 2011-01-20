@@ -9,7 +9,7 @@ regarding("order", function() {
     person = knit(function(){return testRelation(["id", "houseId", "name", "age"])})
   })
 
-  test("inspect", function (){knit(function(){
+  test("inspect", function(){knit(function(){
     assert.equal("order.asc(r[id,houseId,name,age],name)", 
                  order.asc(person, person.attr("name")).inspect())
   })})
@@ -17,13 +17,13 @@ regarding("order", function() {
   
   regarding("sameness and equivalence", function() {
     
-    test("same if the sort direction and sort attribute are equal", function (){knit(function(){
+    test("same if the sort direction and sort attribute are equal", function(){knit(function(){
       assert.same(order.asc(person, person.attr("name")), order.asc(person, person.attr("name")))
       assert.notSame(order.asc(person, person.attr("name")), order.desc(person, person.attr("name")))
       assert.notSame(order.asc(person, person.attr("name")), order.asc(person, person.attr("age")))
     })})
         
-    test("equivalent is like same", function (){knit(function(){
+    test("equivalent is like same", function(){knit(function(){
       assert.equivalent(order.asc(person, person.attr("name")), order.asc(person, person.attr("name")))
       assert.notEquivalent(order.asc(person, person.attr("name")), order.desc(person, person.attr("name")))
       assert.notEquivalent(order.asc(person, person.attr("name")), order.asc(person, person.attr("age")))

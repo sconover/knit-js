@@ -1,3 +1,12 @@
+nest / unnest
+  cost
+  prove that cost is low...implement as n+1 strategy, then RF to sorts + weaving
+    ...should it impose its own order.asc on the relation?
+
+quacksLike...anything out there?  underscore method?
+
+jasmine-node at-exit merge
+
 what's the point of knit.engine.Memory?
 
 need to rename "apply" to something else appropriate...
@@ -7,6 +16,22 @@ what about order push / split / merge?
 order adds to cost
 
 what's a sensible way to break apart memory relation?
+
+
+=========
+Knit needs to be stream-based
+  use jquery / sequel / datamapper results set style (rows, rows.first [applies limit 1 relation at the last minute?], rows.all)
+  engine implementers should have to implement something like forEach
+  
+Cross engine joins
+  think join (unix cmd)
+  - needs to assume the two sides are sorted on the join key.  
+    ...so, you need to implement forEach, isSortedOn(joinKeyPart1, joinKeyPart2), sortOn(joinKeyPart1, joinKeyPart2)
+      ...you could of course lie about isSorted..., that just means x-engine joins using your engine will be wacky
+      
+Should be able to use this in node.js to programmatically do file joins like unix join does, and it should be pretty fast.
+  should the system "wake up" on forEach push events / callback from relation sources?
+    imagine doing a x-engine join between a file and remix, that's paged + not resource intensive.
 
 =========
 Next:

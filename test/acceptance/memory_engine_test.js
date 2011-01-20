@@ -1,7 +1,7 @@
 require("../test_helper.js")
 require("knit/engine/memory")
 
-regarding("In Memory Engine", function () {
+regarding("In Memory Engine", function() {
     
   beforeEach(function() {
     engine = new knit.engine.Memory()
@@ -36,7 +36,7 @@ regarding("In Memory Engine", function () {
     }
   }
 
-  regarding("Basics", function () {
+  regarding("Basics", function() {
 
     test("insert, read", function (){
       
@@ -97,9 +97,9 @@ regarding("In Memory Engine", function () {
     
   })
 
-  regarding("Selection", function () {
+  regarding("Selection", function() {
     
-    regarding("Predicates", function () {
+    regarding("Predicates", function() {
     
       test("basic equality", function (){
         var smallerRelation = 
@@ -123,7 +123,7 @@ regarding("In Memory Engine", function () {
 
 
   
-  regarding("Join (cartesian)", function () {
+  regarding("Join (cartesian)", function() {
 
     test("combine each row on the left with each row on the right (cartesian product)", function (){
       
@@ -200,10 +200,10 @@ regarding("In Memory Engine", function () {
     
   })
 
-  regarding("Selection pushing and cost", function () {
+  regarding("Selection pushing and cost", function() {
     test("pushing in a select is less costly than leaving it outside, unnecessarily", function (){
       
-      expression = knit(function(){
+      var expression = knit(function(){
         return select(join(person, house), equality(house.attr("address"), "Chimney Hill"))
       })
       
@@ -226,7 +226,7 @@ regarding("In Memory Engine", function () {
 
     test("pushing in a select and making it into a join predicate is less costly than just leaving the select outside", function (){
 
-      expression = knit(function(){
+      var expression = knit(function(){
         return select(join(person, house), equality(house.attr("houseId"), person.attr("houseId")))
       })
       
@@ -250,7 +250,7 @@ regarding("In Memory Engine", function () {
 
   })
 
-  regarding("Order", function () {
+  regarding("Order", function() {
     
     test("rows are in ascending order", function (){
       var peopleInNameOrderAscending = 
@@ -290,7 +290,80 @@ regarding("In Memory Engine", function () {
   })
   
 
-  xregarding("Projection", function () {
+  xregarding("Nest, unnest", function() {
+    
+    regarding("Non First Normal Form to First Normal Form via unnest", function() {
+
+      test("simple.  flattens the nested relation by distributing.", function (){
+        
+        var houseToPeopleRows_non1NF = [
+          [101, "Chimney Hill", [[1, "Jane", 5],
+                                 [2, "Puck", 12]]],          
+          [102, "Parnassus", [[3, "Fanny", 30]]]
+        ]
+        
+        var simplePerson = engine.createRelation("person", ["personId", "name", "age"])
+        var houseToPeople_non1NF = engine.createRelation("housesAndPeople", ["houseId", "address", {"people":simplePerson}])
+        houseToPeople_non1NF.merge(houseToPeopleRows_non1NF)
+
+        assert.equal({
+          name:"housesAndPeople",
+          attributes:["houseId", "address", {"people":simplePerson}],
+          rows:houseToPeopleRows_non1NF
+        }, relationContents(houseToPeople_non1NF))
+
+        
+        
+        var houseToPerson_1NF = knit(function(){
+          return unnest(houseToPeople_non1NF, "people")
+        })
+        
+        assert.equal({
+          name:"housesAndPeople",
+          attributes:["houseId", "address", "personId", "name", "age"],
+          rows:[
+            [101, "Chimney Hill", 1, "Jane", 5],
+            [101, "Chimney Hill", 2, "Puck", 12],
+            [102, "Parnassus", 3, "Fanny", 30]
+          ]
+        }, relationContents(houseToPerson_1NF))
+        
+      })
+    })
+
+    regarding("Group up 'child' data into nested relations", function() {
+
+      test("simple.  1NF to nested by matching on non-nested rows.  order doesn't matter.", function (){
+        
+        var simplePerson = engine.createRelation("person", ["personId", "name", "age"])
+        var houseToPeople_1NF = engine.createRelation("housesAndPeople", ["houseId", "address", "personId", "name", "age"])
+        houseToPeople_1NF.merge([
+          [101, "Chimney Hill", 1, "Jane", 5],
+          [101, "Chimney Hill", 2, "Puck", 12],
+          [102, "Parnassus", 3, "Fanny", 30]
+        ])
+        
+        
+        var houseToPerson_non1NF = knit(function(){
+          return nest(houseToPeople_1NF, {"people":simplePerson})
+        })
+        
+        assert.equal({
+          name:"housesAndPeople",
+          attributes:["houseId", "address", {"people":simplePerson}],
+          rows:[
+            [101, "Chimney Hill", [[1, "Jane", 5],
+                                   [2, "Puck", 12]]],          
+            [102, "Parnassus", [[3, "Fanny", 30]]]
+          ]
+        }, relationContents(houseToPerson_non1NF))
+        
+      })
+    })
+          
+  })
+
+  xregarding("Projection", function() {
 
     test("project a subset of attributes over the relation", function (){
 

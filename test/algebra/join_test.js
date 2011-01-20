@@ -27,14 +27,14 @@ regarding("join", function() {
   
   regarding("sameness and equivalence", function() {
     
-    test("same", function (){knit(function(){
+    test("same", function(){knit(function(){
       assert.same(join(person, house), join(person, house))
 
       assert.notSame(join(person, house), join(house, city))
       assert.notSame(join(house, city), join(person, house))
     })})    
 
-    test("same - with predicate", function (){knit(function(){
+    test("same - with predicate", function(){knit(function(){
       assert.same(join(person, house, equality(person.attr("houseId"), house.attr("houseId"))),
                   join(person, house, equality(person.attr("houseId"), house.attr("houseId"))))
 
@@ -42,11 +42,11 @@ regarding("join", function() {
                      join(person, house, equality(person.attr("houseId"), house.attr("houseId"))))
     })})
 
-    test("same implies equivalent", function (){knit(function(){
+    test("same implies equivalent", function(){knit(function(){
       assert.equivalent(join(person, house), join(person, house))
     })})
 
-    test("equivalent with predicate", function (){knit(function(){
+    test("equivalent with predicate", function(){knit(function(){
       assert.equivalent(join(person, house, equality(person.attr("houseId"), house.attr("houseId"))),
                         join(person, house, equality(person.attr("houseId"), house.attr("houseId"))))
 
@@ -54,12 +54,12 @@ regarding("join", function() {
                         join(person, house, equality(person.attr("houseId"), house.attr("houseId"))))
     })})
 
-    test("commutativity - two join functions are equivalent if the relations are the same but in different order", function (){knit(function(){
+    test("commutativity - two join functions are equivalent if the relations are the same but in different order", function(){knit(function(){
       assert.equivalent(join(person, house), join(house, person))
       assert.notEquivalent(join(person, house), join(person, city))
     })})
 
-    test("nonassociativity - order of operations (inner/outer) matters", function (){knit(function(){
+    test("nonassociativity - order of operations (inner/outer) matters", function(){knit(function(){
       assert.equivalent(join(join(person, house), city), join(join(person, house), city))
       assert.notEquivalent(join(join(person, house), city), join(person, join(house, city)))
     })})
@@ -67,12 +67,12 @@ regarding("join", function() {
   })
   
   regarding("appendToPredicate", function() {
-    test("when there's only a True predicate existing, replace it", function (){knit(function(){
+    test("when there's only a True predicate existing, replace it", function(){knit(function(){
       assert.same(join(person, house).appendToPredicate(equality(4,5)), join(person, house, equality(4,5)))
       assert.same(join(person, house, TRUE).appendToPredicate(equality(4,5)), join(person, house, equality(4,5)))
     })})    
 
-    test("when there's any other kind of existing predicate, make a conjunction", function (){knit(function(){
+    test("when there's any other kind of existing predicate, make a conjunction", function(){knit(function(){
       assert.same(join(person, house, equality(4,5)).appendToPredicate(equality(6,7)),
                   join(person, house, conjunction(equality(4,5), equality(6,7))))
     })})    

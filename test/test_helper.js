@@ -64,3 +64,11 @@ assert.same = function(expected, actual) {
 assert.notSame = function(expected, actual) {
   assert._same(expected, actual, false, "is Not Same")
 }
+
+
+assert.arraySame = function(expected, actual) {
+  _.each(expected, function(item, i){
+    assert.same(item, actual[i])
+  })
+}
+

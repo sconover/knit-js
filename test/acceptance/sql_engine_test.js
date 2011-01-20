@@ -1,7 +1,7 @@
 require("../test_helper.js")
 require("knit/engine/memory")
 
-xregarding("Sql Engine", function () {
+xregarding("Sql Engine", function() {
     
   beforeEach(function() {
     engine = new knit.engine.Sql(new knit.engine.Sql.Sqlite(":memory:"))
@@ -50,7 +50,7 @@ xregarding("Sql Engine", function () {
     }
   }
 
-  regarding("Basics", function () {
+  regarding("Basics", function() {
 
     test("insert, read", function (){
       
@@ -74,9 +74,9 @@ xregarding("Sql Engine", function () {
     
   })
 
-  regarding("Selection", function () {
+  regarding("Selection", function() {
     
-    regarding("Predicates", function () {
+    regarding("Predicates", function() {
     
       test("basic equality", function (){
         var smallerRelation = 
@@ -100,7 +100,7 @@ xregarding("Sql Engine", function () {
 
 
   
-  regarding("Join (cartesian)", function () {
+  regarding("Join (cartesian)", function() {
 
     test("combine each row on the left with each row on the right (cartesian product)", function (){
       
@@ -177,7 +177,7 @@ xregarding("Sql Engine", function () {
     
   })
 
-  regarding("Selection pushing and cost", function () {
+  regarding("Selection pushing and cost", function() {
     test("pushing in a select is less costly than leaving it outside, unnecessarily", function (){
       
       expression = knit(function(){
@@ -227,7 +227,7 @@ xregarding("Sql Engine", function () {
 
   })
 
-  xregarding("Projection", function () {
+  xregarding("Projection", function() {
 
     test("project a subset of attributes over the relation", function (){
 

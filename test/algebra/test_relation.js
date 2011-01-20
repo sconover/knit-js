@@ -56,7 +56,7 @@ knit.TestAttribute = function(name, sourceRelation) {
 _.extend(knit.TestAttribute.prototype, {
   isSame: function(other) {
     return this.name == other.name &&
-           other._nestedRelation === undefined &&
+           other.nestedRelation === undefined &&
            this._sourceRelation === other._sourceRelation
   },
   
@@ -68,20 +68,20 @@ _.extend(knit.TestAttribute.prototype, {
 
 knit.TestNestedAttribute = function(name, nestedRelation, sourceRelation) {
   this.name = name
-  this._nestedRelation = nestedRelation
+  this.nestedRelation = nestedRelation
   this._sourceRelation = sourceRelation
 }
 
 _.extend(knit.TestNestedAttribute.prototype, {
   isSame: function(other) {
     return this.name == other.name &&
-           other._nestedRelation != undefined &&
-           this._nestedRelation.isSame(other._nestedRelation) &&
+           other.nestedRelation != undefined &&
+           this.nestedRelation.isSame(other.nestedRelation) &&
            this._sourceRelation === other._sourceRelation
   },
   
   inspect: function() {
-    return this.name + ":" + this._nestedRelation.inspect()
+    return this.name + ":" + this.nestedRelation.inspect()
   }
 
 })

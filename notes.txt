@@ -3,19 +3,38 @@ nest / unnest
   prove that cost is low...implement as n+1 strategy, then RF to sorts + weaving
     ...should it impose its own order.asc on the relation?
 
+reconsider apply
+  interesting that it's in the same place as rows and objects
+  turn this into a late-evaluating result set like sequel
+    go look at sequel internals
+  also go make things stream/firehose-oriented now?
+    engine implementations provide an iterator (something with forEach?)
+      make sure underscore can use it
+      what about jquery?  jQuery(objects()).each()...  jQuery(rows()).each()...
+  later: rows and objects can take a callback method, jquery-style, for async support (callback with the iterator)
+
 quacksLike...anything out there?  underscore method?
 
 jasmine-node at-exit merge
 
+style: property or function?  name vs name().  cost, or cost() ?  etc
+  general style audit
+
 what's the point of knit.engine.Memory?
 
-need to rename "apply" to something else appropriate...
+organization...
+  implementations of different parts of the algebra
+  apply / rows / etc
+  if someone else is implementing, is it obvious where to put things?
+    code should guide you.
+    here are the buckets.
 
 what about order push / split / merge?
 
 order adds to cost
 
 what's a sensible way to break apart memory relation?
+
 
 
 =========

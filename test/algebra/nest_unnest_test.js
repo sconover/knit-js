@@ -29,22 +29,5 @@ regarding("unnest", function() {
     })})    
   })
   
-  
-  regarding("unnesting a relation pull the relation up to the top level", function() {
-  
-    xtest("unnest", function(){knit(function(){
-      var bareHouse = knit(function(){return testRelation(["houseId", "address"])})
-      
-      assert.arraySame([
-        house.attr("houseId"),
-        house.attr("address"),
-        person.attr("personId"),
-        person.attr("name"),
-        person.attr("age")
-      ], unnest(house, house.attr("people")).attributes())
-    })})
-  
-  })
-
 })
 

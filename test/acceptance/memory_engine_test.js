@@ -31,9 +31,21 @@ regarding("In Memory Engine", function() {
   function relationContents(relation) {
     return {
      name:relation.name(),
-     attributes:_.map(relation.attributes(), function(attribute){return attribute.name}),
+     attributes:getAttributes(relation),
      rows:relation.rows()
     }
+  }
+  
+  function getAttributes(relation) {
+    return _.map(relation.attributes(), function(attribute){
+      if (attribute.nestedRelation) {
+        var mapping = {}
+        mapping[attribute.name] = getAttributes(attribute.nestedRelation)
+        return mapping
+      } else {
+        return attribute.name
+      }
+    })
   }
 
   regarding("Basics", function() {
@@ -290,41 +302,39 @@ regarding("In Memory Engine", function() {
   })
   
 
-  xregarding("Nest, unnest", function() {
+  regarding("Nest, unnest", function() {
     
     regarding("Non First Normal Form to First Normal Form via unnest", function() {
 
       test("simple.  flattens the nested relation by distributing.", function (){
         
         var houseToPeopleRows_non1NF = [
-          [101, "Chimney Hill", [[1, "Jane", 5],
-                                 [2, "Puck", 12]]],          
-          [102, "Parnassus", [[3, "Fanny", 30]]]
+          [101, [[1, "Jane", 5],
+                 [2, "Puck", 12]], "Chimney Hill"],          
+          [102, [[3, "Fanny", 30]], "Parnassus"]
         ]
         
         var simplePerson = engine.createRelation("person", ["personId", "name", "age"])
-        var houseToPeople_non1NF = engine.createRelation("housesAndPeople", ["houseId", "address", {"people":simplePerson}])
+        var houseToPeople_non1NF = engine.createRelation("housesAndPeople", ["houseId", {"people":simplePerson}, "address"])
         houseToPeople_non1NF.merge(houseToPeopleRows_non1NF)
 
         assert.equal({
           name:"housesAndPeople",
-          attributes:["houseId", "address", {"people":simplePerson}],
+          attributes:["houseId", {"people":["personId","name","age"]}, "address"],
           rows:houseToPeopleRows_non1NF
         }, relationContents(houseToPeople_non1NF))
 
-        
-        
         var houseToPerson_1NF = knit(function(){
-          return unnest(houseToPeople_non1NF, "people")
-        })
-        
+          return unnest(this.houseToPeople_non1NF, this.houseToPeople_non1NF.attr("people"))
+        }, {houseToPeople_non1NF:houseToPeople_non1NF}).apply()
+                
         assert.equal({
           name:"housesAndPeople",
-          attributes:["houseId", "address", "personId", "name", "age"],
+          attributes:["houseId", "personId", "name", "age", "address"],
           rows:[
-            [101, "Chimney Hill", 1, "Jane", 5],
-            [101, "Chimney Hill", 2, "Puck", 12],
-            [102, "Parnassus", 3, "Fanny", 30]
+            [101, 1, "Jane", 5, "Chimney Hill"],
+            [101, 2, "Puck", 12, "Chimney Hill"],
+            [102, 3, "Fanny", 30, "Parnassus"]
           ]
         }, relationContents(houseToPerson_1NF))
         
@@ -333,7 +343,7 @@ regarding("In Memory Engine", function() {
 
     regarding("Group up 'child' data into nested relations", function() {
 
-      test("simple.  1NF to nested by matching on non-nested rows.  order doesn't matter.", function (){
+      xtest("simple.  1NF to nested by matching on non-nested rows.  order doesn't matter.", function (){
         
         var simplePerson = engine.createRelation("person", ["personId", "name", "age"])
         var houseToPeople_1NF = engine.createRelation("housesAndPeople", ["houseId", "address", "personId", "name", "age"])

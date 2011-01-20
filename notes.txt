@@ -1,7 +1,14 @@
 nest / unnest
+  impose order on non-nested cols?
+    ask whether it's ordered, and it it's not, impose order?
+      relation.ordered?()
+    just leave this as a known issue...
   cost
   prove that cost is low...implement as n+1 strategy, then RF to sorts + weaving
     ...should it impose its own order.asc on the relation?
+
+this.newNestedAttribute = this.relationOne.newNestedAttribute
+  kinda sucks
 
 reconsider apply
   interesting that it's in the same place as rows and objects
@@ -11,6 +18,9 @@ reconsider apply
     engine implementations provide an iterator (something with forEach?)
       make sure underscore can use it
       what about jquery?  jQuery(objects()).each()...  jQuery(rows()).each()...
+      good inspect capability
+        rows.inspect returns tab-delimited table
+        objects.inspect ... hmm, pretty-printed json?  not sure.  do nothing / just use rows.inspect...
   later: rows and objects can take a callback method, jquery-style, for async support (callback with the iterator)
 
 quacksLike...anything out there?  underscore method?
@@ -35,7 +45,17 @@ order adds to cost
 
 what's a sensible way to break apart memory relation?
 
+=========
+readme
+  examples of nesting and unnesting, examples
 
+=========
+acceptance suite
+  write the test titles the way you'd want the feature docs to read.
+  should have a way for engines to say "i support this feature" and "i don't support this feature"
+    supports
+    doesntSupport
+      instead of "test"
 
 =========
 Knit needs to be stream-based

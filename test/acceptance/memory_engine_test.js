@@ -343,24 +343,29 @@ regarding("In Memory Engine", function() {
 
     regarding("Group up 'child' data into nested relations", function() {
 
-      xtest("simple.  1NF to nested by matching on non-nested rows.  order doesn't matter.", function (){
+      test("simple.  1NF to nested by matching on non-nested rows", function (){
         
-        var simplePerson = engine.createRelation("person", ["personId", "name", "age"])
         var houseToPeople_1NF = engine.createRelation("housesAndPeople", ["houseId", "address", "personId", "name", "age"])
         houseToPeople_1NF.merge([
           [101, "Chimney Hill", 1, "Jane", 5],
-          [101, "Chimney Hill", 2, "Puck", 12],
-          [102, "Parnassus", 3, "Fanny", 30]
+          [102, "Parnassus", 3, "Fanny", 30],
+          [101, "Chimney Hill", 2, "Puck", 12]
         ])
         
-        
         var houseToPerson_non1NF = knit(function(){
-          return nest(houseToPeople_1NF, {"people":simplePerson})
-        })
-        
+          return nest(
+                  this.houseToPeople_1NF, 
+                  {"people":[
+                    this.houseToPeople_1NF.attr("personId"), 
+                    this.houseToPeople_1NF.attr("name"), 
+                    this.houseToPeople_1NF.attr("age")
+                  ]}
+                )
+        }, {houseToPeople_1NF:houseToPeople_1NF}).apply()
+
         assert.equal({
           name:"housesAndPeople",
-          attributes:["houseId", "address", {"people":simplePerson}],
+          attributes:["houseId", "address", {"people":["personId", "name", "age"]}],
           rows:[
             [101, "Chimney Hill", [[1, "Jane", 5],
                                    [2, "Puck", 12]]],          

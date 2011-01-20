@@ -1056,7 +1056,7 @@ _.extend(knit.engine.Memory.Relation.prototype, {
   },
 
   applyUnnest: function(nestedAttribute) {
-    var newAttributes = this.attributes()
+    var newAttributes = [].concat(this.attributes())
     var nestedAttributeIndex = _.indexOf(newAttributes, nestedAttribute)
     newAttributes.splice.apply(newAttributes, [nestedAttributeIndex,1].concat(nestedAttribute.nestedRelation.attributes()))
     
@@ -1070,7 +1070,6 @@ _.extend(knit.engine.Memory.Relation.prototype, {
         unnestedRows.push(newRow)
       })
     })
-    
     return this._newRelation(unnestedRows, this.name(), newAttributes) 
   },
   

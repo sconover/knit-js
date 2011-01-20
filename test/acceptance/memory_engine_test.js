@@ -340,7 +340,7 @@ regarding("In Memory Engine", function() {
         
       })
       
-      test("multiple nesting levels", function (){
+      test("multiple levels of unnesting", function (){
         
         var housePeoplePetRows = [
           [101, "Chimney Hill", [[1, "Jane", 5, [[101, "Puck", 12]]],
@@ -390,7 +390,7 @@ regarding("In Memory Engine", function() {
       
     })
 
-    xregarding("Group up 'child' data into nested relations", function() {
+    regarding("Group up 'child' data into nested relations", function() {
 
       test("simple.  1NF to nested by matching on non-nested rows.  orders rows on flat attributes, works with intermingled nested/non-nested columns", function (){
         
@@ -424,7 +424,70 @@ regarding("In Memory Engine", function() {
         
       })
     })
-          
+    
+    
+    test("multiple levels of nesting", function (){
+      var housePeoplePet = engine.createRelation("housePeoplePet", ["houseId", "address", "personId", "name", "age", "petId", "petName", "petAge"])
+      housePeoplePet.merge([
+        [101, "Chimney Hill", 1, "Jane", 5, 101, "Puck", 12],
+        [101, "Chimney Hill", 2, "Tricia", 40, 102, "Maggie", 11],
+        [101, "Chimney Hill", 2, "Tricia", 40, 103, "Molly", 11],
+        [102, "Parnassus", 3, "Fanny", 30, 104, "Spot", 8 ]
+      ])
+      
+      var nestPetsOnly = knit(function(){
+        return order.asc(nest(
+                this.housePeoplePet,
+                {"pets":[
+                  this.housePeoplePet.attr("petId"),
+                  this.housePeoplePet.attr("petName"),
+                  this.housePeoplePet.attr("petAge")
+                ]}                 
+               ), this.housePeoplePet.attr("personId"))
+      }, {housePeoplePet:housePeoplePet}).apply()
+                      
+      assert.equal({
+        name:"housePeoplePet",
+        attributes:["houseId", "address", "personId", "name", "age", {"pets":["petId", "petName", "petAge"]}],
+        rows:[
+          [101, "Chimney Hill", 1, "Jane", 5, [[101, "Puck", 12]]],
+          [101, "Chimney Hill", 2, "Tricia", 40, [[102, "Maggie", 11],
+                                                  [103, "Molly", 11]] ],
+          [102, "Parnassus", 3, "Fanny", 30, [[104, "Spot", 8]] ]
+        ]
+      }, relationContents(nestPetsOnly))
+      
+      //Note that you currently can't nest nest's
+      //This is a possible hole in the design.  The problem is that "pets" doesn't exist until we apply the first nest.
+      //...so you can't go around referencing pets for another nest in the same apply.
+      //Figure out how to make this late binding at some point...
+      
+      var nestPeopleInAdditionToPets = knit(function(){
+        return nest(
+                 this.nestPetsOnly,
+                 {"people":[
+                   this.nestPetsOnly.attr("personId"),
+                   this.nestPetsOnly.attr("name"),
+                   this.nestPetsOnly.attr("age"),
+                   this.nestPetsOnly.attr("pets")
+                 ]}
+               )
+      }, {nestPetsOnly:nestPetsOnly}).apply()
+      
+      assert.equal({
+        name:"housePeoplePet",
+        attributes:["houseId", "address", {"people":["personId","name","age", {"pets":["petId", "petName", "petAge"]}]}],
+        rows:[
+          [101, "Chimney Hill", [[1, "Jane", 5, [[101, "Puck", 12]]],
+                                 [2, "Tricia", 40, [[102, "Maggie", 11],
+                                                    [103, "Molly", 11]] ]] ],          
+          [102, "Parnassus", [[3, "Fanny", 30, [[104, "Spot", 8]] ]] ]
+        ]
+      }, relationContents(nestPeopleInAdditionToPets))
+      
+      
+      
+    })
   })
 
   xregarding("Projection", function() {

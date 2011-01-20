@@ -306,7 +306,7 @@ regarding("In Memory Engine", function() {
     
     regarding("Non First Normal Form to First Normal Form via unnest", function() {
 
-      test("simple.  flattens the nested relation by distributing.", function (){
+      xtest("simple.  flattens the nested relation by distributing.", function (){
         
         var houseToPeopleRows_non1NF = [
           [101, [[1, "Jane", 5],
@@ -339,9 +339,58 @@ regarding("In Memory Engine", function() {
         }, relationContents(houseToPerson_1NF))
         
       })
+      
+      test("multiple nesting levels", function (){
+        
+        var housePeoplePetRows = [
+          [101, "Chimney Hill", [[1, "Jane", 5, [[101, "Puck", 12]]],
+                                 [2, "Tricia", 40, [[102, "Maggie", 11],
+                                                    [103, "Molly", 11]] ]] ],          
+          [102, "Parnassus", [[3, "Fanny", 30, [[104, "Spot", 8]] ]] ]
+        ]
+        
+        var pet = engine.createRelation("pet", ["petId", "petName", "petAge"])
+        var personWithPets = engine.createRelation("person", ["personId", "name", "age", {"pets":pet}])
+        var housePeoplePet = engine.createRelation("housePeoplePet", ["houseId", "address", {"people":personWithPets}])
+        housePeoplePet.merge(housePeoplePetRows)
+
+        assert.equal({
+          name:"housePeoplePet",
+          attributes:["houseId", "address", {"people":["personId","name","age", {"pets":["petId", "petName", "petAge"]}]}],
+          rows:housePeoplePetRows
+        }, relationContents(housePeoplePet))
+        
+        var unnestPeopleOnly = knit(function(){return unnest(this.housePeoplePet, this.housePeoplePet.attr("people"))}, {housePeoplePet:housePeoplePet}).apply()
+                        
+        assert.equal({
+          name:"housePeoplePet",
+          attributes:["houseId", "address", "personId", "name", "age", {"pets":["petId", "petName", "petAge"]}],
+          rows:[
+            [101, "Chimney Hill", 1, "Jane", 5, [[101, "Puck", 12]]],
+            [101, "Chimney Hill", 2, "Tricia", 40, [[102, "Maggie", 11],
+                                                    [103, "Molly", 11]] ],
+            [102, "Parnassus", 3, "Fanny", 30, [[104, "Spot", 8]] ]
+          ]
+        }, relationContents(unnestPeopleOnly))
+        
+        var unnestPeopleAndPet = knit(function(){return unnest(unnest(this.housePeoplePet, this.housePeoplePet.attr("people")), this.personWithPets.attr("pets"))}, {personWithPets:personWithPets, housePeoplePet:housePeoplePet}).apply()
+
+        assert.equal({
+          name:"housePeoplePet",
+          attributes:["houseId", "address", "personId", "name", "age", "petId", "petName", "petAge"],
+          rows:[
+            [101, "Chimney Hill", 1, "Jane", 5, 101, "Puck", 12],
+            [101, "Chimney Hill", 2, "Tricia", 40, 102, "Maggie", 11],
+            [101, "Chimney Hill", 2, "Tricia", 40, 103, "Molly", 11],
+            [102, "Parnassus", 3, "Fanny", 30, 104, "Spot", 8 ]
+          ]
+        }, relationContents(unnestPeopleAndPet))        
+      })
+      
+      
     })
 
-    regarding("Group up 'child' data into nested relations", function() {
+    xregarding("Group up 'child' data into nested relations", function() {
 
       test("simple.  1NF to nested by matching on non-nested rows.  orders rows on flat attributes, works with intermingled nested/non-nested columns", function (){
         

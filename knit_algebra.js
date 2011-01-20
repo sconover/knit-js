@@ -335,6 +335,7 @@ require("knit/algebra/join")
 require("knit/algebra/predicate")
 require("knit/algebra/select")
 require("knit/algebra/order")
+require("knit/algebra/nest_unnest")
 
 }, 
 'knit/algebra/join': function(require, exports, module) {
@@ -346,6 +347,8 @@ knit.algebra.Join = function(relationOne, relationTwo, predicate) {
   this.relationOne = relationOne
   this.relationTwo = relationTwo
   this.predicate = predicate || new knit.algebra.predicate.True()
+  
+  this.newNestedAttribute = this.relationOne.newNestedAttribute
 }
 
 _.extend(knit.algebra.Join.prototype, {
@@ -576,6 +579,8 @@ knit.algebra.Select = function(relation, criteria) {
   this._attributes = relation.attributes()
   this.relation = relation
   this.criteria = criteria
+  
+  this.newNestedAttribute = this.relation.newNestedAttribute
 }
 
 _.extend(knit.algebra.Select.prototype, {
@@ -700,6 +705,8 @@ knit.algebra.Order = function(relation, orderAttribute, direction) {
   this.relation = relation
   this.orderAttribute = orderAttribute
   this.direction = direction
+  
+  this.newNestedAttribute = this.relation.newNestedAttribute
 }
 
 _.extend(knit.algebra.Order.prototype, {
@@ -728,6 +735,71 @@ knit.dslLocals.order = {
   desc: function(relation, orderAttribute) {
     return new knit.algebra.Order(relation, orderAttribute, knit.algebra.Order.DESC)
   }
+}
+}, 
+'knit/algebra/nest_unnest': function(require, exports, module) {
+require("knit/core")
+
+knit.algebra.Unnest = function(relation, nestedAttribute) {
+  this._attributes = relation.attributes()
+  this.relation = relation
+  this.nestedAttribute = nestedAttribute
+}
+
+_.extend(knit.algebra.Unnest.prototype, {
+  attributes: function(){ return this._attributes },
+  
+  isSame: function(other) {
+    return other instanceof knit.algebra.Unnest && 
+           this.relation.isSame(other.relation) &&
+           this.nestedAttribute.isSame(other.nestedAttribute)
+  },
+  
+  inspect: function(){return "unnest(" + this.relation.inspect() + "," + this.nestedAttribute.inspect() + ")"}
+})
+
+knit.algebra.Unnest.prototype.isEquivalent = knit.algebra.Unnest.prototype.isSame
+
+knit.dslLocals.unnest = function(relation, nestedAttribute) {
+  return new knit.algebra.Unnest(relation, nestedAttribute)
+}
+
+
+knit.algebra.Nest = function(relation, nestedAttributeNameAndAttributesToNest) {
+  this.relation = relation
+
+  var nestedAttributeName = _.keys(nestedAttributeNameAndAttributesToNest)[0]
+  var attributesToNest = _.values(nestedAttributeNameAndAttributesToNest)[0]
+  
+  this.nestedAttribute = this.relation.newNestedAttribute(nestedAttributeName, attributesToNest)
+  
+  this._attributes = [].concat(relation.attributes())
+  var self = this
+  var attributePositions = _.map(attributesToNest, function(attribute){return _.indexOf(self._attributes, attribute)})
+  attributePositions.sort()
+  var firstAttributePosition = attributePositions.shift()
+  this._attributes.splice(firstAttributePosition,1,this.nestedAttribute)
+  
+  attributePositions.reverse()
+  _.each(attributePositions, function(pos){self._attributes.splice(pos,1)})
+}
+
+_.extend(knit.algebra.Nest.prototype, {
+  attributes: function(){ return this._attributes },
+  
+  isSame: function(other) {
+    return other instanceof knit.algebra.Nest && 
+           this.relation.isSame(other.relation) &&
+           this.nestedAttribute.isSame(other.nestedAttribute)
+  },
+  
+  inspect: function(){return "nest(" + this.relation.inspect() + "," + this.nestedAttribute.inspect() + ")"}
+})
+
+knit.algebra.Nest.prototype.isEquivalent = knit.algebra.Nest.prototype.isSame
+
+knit.dslLocals.nest = function(relation, nestedAttributeNameAndAttributesToNest) {
+  return new knit.algebra.Nest(relation, nestedAttributeNameAndAttributesToNest)
 }
 }
 });

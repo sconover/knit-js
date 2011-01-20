@@ -339,6 +339,7 @@ require("knit/algebra/join")
 require("knit/algebra/predicate")
 require("knit/algebra/select")
 require("knit/algebra/order")
+require("knit/algebra/nest_unnest")
 
 }, 
 'knit/algebra/join': function(require, exports, module) {
@@ -350,6 +351,8 @@ knit.algebra.Join = function(relationOne, relationTwo, predicate) {
   this.relationOne = relationOne
   this.relationTwo = relationTwo
   this.predicate = predicate || new knit.algebra.predicate.True()
+  
+  this.newNestedAttribute = this.relationOne.newNestedAttribute
 }
 
 _.extend(knit.algebra.Join.prototype, {
@@ -580,6 +583,8 @@ knit.algebra.Select = function(relation, criteria) {
   this._attributes = relation.attributes()
   this.relation = relation
   this.criteria = criteria
+  
+  this.newNestedAttribute = this.relation.newNestedAttribute
 }
 
 _.extend(knit.algebra.Select.prototype, {
@@ -704,6 +709,8 @@ knit.algebra.Order = function(relation, orderAttribute, direction) {
   this.relation = relation
   this.orderAttribute = orderAttribute
   this.direction = direction
+  
+  this.newNestedAttribute = this.relation.newNestedAttribute
 }
 
 _.extend(knit.algebra.Order.prototype, {
@@ -732,6 +739,71 @@ knit.dslLocals.order = {
   desc: function(relation, orderAttribute) {
     return new knit.algebra.Order(relation, orderAttribute, knit.algebra.Order.DESC)
   }
+}
+}, 
+'knit/algebra/nest_unnest': function(require, exports, module) {
+require("knit/core")
+
+knit.algebra.Unnest = function(relation, nestedAttribute) {
+  this._attributes = relation.attributes()
+  this.relation = relation
+  this.nestedAttribute = nestedAttribute
+}
+
+_.extend(knit.algebra.Unnest.prototype, {
+  attributes: function(){ return this._attributes },
+  
+  isSame: function(other) {
+    return other instanceof knit.algebra.Unnest && 
+           this.relation.isSame(other.relation) &&
+           this.nestedAttribute.isSame(other.nestedAttribute)
+  },
+  
+  inspect: function(){return "unnest(" + this.relation.inspect() + "," + this.nestedAttribute.inspect() + ")"}
+})
+
+knit.algebra.Unnest.prototype.isEquivalent = knit.algebra.Unnest.prototype.isSame
+
+knit.dslLocals.unnest = function(relation, nestedAttribute) {
+  return new knit.algebra.Unnest(relation, nestedAttribute)
+}
+
+
+knit.algebra.Nest = function(relation, nestedAttributeNameAndAttributesToNest) {
+  this.relation = relation
+
+  var nestedAttributeName = _.keys(nestedAttributeNameAndAttributesToNest)[0]
+  var attributesToNest = _.values(nestedAttributeNameAndAttributesToNest)[0]
+  
+  this.nestedAttribute = this.relation.newNestedAttribute(nestedAttributeName, attributesToNest)
+  
+  this._attributes = [].concat(relation.attributes())
+  var self = this
+  var attributePositions = _.map(attributesToNest, function(attribute){return _.indexOf(self._attributes, attribute)})
+  attributePositions.sort()
+  var firstAttributePosition = attributePositions.shift()
+  this._attributes.splice(firstAttributePosition,1,this.nestedAttribute)
+  
+  attributePositions.reverse()
+  _.each(attributePositions, function(pos){self._attributes.splice(pos,1)})
+}
+
+_.extend(knit.algebra.Nest.prototype, {
+  attributes: function(){ return this._attributes },
+  
+  isSame: function(other) {
+    return other instanceof knit.algebra.Nest && 
+           this.relation.isSame(other.relation) &&
+           this.nestedAttribute.isSame(other.nestedAttribute)
+  },
+  
+  inspect: function(){return "nest(" + this.relation.inspect() + "," + this.nestedAttribute.inspect() + ")"}
+})
+
+knit.algebra.Nest.prototype.isEquivalent = knit.algebra.Nest.prototype.isSame
+
+knit.dslLocals.nest = function(relation, nestedAttributeNameAndAttributesToNest) {
+  return new knit.algebra.Nest(relation, nestedAttributeNameAndAttributesToNest)
 }
 }, 
 'knit/engine/memory': function(require, exports, module) {
@@ -793,6 +865,26 @@ require("knit/algebra")
     }
   }, knit.algebra.rowsAndObjects))
 
+  _.extend(knit.algebra.Unnest.prototype, _.extend({
+    apply: function() {
+      return this.relation.apply().applyUnnest(this.nestedAttribute)
+    }
+  }, knit.algebra.rowsAndObjects))
+
+  _.extend(knit.algebra.Nest.prototype, _.extend({
+    apply: function() {
+      //impose order for now
+      var relation = this.relation
+      var forceOrderOnTheseAttributes = _.without(this.attributes(), this.nestedAttribute)
+      while(forceOrderOnTheseAttributes.length > 0) {
+        var orderByAttr = forceOrderOnTheseAttributes.shift()
+        relation = new knit.algebra.Order(relation, orderByAttr, knit.algebra.Order.ASC)
+      }
+      
+      return relation.apply().applyNest(this.nestedAttribute, this.attributes())
+    }
+  }, knit.algebra.rowsAndObjects))
+
 // })()
 
 
@@ -806,11 +898,32 @@ knit.engine.Memory.Attribute = function(name, sourceRelation) {
 _.extend(knit.engine.Memory.Attribute.prototype, {
   isSame: function(other) {
     return this.name == other.name &&
+           other.nestedRelation === undefined &&
            this._sourceRelation === other._sourceRelation
   },
   
   inspect: function() {
     return this.name
+  }
+
+})
+
+knit.engine.Memory.NestedAttribute = function(name, nestedRelation, sourceRelation) {
+  this.name = name
+  this.nestedRelation = nestedRelation
+  this._sourceRelation = sourceRelation
+}
+
+_.extend(knit.engine.Memory.NestedAttribute.prototype, {
+  isSame: function(other) {
+    return this.name == other.name &&
+           other.nestedRelation != undefined &&
+           this.nestedRelation.isSame(other.nestedRelation) &&
+           this._sourceRelation === other._sourceRelation
+  },
+  
+  inspect: function() {
+    return this.name + ":" + this.nestedRelation.inspect()
   }
 
 })
@@ -821,7 +934,16 @@ knit.engine.Memory.Relation = function(name, attributeNames, primaryKey, rows, c
   this._name = name
   var self = this
   this._attributes = _.map(attributeNames, function(attr){
-    return attr.name ? attr : new knit.engine.Memory.Attribute(attr, self)
+    if (attr.name) {
+      return attr
+    } else if (typeof attr == "string") {
+      var attributeName = attr
+      return new knit.engine.Memory.Attribute(attributeName, self)
+    } else {
+      var attributeName = _.keys(attr)[0]
+      var nestedRelation = _.values(attr)[0]
+      return new knit.engine.Memory.NestedAttribute(attributeName, nestedRelation, self)
+    }
   })
   
   this._pkAttributeNames = primaryKey || []
@@ -864,7 +986,7 @@ _.extend(knit.engine.Memory.Relation.prototype, {
   
   objects: function() {
     var self = this
-    return _.map(this._rowStore.rows(), function(row){
+    return _.map(this.rows(), function(row){
       var object = {}
       _.each(row, function(value, columnPosition){
         var propertyName = self._attributes[columnPosition].name
@@ -933,12 +1055,96 @@ _.extend(knit.engine.Memory.Relation.prototype, {
     return this._newRelation(sortedRows) 
   },
 
-  _newRelation: function(rows, name) {
+  applyUnnest: function(nestedAttribute) {
+    var newAttributes = this.attributes()
+    var nestedAttributeIndex = _.indexOf(newAttributes, nestedAttribute)
+    newAttributes.splice.apply(newAttributes, [nestedAttributeIndex,1].concat(nestedAttribute.nestedRelation.attributes()))
+    
+    var unnestedRows = []
+
+    _.each(this.rows(), function(row) {
+      var nestedRows = row[nestedAttributeIndex]
+      _.each(nestedRows, function(nestedRow){
+        var newRow = [].concat(row)
+        newRow.splice.apply(newRow, [nestedAttributeIndex,1].concat(nestedRow))
+        unnestedRows.push(newRow)
+      })
+    })
+    
+    return this._newRelation(unnestedRows, this.name(), newAttributes) 
+  },
+  
+  applyNest: function(nestedAttribute, newAttributeArrangement) {
+    //assumption: this relation is ordered by all non-nested attributes.  
+    //note that for now this is guaranteed by nest.apply.
+    var self = this
+    
+    var oldNestedPositions = []
+    _.each(nestedAttribute.nestedRelation.attributes(), function(nestedAttr) {
+      var oldNestedPosition = _.indexOf(self.attributes(), nestedAttr)
+      oldNestedPositions.push(oldNestedPosition)
+    })
+
+    var newFlatAttrPositionToOldFlatAttrPosition = {}
+    var oldFlatPositions = []
+    _.each(newAttributeArrangement, function(newAttr, newPosition){
+      if (!newAttr.isSame(nestedAttribute)) {
+        var oldFlatPosition = _.indexOf(self.attributes(), newAttr)
+        oldFlatPositions.push(oldFlatPosition)
+        newFlatAttrPositionToOldFlatAttrPosition[newPosition] = oldFlatPosition
+      }
+    })
+    
+    var nestedAttributePosition = _.indexOf(newAttributeArrangement, nestedAttribute)
+    
+    var newRows = []
+    
+    var currentNewRow = null
+    var currentFlatValues = null
+    _.each(this.rows(), function(row) {
+      var flatValuesForThisRow = _.map(oldFlatPositions, function(flatPosition){return row[flatPosition]})
+      var nestedValuesForThisRow = _.map(oldNestedPositions, function(nestedPosition){return row[nestedPosition]})
+
+      if (_.isEqual(flatValuesForThisRow, currentFlatValues)) {
+        currentNewRow[nestedAttributePosition].push(nestedValuesForThisRow)
+      } else {
+        if (currentNewRow) {
+          newRows.push(currentNewRow)
+        }
+        
+        currentNewRow = _.map(newAttributeArrangement, function(attr, newPos){
+          if (attr.isSame(nestedAttribute)) {
+            return [nestedValuesForThisRow]
+          } else {
+            var oldPos = newFlatAttrPositionToOldFlatAttrPosition[newPos]
+            return row[oldPos]
+          }
+        })
+        
+        currentFlatValues = flatValuesForThisRow
+      }
+    })
+    
+    if (currentNewRow) {
+      newRows.push(currentNewRow)
+    }
+    
+    return this._newRelation(newRows, this.name(), newAttributeArrangement) 
+  },
+
+  newNestedAttribute: function(attributeName, attributesToNest) {
+    var nestedRelation = new knit.engine.Memory.Relation("(nested)", attributesToNest, [], [], 0) 
+    return new knit.engine.Memory.NestedAttribute(attributeName, nestedRelation, this)
+  },
+
+  _newRelation: function(rows, name, attributes) {
     var newName = name || this.name()
+    var newAttributes = attributes || this.attributes()
     
     //curry?
-    return new knit.engine.Memory.Relation(newName, this.attributes(), this._pkAttributeNames, rows, this.cost + rows.length) 
+    return new knit.engine.Memory.Relation(newName, newAttributes, this._pkAttributeNames, rows, this.cost + rows.length) 
   }
+  
 })
 
 knit.engine.Memory.Relation.prototype.isEquivalent = knit.engine.Memory.Relation.prototype.isSame

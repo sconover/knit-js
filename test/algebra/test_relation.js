@@ -25,17 +25,22 @@ _.extend(knit.TestRelationFunction.prototype, {
   },
   
   isSame: function(other) {
-    return this === other
+    return other instanceof knit.TestRelationFunction &&
+           this.attributes().length == other.attributes().length &&
+           _.detect(this.attributes(), function(attr, i){return !attr.isSame(other.attributes()[i])}) == null
   },
   
   split: function(){return this},
   merge: function(){return this},
-
+  
+  newNestedAttribute: function(attributeName, attributesToNest) {
+    var nestedRelation = new knit.TestRelationFunction([]) 
+    nestedRelation._attributes = attributesToNest
+    return new knit.TestNestedAttribute(attributeName, nestedRelation, this)
+  },
   
   inspect: function() {
-    return "r[" + 
-           _.map(this.attributes(), function(attr){return attr.inspect()}).join(",") + 
-           "]" 
+    return "r[" + _.map(this.attributes(), function(attr){return attr.inspect()}).join(",") + "]" 
   }
 
 })

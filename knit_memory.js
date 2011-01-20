@@ -338,6 +338,7 @@ DSLFunction = function() {
 require("knit/algebra/join")
 require("knit/algebra/predicate")
 require("knit/algebra/select")
+require("knit/algebra/project")
 require("knit/algebra/order")
 require("knit/algebra/nest_unnest")
 
@@ -701,6 +702,33 @@ knit.dslLocals.select = function(relation, criteria) {
 }
 
 }, 
+'knit/algebra/project': function(require, exports, module) {
+require("knit/core")
+
+knit.algebra.Project = function(relation, attributes) {
+  this._attributes = attributes
+  this.relation = relation
+}
+
+_.extend(knit.algebra.Project.prototype, {
+  attributes: function(){ return this._attributes },
+  
+  isSame: function(other) {
+    return other instanceof knit.algebra.Project && 
+           this.relation.isSame(other.relation) &&
+           _.isEqual(this.attributes(), other.attributes())
+  },
+  
+  inspect: function(){return "project(" + this.relation.inspect() + "," + 
+                                          "[" + _.map(this.attributes(), function(attr){return attr.inspect()}).join(",") + "])"}
+})
+
+knit.algebra.Project.prototype.isEquivalent = knit.algebra.Project.prototype.isSame
+
+knit.dslLocals.project = function(relation, attributes) {
+  return new knit.algebra.Project(relation, attributes)
+}
+}, 
 'knit/algebra/order': function(require, exports, module) {
 require("knit/core")
 
@@ -851,6 +879,12 @@ require("knit/algebra")
     }
   }, knit.algebra.rowsAndObjects))
 
+  _.extend(knit.algebra.Project.prototype, _.extend({
+    apply: function() {
+      return this.relation.apply().applyProject(this.attributes())
+    }
+  }, knit.algebra.rowsAndObjects))
+
   _.extend(knit.algebra.Join.prototype, _.extend({
     apply: function() {
       var joinedRelation = this.relationOne.apply().applyJoin(this.relationTwo.apply(), this.predicate)
@@ -933,18 +967,27 @@ _.extend(knit.engine.Memory.NestedAttribute.prototype, {
 knit.engine.Memory.Relation = function(name, attributeNames, primaryKey, rows, costSoFar) {
   this._name = name
   var self = this
-  this._attributes = _.map(attributeNames, function(attr){
+  this.nameToAttribute = {}
+  this._attributes = []
+  
+  var self = this
+  _.each(attributeNames, function(attr){
+    var attrToAdd = null
     if (attr.name) {
-      return attr
+      attrToAdd = attr
     } else if (typeof attr == "string") {
       var attributeName = attr
-      return new knit.engine.Memory.Attribute(attributeName, self)
+      attrToAdd = new knit.engine.Memory.Attribute(attributeName, self)
     } else {
       var attributeName = _.keys(attr)[0]
       var nestedRelation = _.values(attr)[0]
-      return new knit.engine.Memory.NestedAttribute(attributeName, nestedRelation, self)
+      attrToAdd = new knit.engine.Memory.NestedAttribute(attributeName, nestedRelation, self)
     }
+    
+    self._attributes.push(attrToAdd)
+    self.nameToAttribute[attrToAdd.name] = attrToAdd
   })
+  
   
   this._pkAttributeNames = primaryKey || []
   var pkPositions = 
@@ -966,8 +1009,16 @@ _.extend(knit.engine.Memory.Relation.prototype, {
   name: function(){ return this._name },
   attributes: function(){ return this._attributes },
   
-  attr: function(attributeName) {
-    return _.detect(this.attributes(), function(attr){return attr.name == attributeName})
+  attr: function() {
+    var args = _.toArray(arguments)
+    if (args.length == 0) {
+      return null
+    } else if (args.length == 1) {
+      return this.nameToAttribute[args[0]]
+    } else {
+      var self = this
+      return _.map(args, function(attributeName){return self.nameToAttribute[attributeName]})
+    }
   },
   
   isSame: function(other) {
@@ -1027,6 +1078,17 @@ _.extend(knit.engine.Memory.Relation.prototype, {
             })
 
     return this._newRelation(matchingRows) 
+  },
+  
+  applyProject: function(attributes) {
+    var self = this
+    var positionsToKeep = _.map(attributes, function(attr){return _.indexOf(self.attributes(), attr)})
+    var projectedRows = _.map(this.rows(), function(row) {
+      return _.map(positionsToKeep, function(position) {
+        return row[position]
+      })
+    })
+    return this._newRelation(projectedRows, this.name(), attributes) 
   },
 
   applyJoin: function(relationTwo, predicate) {

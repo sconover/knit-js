@@ -490,12 +490,13 @@ regarding("In Memory Engine", function() {
     })
   })
 
-  xregarding("Projection", function() {
+  regarding("Projection", function() {
 
     test("project a subset of attributes over the relation", function (){
-
-      smallerRelation = engine.project(person, person.attributes().get("name", "age"))
-
+      var narrowerRelation = knit(function(){
+        return project(person, person.attr("name", "age"))
+      }).apply()
+      
       assert.equal({
         name:"person",
         attributes:["name", "age"],
@@ -504,7 +505,7 @@ regarding("In Memory Engine", function() {
           ["Puck", 12],
           ["Fanny", 30]
         ]
-      }, relationContents(smallerRelation))
+      }, relationContents(narrowerRelation))
     })
           
   })

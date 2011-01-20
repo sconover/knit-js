@@ -23,6 +23,11 @@ reconsider apply
         objects.inspect ... hmm, pretty-printed json?  not sure.  do nothing / just use rows.inspect...
   later: rows and objects can take a callback method, jquery-style, for async support (callback with the iterator)
 
+an attributes class up in the algebra to take care of common attributes issues
+  inspect
+  sameness
+  attr lookup
+
 quacksLike...anything out there?  underscore method?
 
 jasmine-node at-exit merge

@@ -343,13 +343,13 @@ regarding("In Memory Engine", function() {
 
     regarding("Group up 'child' data into nested relations", function() {
 
-      test("simple.  1NF to nested by matching on non-nested rows", function (){
+      test("simple.  1NF to nested by matching on non-nested rows.  orders rows on flat attributes, works with intermingled nested/non-nested columns", function (){
         
-        var houseToPeople_1NF = engine.createRelation("housesAndPeople", ["houseId", "address", "personId", "name", "age"])
+        var houseToPeople_1NF = engine.createRelation("housesAndPeople", ["houseId", "personId", "name", "address", "age"])
         houseToPeople_1NF.merge([
-          [101, "Chimney Hill", 1, "Jane", 5],
-          [102, "Parnassus", 3, "Fanny", 30],
-          [101, "Chimney Hill", 2, "Puck", 12]
+          [101,  1, "Jane", "Chimney Hill", 5],
+          [102,  3, "Fanny", "Parnassus", 30],
+          [101,  2, "Puck", "Chimney Hill", 12]
         ])
         
         var houseToPerson_non1NF = knit(function(){
@@ -365,11 +365,11 @@ regarding("In Memory Engine", function() {
 
         assert.equal({
           name:"housesAndPeople",
-          attributes:["houseId", "address", {"people":["personId", "name", "age"]}],
+          attributes:["houseId", {"people":["personId", "name", "age"]}, "address"],
           rows:[
-            [101, "Chimney Hill", [[1, "Jane", 5],
-                                   [2, "Puck", 12]]],          
-            [102, "Parnassus", [[3, "Fanny", 30]]]
+            [101, [[1, "Jane", 5],
+                   [2, "Puck", 12]], "Chimney Hill"],          
+            [102, [[3, "Fanny", 30]], "Parnassus"]
           ]
         }, relationContents(houseToPerson_non1NF))
         

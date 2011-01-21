@@ -6,7 +6,7 @@ regarding("In Memory Engine", function() {
   beforeEach(function() {
     engine = new knit.engine.Memory()
 
-    person = engine.createRelation("person", ["id", "houseId", "name", "age"])
+    person = engine.createRelation("person", ["personId", "houseId", "name", "age"])
     house = engine.createRelation("house", ["houseId", "address", "cityId"])
     city = engine.createRelation("city", ["cityId", "name"])
 
@@ -71,7 +71,7 @@ regarding("In Memory Engine", function() {
     })
     
     test("primary key - replace rows a row if it's a dup", function (){
-      var person2 = engine.createRelation("person", ["id", "houseId", "name", "age"], ["id"])
+      var person2 = engine.createRelation("person", ["personId", "houseId", "name", "age"], ["personId"])
 
       person2.merge([
         [1, 101, "Jane", 5],
@@ -99,9 +99,9 @@ regarding("In Memory Engine", function() {
     test("return results in js object / associative array style", function (){
       
       assert.equal([
-        {id:1, houseId:101, name:"Jane", age:5},
-        {id:2, houseId:101, name:"Puck", age:12},
-        {id:3, houseId:102, name:"Fanny", age:30}
+        {personId:1, houseId:101, name:"Jane", age:5},
+        {personId:2, houseId:101, name:"Puck", age:12},
+        {personId:3, houseId:102, name:"Fanny", age:30}
       ], person.objects())
       
     })
@@ -121,7 +121,7 @@ regarding("In Memory Engine", function() {
           
         assert.equal({
           name:"person",
-          attributes:["id", "houseId", "name", "age"],
+          attributes:["personId", "houseId", "name", "age"],
           rows:[
             [3, 102, "Fanny", 30]
           ]
@@ -145,7 +145,7 @@ regarding("In Memory Engine", function() {
       
       assert.equal({
         name:"person__house",
-        attributes:["id", "houseId", "name", "age", 
+        attributes:["personId", "houseId", "name", "age", 
                     "houseId", "address", "cityId"],
         rows:[
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001],
@@ -168,7 +168,7 @@ regarding("In Memory Engine", function() {
       
       assert.equal({
         name:"person__house__city",
-        attributes:["id", "houseId", "name", "age", 
+        attributes:["personId", "houseId", "name", "age", 
                     "houseId", "address", "cityId",
                     "cityId", "name"],
         rows:[
@@ -197,7 +197,7 @@ regarding("In Memory Engine", function() {
       
       assert.equal({
         name:"person__house",
-        attributes:["id", "houseId", "name", "age", 
+        attributes:["personId", "houseId", "name", "age", 
                     "houseId", "address", "cityId"],
         rows:[
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001],
@@ -221,7 +221,7 @@ regarding("In Memory Engine", function() {
       
       expected = {
         name:"person__house",
-        attributes:["id", "houseId", "name", "age", 
+        attributes:["personId", "houseId", "name", "age", 
                     "houseId", "address", "cityId"],
         rows:[
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001],
@@ -244,7 +244,7 @@ regarding("In Memory Engine", function() {
       
       expected = {
         name:"person__house",
-        attributes:["id", "houseId", "name", "age", 
+        attributes:["personId", "houseId", "name", "age", 
                     "houseId", "address", "cityId"],
         rows:[
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001],
@@ -272,7 +272,7 @@ regarding("In Memory Engine", function() {
         
       assert.equal({
         name:"person",
-        attributes:["id", "houseId", "name", "age"],
+        attributes:["personId", "houseId", "name", "age"],
         rows:[
           [3, 102, "Fanny", 30],
           [1, 101, "Jane", 5],
@@ -289,7 +289,7 @@ regarding("In Memory Engine", function() {
         
       assert.equal({
         name:"person",
-        attributes:["id", "houseId", "name", "age"],
+        attributes:["personId", "houseId", "name", "age"],
         rows:[
           [2, 101, "Puck", 12],
           [1, 101, "Jane", 5],
@@ -303,40 +303,38 @@ regarding("In Memory Engine", function() {
   
 
   regarding("Nest, unnest", function() {
+    beforeEach(function() {
+      simplePerson = knit(function(){return project(person, person.attr("personId", "name", "age"))}).apply()
+    })
     
     regarding("Non First Normal Form to First Normal Form via unnest", function() {
 
       test("simple.  flattens the nested relation by distributing.", function (){
-        
-        var houseToPeopleRows_non1NF = [
-          [101, [[1, "Jane", 5],
-                 [2, "Puck", 12]], "Chimney Hill"],          
-          [102, [[3, "Fanny", 30]], "Parnassus"]
-        ]
-        
-        var simplePerson = engine.createRelation("person", ["personId", "name", "age"])
-        var houseToPeople_non1NF = engine.createRelation("housesAndPeople", ["houseId", {"people":simplePerson}, "address"])
-        houseToPeople_non1NF.merge(houseToPeopleRows_non1NF)
+        var housePeopleNested = 
+          engine.createRelation("housePeople", 
+                                [house.attr("houseId"), {"people":simplePerson}, house.attr("address")]).
+                                merge([
+                                  [101, [[1, "Jane", 5],
+                                         [2, "Puck", 12]], "Chimney Hill"],          
+                                  [102, [[3, "Fanny", 30]], "Parnassus"]                                
+                                ])
 
-        assert.equal({
-          name:"housesAndPeople",
-          attributes:["houseId", {"people":["personId","name","age"]}, "address"],
-          rows:houseToPeopleRows_non1NF
-        }, relationContents(houseToPeople_non1NF))
+        assert.equal(["houseId", {"people":["personId","name","age"]}, "address"], getAttributes(housePeopleNested))
 
-        var houseToPerson_1NF = knit(function(){
-          return unnest(this.houseToPeople_non1NF, this.houseToPeople_non1NF.attr("people"))
-        }, {houseToPeople_non1NF:houseToPeople_non1NF}).apply()
+        var housePeopleUnnested = 
+          knit(function(){
+            return unnest(this.housePeople, this.housePeople.attr("people"))
+          }, {housePeople:housePeopleNested}).apply()
                 
         assert.equal({
-          name:"housesAndPeople",
+          name:"housePeople",
           attributes:["houseId", "personId", "name", "age", "address"],
           rows:[
             [101, 1, "Jane", 5, "Chimney Hill"],
             [101, 2, "Puck", 12, "Chimney Hill"],
             [102, 3, "Fanny", 30, "Parnassus"]
           ]
-        }, relationContents(houseToPerson_1NF))
+        }, relationContents(housePeopleUnnested))
         
       })
       

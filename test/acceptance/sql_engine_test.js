@@ -82,7 +82,7 @@ xregarding("Sql Engine", function() {
         var smallerRelation = 
           knit(function(){
             return select(person, equality(person.attr("name"), "Fanny"))
-          }).apply()
+          }).perform()
           
         assert.equal({
           name:"person",
@@ -106,7 +106,7 @@ xregarding("Sql Engine", function() {
       
       allPeopleCombinedWithAllHouses = knit(function(){
         return join(person, house)
-      }).apply()
+      }).perform()
       
       assert.equal({
         name:"person__house",
@@ -128,7 +128,7 @@ xregarding("Sql Engine", function() {
 
       allPeopleCombinedWithAllHousesCombinedWithAllCities = knit(function(){
         return join(join(person, house), city)
-      }).apply()
+      }).perform()
       
       
       assert.equal({
@@ -158,7 +158,7 @@ xregarding("Sql Engine", function() {
       
       allPeopleCombinedWithAllHouses = knit(function(){
         return join(person, house, equality(person.attr("houseId"), house.attr("houseId")))
-      }).apply()
+      }).perform()
       
       assert.equal({
         name:"person__house",
@@ -195,10 +195,10 @@ xregarding("Sql Engine", function() {
         ]
       }
 
-      assert.equal(expected, relationContents(expression.apply()))
-      assert.equal(expected, relationContents(expression.push().apply()))
+      assert.equal(expected, relationContents(expression.perform()))
+      assert.equal(expected, relationContents(expression.push().perform()))
 
-      assert.equal(true, expression.apply().cost > expression.push().apply().cost)
+      assert.equal(true, expression.perform().cost > expression.push().perform().cost)
     })
 
     test("pushing in a select and making it into a join predicate is less costly than just leaving the select outside", function (){
@@ -218,10 +218,10 @@ xregarding("Sql Engine", function() {
         ]
       }
 
-      assert.equal(expected, relationContents(expression.apply()))
-      assert.equal(expected, relationContents(expression.push().apply()))
+      assert.equal(expected, relationContents(expression.perform()))
+      assert.equal(expected, relationContents(expression.push().perform()))
 
-      assert.equal(true, expression.apply().cost > expression.push().apply().cost)
+      assert.equal(true, expression.perform().cost > expression.push().perform().cost)
     })
     
 

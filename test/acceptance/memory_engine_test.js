@@ -117,7 +117,7 @@ regarding("In Memory Engine", function() {
         var smallerRelation = 
           knit(function(){
             return select(person, equality(person.attr("name"), "Fanny"))
-          }).apply()
+          }).perform()
           
         assert.equal({
           name:"person",
@@ -141,7 +141,7 @@ regarding("In Memory Engine", function() {
       
       allPeopleCombinedWithAllHouses = knit(function(){
         return join(person, house)
-      }).apply()
+      }).perform()
       
       assert.equal({
         name:"person__house",
@@ -163,7 +163,7 @@ regarding("In Memory Engine", function() {
 
       allPeopleCombinedWithAllHousesCombinedWithAllCities = knit(function(){
         return join(join(person, house), city)
-      }).apply()
+      }).perform()
       
       
       assert.equal({
@@ -193,7 +193,7 @@ regarding("In Memory Engine", function() {
       
       allPeopleCombinedWithAllHouses = knit(function(){
         return join(person, house, equality(person.attr("houseId"), house.attr("houseId")))
-      }).apply()
+      }).perform()
       
       assert.equal({
         name:"person__house",
@@ -230,10 +230,10 @@ regarding("In Memory Engine", function() {
         ]
       }
 
-      assert.equal(expected, relationContents(expression.apply()))
-      assert.equal(expected, relationContents(expression.push().apply()))
+      assert.equal(expected, relationContents(expression.perform()))
+      assert.equal(expected, relationContents(expression.push().perform()))
 
-      assert.equal(true, expression.apply().cost > expression.push().apply().cost)
+      assert.equal(true, expression.perform().cost > expression.push().perform().cost)
     })
 
     test("pushing in a select and making it into a join predicate is less costly than just leaving the select outside", function (){
@@ -253,10 +253,10 @@ regarding("In Memory Engine", function() {
         ]
       }
 
-      assert.equal(expected, relationContents(expression.apply()))
-      assert.equal(expected, relationContents(expression.push().apply()))
+      assert.equal(expected, relationContents(expression.perform()))
+      assert.equal(expected, relationContents(expression.push().perform()))
 
-      assert.equal(true, expression.apply().cost > expression.push().apply().cost)
+      assert.equal(true, expression.perform().cost > expression.push().perform().cost)
     })
     
 
@@ -268,7 +268,7 @@ regarding("In Memory Engine", function() {
       var peopleInNameOrderAscending = 
         knit(function(){
           return order.asc(person, person.attr("name"))
-        }).apply()
+        }).perform()
         
       assert.equal({
         name:"person",
@@ -285,7 +285,7 @@ regarding("In Memory Engine", function() {
       var peopleInNameOrderDescending = 
         knit(function(){
           return order.desc(person, person.attr("name"))
-        }).apply()
+        }).perform()
         
       assert.equal({
         name:"person",
@@ -304,7 +304,7 @@ regarding("In Memory Engine", function() {
 
   regarding("nest, unnest", function() {
     beforeEach(function() {
-      simplePerson = knit(function(){return project(person, person.attr("personId", "name", "age"))}).apply()
+      simplePerson = knit(function(){return project(person, person.attr("personId", "name", "age"))}).perform()
     })
     
     regarding("unnest.  take grouped up 'subrows' and flatten them into the parent structure.", function() {
@@ -329,7 +329,7 @@ regarding("In Memory Engine", function() {
         var housePeopleUnnested = 
           knit(function(){
             return unnest(this.housePeople, this.housePeople.attr("people"))
-          }, {housePeople:housePeopleNested}).apply()
+          }, {housePeople:housePeopleNested}).perform()
                 
         assert.equal({
           name:"housePeople",
@@ -371,7 +371,7 @@ regarding("In Memory Engine", function() {
         
         var unnestHousesOnly = knit(function(){
           return unnest(this.cityHousesPeople, this.cityHousesPeople.attr("houses"))
-        }, {cityHousesPeople:cityHousesPeopleNested}).apply()
+        }, {cityHousesPeople:cityHousesPeopleNested}).perform()
                         
         assert.equal({
           name:"cityHousesPeople",
@@ -390,7 +390,7 @@ regarding("In Memory Engine", function() {
                    unnest(this.cityHousesPeople, this.cityHousesPeople.attr("houses")), 
                    this.housePeople.attr("people")
                  )
-        }, {housePeople:housePeople, cityHousesPeople:cityHousesPeopleNested}).apply()
+        }, {housePeople:housePeople, cityHousesPeople:cityHousesPeopleNested}).perform()
         
         assert.equal({
           name:"cityHousesPeople",
@@ -426,7 +426,7 @@ regarding("In Memory Engine", function() {
                   this.housePeople, 
                   {"people":this.housePeople.attr("personId", "name", "age")}
                 )
-        }, {housePeople:housePeopleUnnested}).apply()
+        }, {housePeople:housePeopleUnnested}).perform()
 
         assert.equal({
           name:"housePeople",
@@ -464,7 +464,7 @@ regarding("In Memory Engine", function() {
                  ),
                  this.cityHousePerson.attr("cityId")
                )
-      }, {cityHousePerson:cityHousePerson}).apply()
+      }, {cityHousePerson:cityHousePerson}).perform()
                       
       assert.equal({
         name:"cityHousePerson",
@@ -478,8 +478,8 @@ regarding("In Memory Engine", function() {
       }, relationContents(nestPeopleOnly))
       
       //Note that you currently can't nest nest's
-      //This is a possible hole in the design.  The problem is that "pets" doesn't exist until we apply the first nest.
-      //...so you can't go around referencing pets for another nest in the same apply.
+      //This is a possible hole in the design.  The problem is that "pets" doesn't exist until we perform the first nest.
+      //...so you can't go around referencing pets for another nest in the same perform.
       //Figure out how to make this late binding at some point...
 
       var nestHousesAndPeople = knit(function(){
@@ -490,7 +490,7 @@ regarding("In Memory Engine", function() {
                  ),
                  this.nestPeopleOnly.attr("cityId")
                )
-      }, {nestPeopleOnly:nestPeopleOnly}).apply()
+      }, {nestPeopleOnly:nestPeopleOnly}).perform()
 
 
       assert.equal({
@@ -567,7 +567,7 @@ regarding("In Memory Engine", function() {
     test("project a subset of attributes over the relation", function (){
       var narrowerRelation = knit(function(){
         return project(person, person.attr("name", "age"))
-      }).apply()
+      }).perform()
       
       assert.equal({
         name:"person",

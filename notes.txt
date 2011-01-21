@@ -14,6 +14,8 @@ reconsider apply
   interesting that it's in the same place as rows and objects
   turn this into a late-evaluating result set like sequel
     go look at sequel internals
+      https://github.com/jeremyevans/sequel/blob/master/lib/sequel/dataset/actions.rb
+    
   also go make things stream/firehose-oriented now?
     engine implementations provide an iterator (something with forEach?)
       make sure underscore can use it

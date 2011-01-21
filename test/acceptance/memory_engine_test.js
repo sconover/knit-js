@@ -306,7 +306,7 @@ regarding("In Memory Engine", function() {
     
     regarding("Non First Normal Form to First Normal Form via unnest", function() {
 
-      xtest("simple.  flattens the nested relation by distributing.", function (){
+      test("simple.  flattens the nested relation by distributing.", function (){
         
         var houseToPeopleRows_non1NF = [
           [101, [[1, "Jane", 5],
@@ -404,11 +404,7 @@ regarding("In Memory Engine", function() {
         var houseToPerson_non1NF = knit(function(){
           return nest(
                   this.houseToPeople_1NF, 
-                  {"people":[
-                    this.houseToPeople_1NF.attr("personId"), 
-                    this.houseToPeople_1NF.attr("name"), 
-                    this.houseToPeople_1NF.attr("age")
-                  ]}
+                  {"people":this.houseToPeople_1NF.attr("personId", "name", "age")}
                 )
         }, {houseToPeople_1NF:houseToPeople_1NF}).apply()
 
@@ -438,11 +434,7 @@ regarding("In Memory Engine", function() {
       var nestPetsOnly = knit(function(){
         return order.asc(nest(
                 this.housePeoplePet,
-                {"pets":[
-                  this.housePeoplePet.attr("petId"),
-                  this.housePeoplePet.attr("petName"),
-                  this.housePeoplePet.attr("petAge")
-                ]}                 
+                {"pets":this.housePeoplePet.attr("petId", "petName", "petAge")}                 
                ), this.housePeoplePet.attr("personId"))
       }, {housePeoplePet:housePeoplePet}).apply()
                       
@@ -465,12 +457,7 @@ regarding("In Memory Engine", function() {
       var nestPeopleInAdditionToPets = knit(function(){
         return nest(
                  this.nestPetsOnly,
-                 {"people":[
-                   this.nestPetsOnly.attr("personId"),
-                   this.nestPetsOnly.attr("name"),
-                   this.nestPetsOnly.attr("age"),
-                   this.nestPetsOnly.attr("pets")
-                 ]}
+                 {"people":this.nestPetsOnly.attr("personId", "name", "age", "pets")}
                )
       }, {nestPetsOnly:nestPetsOnly}).apply()
       

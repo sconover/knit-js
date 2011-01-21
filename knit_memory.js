@@ -708,6 +708,8 @@ require("knit/core")
 knit.algebra.Project = function(relation, attributes) {
   this._attributes = attributes
   this.relation = relation
+  
+  this.newNestedAttribute = this.relation.newNestedAttribute
 }
 
 _.extend(knit.algebra.Project.prototype, {
@@ -1035,13 +1037,19 @@ _.extend(knit.engine.Memory.Relation.prototype, {
     return this._rowStore.rows()
   },
   
-  objects: function() {
+  objects: function(rows) {
+    rows = rows || this.rows()
     var self = this
-    return _.map(this.rows(), function(row){
+    return _.map(rows, function(row){
       var object = {}
       _.each(row, function(value, columnPosition){
-        var propertyName = self._attributes[columnPosition].name
-        object[propertyName] = value
+        var attr = self._attributes[columnPosition]
+        var propertyName = attr.name
+        if (attr.nestedRelation) {
+          object[propertyName] = attr.nestedRelation.objects(value)
+        } else {
+          object[propertyName] = value
+        }
       })
       return object
     })

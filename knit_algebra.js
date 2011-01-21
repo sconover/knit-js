@@ -704,6 +704,8 @@ require("knit/core")
 knit.algebra.Project = function(relation, attributes) {
   this._attributes = attributes
   this.relation = relation
+  
+  this.newNestedAttribute = this.relation.newNestedAttribute
 }
 
 _.extend(knit.algebra.Project.prototype, {

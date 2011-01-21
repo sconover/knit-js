@@ -311,15 +311,20 @@ regarding("In Memory Engine", function() {
 
       test("simple.  flattens the nested relation by distributing.", function (){
         var housePeopleNested = 
-          engine.createRelation("housePeople", 
-                                [house.attr("houseId"), {"people":simplePerson}, house.attr("address")]).
-                                merge([
-                                  [101, [[1, "Jane", 5],
-                                         [2, "Puck", 12]], "Chimney Hill"],          
-                                  [102, [[3, "Fanny", 30]], "Parnassus"]                                
-                                ])
+          engine.createRelation(
+            "housePeople", 
+            [
+             house.attr("houseId"), 
+             {"people":simplePerson}, 
+             house.attr("address")
+            ]).
+            merge([
+              [101, [[1, "Jane", 5],
+                     [2, "Puck", 12]], "Chimney Hill"],          
+              [102, [[3, "Fanny", 30]], "Parnassus"]                                
+            ])
 
-        assert.equal(["houseId", {"people":["personId","name","age"]}, "address"], getAttributes(housePeopleNested))
+        assert.equal(["houseId", {"people":["personId", "name", "age"]}, "address"], getAttributes(housePeopleNested))
 
         var housePeopleUnnested = 
           knit(function(){
@@ -339,50 +344,64 @@ regarding("In Memory Engine", function() {
       })
       
       test("multiple levels of unnesting", function (){
+        var housePeople = 
+          engine.createRelation(
+            "housePeople", 
+            [
+             house.attr("houseId"), house.attr("address"),
+             {"people":simplePerson}
+            ])
         
-        var housePeoplePetRows = [
-          [101, "Chimney Hill", [[1, "Jane", 5, [[101, "Puck", 12]]],
-                                 [2, "Tricia", 40, [[102, "Maggie", 11],
-                                                    [103, "Molly", 11]] ]] ],          
-          [102, "Parnassus", [[3, "Fanny", 30, [[104, "Spot", 8]] ]] ]
-        ]
+        var cityHousesPeopleNested = 
+          engine.createRelation(
+            "cityHousesPeople", 
+            [
+             city.attr("cityId"), city.attr("name"), 
+             {"houses":housePeople}
+            ]).
+            merge([
+              [1001, "San Francisco", [ [101, "Chimney Hill", [[1, "Jane", 5],
+                                                               [2, "Puck", 12]] ],
+                                        [102, "Parnassus", [[3, "Fanny", 30]] ]   ] ],
+              [1002, "New Orleans", [[103, "Canal", [[4, "Amy", 6]] ]] ]
+            ])
         
-        var pet = engine.createRelation("pet", ["petId", "petName", "petAge"])
-        var personWithPets = engine.createRelation("person", ["personId", "name", "age", {"pets":pet}])
-        var housePeoplePet = engine.createRelation("housePeoplePet", ["houseId", "address", {"people":personWithPets}])
-        housePeoplePet.merge(housePeoplePetRows)
-
-        assert.equal({
-          name:"housePeoplePet",
-          attributes:["houseId", "address", {"people":["personId","name","age", {"pets":["petId", "petName", "petAge"]}]}],
-          rows:housePeoplePetRows
-        }, relationContents(housePeoplePet))
+        assert.equal(["cityId", "name", {"houses":["houseId", "address", {"people":["personId", "name", "age"]}]}], getAttributes(cityHousesPeopleNested))
         
-        var unnestPeopleOnly = knit(function(){return unnest(this.housePeoplePet, this.housePeoplePet.attr("people"))}, {housePeoplePet:housePeoplePet}).apply()
+        
+        var unnestHousesOnly = knit(function(){
+          return unnest(this.cityHousesPeople, this.cityHousesPeople.attr("houses"))
+        }, {cityHousesPeople:cityHousesPeopleNested}).apply()
                         
         assert.equal({
-          name:"housePeoplePet",
-          attributes:["houseId", "address", "personId", "name", "age", {"pets":["petId", "petName", "petAge"]}],
+          name:"cityHousesPeople",
+          attributes:["cityId", "name", "houseId", "address", {"people":["personId", "name", "age"]}],
           rows:[
-            [101, "Chimney Hill", 1, "Jane", 5, [[101, "Puck", 12]]],
-            [101, "Chimney Hill", 2, "Tricia", 40, [[102, "Maggie", 11],
-                                                    [103, "Molly", 11]] ],
-            [102, "Parnassus", 3, "Fanny", 30, [[104, "Spot", 8]] ]
+            [1001, "San Francisco", 101, "Chimney Hill", [[1, "Jane", 5],
+                                                          [2, "Puck", 12]] ],
+            [1001, "San Francisco", 102, "Parnassus", [[3, "Fanny", 30]] ],
+            [1002, "New Orleans", 103, "Canal", [[4, "Amy", 6]] ]
           ]
-        }, relationContents(unnestPeopleOnly))
+        }, relationContents(unnestHousesOnly))
         
-        var unnestPeopleAndPet = knit(function(){return unnest(unnest(this.housePeoplePet, this.housePeoplePet.attr("people")), this.personWithPets.attr("pets"))}, {personWithPets:personWithPets, housePeoplePet:housePeoplePet}).apply()
-
+        
+        var unnestHousesAndPeople = knit(function(){
+          return unnest(
+                   unnest(this.cityHousesPeople, this.cityHousesPeople.attr("houses")), 
+                   this.housePeople.attr("people")
+                 )
+        }, {housePeople:housePeople, cityHousesPeople:cityHousesPeopleNested}).apply()
+        
         assert.equal({
-          name:"housePeoplePet",
-          attributes:["houseId", "address", "personId", "name", "age", "petId", "petName", "petAge"],
+          name:"cityHousesPeople",
+          attributes:["cityId", "name", "houseId", "address", "personId", "name", "age"],
           rows:[
-            [101, "Chimney Hill", 1, "Jane", 5, 101, "Puck", 12],
-            [101, "Chimney Hill", 2, "Tricia", 40, 102, "Maggie", 11],
-            [101, "Chimney Hill", 2, "Tricia", 40, 103, "Molly", 11],
-            [102, "Parnassus", 3, "Fanny", 30, 104, "Spot", 8 ]
+            [1001, "San Francisco", 101, "Chimney Hill", 1, "Jane", 5],
+            [1001, "San Francisco", 101, "Chimney Hill", 2, "Puck", 12],
+            [1001, "San Francisco", 102, "Parnassus", 3, "Fanny", 30],
+            [1002, "New Orleans", 103, "Canal", 4, "Amy", 6]
           ]
-        }, relationContents(unnestPeopleAndPet))        
+        }, relationContents(unnestHousesAndPeople))        
       })
       
       
@@ -461,7 +480,7 @@ regarding("In Memory Engine", function() {
       
       assert.equal({
         name:"housePeoplePet",
-        attributes:["houseId", "address", {"people":["personId","name","age", {"pets":["petId", "petName", "petAge"]}]}],
+        attributes:["houseId", "address", {"people":["personId", "name", "age", {"pets":["petId", "petName", "petAge"]}]}],
         rows:[
           [101, "Chimney Hill", [[1, "Jane", 5, [[101, "Puck", 12]]],
                                  [2, "Tricia", 40, [[102, "Maggie", 11],

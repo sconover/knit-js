@@ -302,12 +302,12 @@ regarding("In Memory Engine", function() {
   })
   
 
-  regarding("Nest, unnest", function() {
+  regarding("nest, unnest", function() {
     beforeEach(function() {
       simplePerson = knit(function(){return project(person, person.attr("personId", "name", "age"))}).apply()
     })
     
-    regarding("Non First Normal Form to First Normal Form via unnest", function() {
+    regarding("unnest.  take grouped up 'subrows' and flatten them into the parent structure.", function() {
 
       test("simple.  flattens the nested relation by distributing.", function (){
         var housePeopleNested = 
@@ -407,9 +407,9 @@ regarding("In Memory Engine", function() {
       
     })
 
-    regarding("Group up 'child' data into nested relations", function() {
+    regarding("nest.  matching on duplicate/ordered parent rows, and take the other columns and group them into 'subrows'.", function() {
 
-      test("simple.  1NF to nested by matching on non-nested rows.  orders rows on flat attributes, works with intermingled nested/non-nested columns", function (){
+      test("simple.  works with intermingled nested/non-nested columns.", function (){
         var housePeopleUnnested = 
           engine.createRelation(
             "housePeople", 
@@ -443,55 +443,66 @@ regarding("In Memory Engine", function() {
     
     
     test("multiple levels of nesting", function (){
-      var housePeoplePet = engine.createRelation("housePeoplePet", ["houseId", "address", "personId", "name", "age", "petId", "petName", "petAge"])
-      housePeoplePet.merge([
-        [101, "Chimney Hill", 1, "Jane", 5, 101, "Puck", 12],
-        [101, "Chimney Hill", 2, "Tricia", 40, 102, "Maggie", 11],
-        [101, "Chimney Hill", 2, "Tricia", 40, 103, "Molly", 11],
-        [102, "Parnassus", 3, "Fanny", 30, 104, "Spot", 8 ]
-      ])
+      var cityHousePerson = 
+        engine.createRelation(
+          "cityHousePerson", 
+          city.attr("cityId", "name").
+          concat(house.attr("houseId", "address")).
+          concat(simplePerson.attr("personId", "name", "age"))
+        ).merge([
+          [1001, "San Francisco", 101, "Chimney Hill", 1, "Jane", 5],
+          [1001, "San Francisco", 101, "Chimney Hill", 2, "Puck", 12],
+          [1001, "San Francisco", 102, "Parnassus", 3, "Fanny", 30],
+          [1002, "New Orleans", 103, "Canal", 4, "Amy", 6]
+        ])
       
-      var nestPetsOnly = knit(function(){
-        return order.asc(nest(
-                this.housePeoplePet,
-                {"pets":this.housePeoplePet.attr("petId", "petName", "petAge")}                 
-               ), this.housePeoplePet.attr("personId"))
-      }, {housePeoplePet:housePeoplePet}).apply()
+      var nestPeopleOnly = knit(function(){
+        return order.asc(
+                 nest(
+                   this.cityHousePerson, 
+                   {"people":this.cityHousePerson.attr("personId", "name", "age")}
+                 ),
+                 this.cityHousePerson.attr("cityId")
+               )
+      }, {cityHousePerson:cityHousePerson}).apply()
                       
       assert.equal({
-        name:"housePeoplePet",
-        attributes:["houseId", "address", "personId", "name", "age", {"pets":["petId", "petName", "petAge"]}],
+        name:"cityHousePerson",
+        attributes:["cityId", "name", "houseId", "address", {"people":["personId", "name", "age"]}],
         rows:[
-          [101, "Chimney Hill", 1, "Jane", 5, [[101, "Puck", 12]]],
-          [101, "Chimney Hill", 2, "Tricia", 40, [[102, "Maggie", 11],
-                                                  [103, "Molly", 11]] ],
-          [102, "Parnassus", 3, "Fanny", 30, [[104, "Spot", 8]] ]
+          [1001, "San Francisco", 101, "Chimney Hill", [[1, "Jane", 5],
+                                                        [2, "Puck", 12]] ],
+          [1001, "San Francisco", 102, "Parnassus", [[3, "Fanny", 30]] ],
+          [1002, "New Orleans", 103, "Canal", [[4, "Amy", 6]] ]
         ]
-      }, relationContents(nestPetsOnly))
+      }, relationContents(nestPeopleOnly))
       
       //Note that you currently can't nest nest's
       //This is a possible hole in the design.  The problem is that "pets" doesn't exist until we apply the first nest.
       //...so you can't go around referencing pets for another nest in the same apply.
       //Figure out how to make this late binding at some point...
-      
-      var nestPeopleInAdditionToPets = knit(function(){
-        return nest(
-                 this.nestPetsOnly,
-                 {"people":this.nestPetsOnly.attr("personId", "name", "age", "pets")}
+
+      var nestHousesAndPeople = knit(function(){
+        return order.asc(
+                 nest(
+                   this.nestPeopleOnly, 
+                   {"houses":this.nestPeopleOnly.attr("houseId", "address", "people")}
+                 ),
+                 this.nestPeopleOnly.attr("cityId")
                )
-      }, {nestPetsOnly:nestPetsOnly}).apply()
-      
+      }, {nestPeopleOnly:nestPeopleOnly}).apply()
+
+
       assert.equal({
-        name:"housePeoplePet",
-        attributes:["houseId", "address", {"people":["personId", "name", "age", {"pets":["petId", "petName", "petAge"]}]}],
+        name:"cityHousePerson",
+        attributes:["cityId", "name", {"houses":["houseId", "address", {"people":["personId", "name", "age"]}]}],
         rows:[
-          [101, "Chimney Hill", [[1, "Jane", 5, [[101, "Puck", 12]]],
-                                 [2, "Tricia", 40, [[102, "Maggie", 11],
-                                                    [103, "Molly", 11]] ]] ],          
-          [102, "Parnassus", [[3, "Fanny", 30, [[104, "Spot", 8]] ]] ]
+          [1001, "San Francisco", [ [101, "Chimney Hill", [[1, "Jane", 5],
+                                                           [2, "Puck", 12]] ],
+                                    [102, "Parnassus", [[3, "Fanny", 30]] ]   ] ],
+          [1002, "New Orleans", [[103, "Canal", [[4, "Amy", 6]] ]] ]
         ]
-      }, relationContents(nestPeopleInAdditionToPets))
-      
+      }, relationContents(nestHousesAndPeople))
       
       
     })

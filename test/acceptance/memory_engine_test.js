@@ -508,38 +508,54 @@ regarding("In Memory Engine", function() {
     })
     
     test(".objects should cause nested stuff to be object-style too", function (){
+      var housePeople = 
+        engine.createRelation(
+          "housePeople", 
+          [
+           house.attr("houseId"), house.attr("address"),
+           {"people":simplePerson}
+          ])
       
-      var pet = engine.createRelation("pet", ["petId", "petName", "petAge"])
-      var personWithPets = engine.createRelation("person", ["personId", "name", "age", {"pets":pet}])
-      var housePeoplePet = engine.createRelation("housePeoplePet", ["houseId", "address", {"people":personWithPets}])
-      housePeoplePet.merge([
-        [101, "Chimney Hill", [[1, "Jane", 5, [[101, "Puck", 12]]],
-                               [2, "Tricia", 40, [[102, "Maggie", 11],
-                                                  [103, "Molly", 11]] ]] ],          
-        [102, "Parnassus", [[3, "Fanny", 30, [[104, "Spot", 8]] ]] ]
-      ])
+      var cityHousesPeopleNested = 
+        engine.createRelation(
+          "cityHousesPeople", 
+          [
+           city.attr("cityId"), city.attr("name"), 
+           {"houses":housePeople}
+          ]).
+          merge([
+            [1001, "San Francisco", [ [101, "Chimney Hill", [[1, "Jane", 5],
+                                                             [2, "Puck", 12]] ],
+                                      [102, "Parnassus", [[3, "Fanny", 30]] ]   ] ],
+            [1002, "New Orleans", [[103, "Canal", [[4, "Amy", 6]] ]] ]
+          ])
+
+      var objects = cityHousesPeopleNested.objects()
       
       assert.equal([
-        {houseId:101, address:"Chimney Hill", 
-          people:[
-            {personId:1, name:"Jane", age:5, 
-              pets:[
-                {petId:101, petName:"Puck", petAge:12}
-              ]},
-            {personId:2, name:"Tricia", age:40, 
-              pets:[
-                {petId:102, petName:"Maggie", petAge:11},
-                {petId:103, petName:"Molly", petAge:11}
-              ]}
-          ]},
-        {houseId:102, address:"Parnassus", 
-          people:[
-            {personId:3, name:"Fanny", age:30, 
-              pets:[
-                {petId:104, petName:"Spot", petAge:8}
-              ]}
-          ]}
-      ], housePeoplePet.objects())
+      
+        {cityId:1001, name:"San Francisco",
+         houses:[
+           {houseId:101, address:"Chimney Hill",
+            people:[
+              {personId:1, name:"Jane", age:5},
+              {personId:2, name:"Puck", age:12}
+            ]},
+           {houseId:102, address:"Parnassus",
+            people:[
+              {personId:3, name:"Fanny", age:30}
+            ]}
+         ]},
+      
+        {cityId:1002, name:"New Orleans",
+         houses:[
+           {houseId:103, address:"Canal",
+            people:[
+              {personId:4, name:"Amy", age:6}
+            ]}
+         ]}
+      
+      ], objects)
       
     })
 

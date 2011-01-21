@@ -410,30 +410,33 @@ regarding("In Memory Engine", function() {
     regarding("Group up 'child' data into nested relations", function() {
 
       test("simple.  1NF to nested by matching on non-nested rows.  orders rows on flat attributes, works with intermingled nested/non-nested columns", function (){
+        var housePeopleUnnested = 
+          engine.createRelation(
+            "housePeople", 
+            [house.attr("houseId"), simplePerson.attr("personId"), simplePerson.attr("name"), 
+             house.attr("address"), simplePerson.attr("age")]
+          ).merge([
+            [101,  1, "Jane", "Chimney Hill", 5],
+            [102,  3, "Fanny", "Parnassus", 30],
+            [101,  2, "Puck", "Chimney Hill", 12]
+          ])
         
-        var houseToPeople_1NF = engine.createRelation("housesAndPeople", ["houseId", "personId", "name", "address", "age"])
-        houseToPeople_1NF.merge([
-          [101,  1, "Jane", "Chimney Hill", 5],
-          [102,  3, "Fanny", "Parnassus", 30],
-          [101,  2, "Puck", "Chimney Hill", 12]
-        ])
-        
-        var houseToPerson_non1NF = knit(function(){
+        var housePeopleNested = knit(function(){
           return nest(
-                  this.houseToPeople_1NF, 
-                  {"people":this.houseToPeople_1NF.attr("personId", "name", "age")}
+                  this.housePeople, 
+                  {"people":this.housePeople.attr("personId", "name", "age")}
                 )
-        }, {houseToPeople_1NF:houseToPeople_1NF}).apply()
+        }, {housePeople:housePeopleUnnested}).apply()
 
         assert.equal({
-          name:"housesAndPeople",
+          name:"housePeople",
           attributes:["houseId", {"people":["personId", "name", "age"]}, "address"],
           rows:[
             [101, [[1, "Jane", 5],
                    [2, "Puck", 12]], "Chimney Hill"],          
             [102, [[3, "Fanny", 30]], "Parnassus"]
           ]
-        }, relationContents(houseToPerson_non1NF))
+        }, relationContents(housePeopleNested))
         
       })
     })

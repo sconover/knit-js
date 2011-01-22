@@ -54,5 +54,37 @@ regarding("references allow late-binding of core relations and attributes. " +
     })
   })
   
+  regarding("attribute reference", function() {
+  
+    test("you can refer to attributes as strings and then resolve to real attributes at perform time", function(){
+      var ageRef = env.attr({"personZ":"age"})
+      assert.equal(false, ageRef === person.attr("age")) //attr method naming collision coming...
+    
+      var realAgeAttribute = ageRef.perform({personZ:person})
+      assert.equal(true, realAgeAttribute === person.attr("age"))
+    })
+
+    test("inspect", function(){
+      assert.equal("age", env.attr({"personZ":"age"}).inspect()) //relation.attr ?  review later...
+    })
+
+  
+    regarding("sameness and equivalence", function() {
+    
+      test("same if the sort direction and sort attribute are equal", function(){knit(function(){
+        assert.same(env.attr({"person":"age"}), env.attr({"person":"age"}))
+        assert.notSame(env.attr({"person":"age"}), env.attr({"personZZZ":"age"}))
+        assert.notSame(env.attr({"person":"age"}), env.attr({"person":"ageZZZ"}))
+      })})
+        
+      test("equivalent is like same", function(){knit(function(){
+        assert.equivalent(env.attr({"person":"age"}), env.attr({"person":"age"}))
+        assert.notEquivalent(env.attr({"person":"age"}), env.attr({"personZZZ":"age"}))
+        assert.notEquivalent(env.attr({"person":"age"}), env.attr({"person":"ageZZZ"}))
+      })})
+        
+    })
+  })
+  
 })
 

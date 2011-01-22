@@ -1,3 +1,11 @@
+what to do about nest/unnest multi-level problem?
+  late binding...
+
+finish app integration
+engines export row iterators (not arrays)
+
+chaining style (reuse dsl methods or vice versa)
+
 nest / unnest
   impose order on non-nested cols?
     ask whether it's ordered, and it it's not, impose order?

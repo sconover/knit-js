@@ -165,7 +165,6 @@ regarding("In Memory Engine", function() {
         return join(join(person, house), city)
       }).perform()
       
-      
       assert.equal({
         name:"person__house__city",
         attributes:["personId", "houseId", "name", "age", 

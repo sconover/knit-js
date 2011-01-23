@@ -18,6 +18,8 @@ nest / unnest
 this.newNestedAttribute = this.relationOne.newNestedAttribute
   kinda sucks
 
+modulrize introduces a lot of code.  consider something cruder / smaller.
+
 reconsider apply
   interesting that it's in the same place as rows and objects
   turn this into a late-evaluating result set like sequel

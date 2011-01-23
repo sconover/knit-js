@@ -40,10 +40,10 @@ regarding("In Memory Engine", function() {
     return _.map(relation.attributes(), function(attribute){
       if (attribute.nestedRelation) {
         var mapping = {}
-        mapping[attribute.name] = getAttributes(attribute.nestedRelation)
+        mapping[attribute.name()] = getAttributes(attribute.nestedRelation)
         return mapping
       } else {
-        return attribute.name
+        return attribute.name()
       }
     })
   }

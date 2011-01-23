@@ -22,7 +22,7 @@ knit.TestRelationFunction = function() {
   F.prototype.attributes = function(){ return this._attributes }
   
   F.prototype.attr = function(attributeName) {
-    return _.detect(this.attributes(), function(attr){return attr.name == attributeName})
+    return _.detect(this.attributes(), function(attr){return attr.name() == attributeName})
   }
   
   F.prototype.isSame = function(other) {
@@ -55,18 +55,19 @@ knit.dslLocals.testRelation = function(attrDefs) {
 
 knit.TestAttribute = function() {
   var F = function(name, sourceRelation) {
-    this.name = name
+    this._name = name
     this._sourceRelation = sourceRelation
   }
 
+  F.prototype.name = function() { return this._name }
   F.prototype.isSame = function(other) {
-    return this.name == other.name &&
+    return this.name() == other.name() &&
            other.nestedRelation === undefined &&
            this._sourceRelation === other._sourceRelation
   }
   
   F.prototype.inspect = function() {
-    return this.name
+    return this.name()
   }
   
   return F
@@ -74,20 +75,21 @@ knit.TestAttribute = function() {
 
 knit.TestNestedAttribute = function() {
   var F = function(name, nestedRelation, sourceRelation) {
-    this.name = name
+    this._name = name
     this.nestedRelation = nestedRelation
     this._sourceRelation = sourceRelation
   }
-
+  
+  F.prototype.name = function() { return this._name }
   F.prototype.isSame = function(other) {
-    return this.name == other.name &&
+    return this.name() == other.name() &&
            other.nestedRelation != undefined &&
            this.nestedRelation.isSame(other.nestedRelation) &&
            this._sourceRelation === other._sourceRelation
   }
   
   F.prototype.inspect = function() {
-    return this.name + ":" + this.nestedRelation.inspect()
+    return this.name() + ":" + this.nestedRelation.inspect()
   }
   
   return F

@@ -1,23 +1,12 @@
-what to do about nest/unnest multi-level problem?
-  late binding...
-  clean up nest/unnest AT
-  
 finish app integration
 engines export row iterators (not arrays)
 
 chaining style (reuse dsl methods or vice versa)
 
 nest / unnest
-  impose order on non-nested cols?
-    ask whether it's ordered, and it it's not, impose order?
-      relation.ordered?()
-    just leave this as a known issue...
   cost
   prove that cost is low...implement as n+1 strategy, then RF to sorts + weaving
     ...should it impose its own order.asc on the relation?
-
-this.newNestedAttribute = this.relationOne.newNestedAttribute
-  kinda sucks
 
 good errors.  knit has guardrails
   relation doesn't exist

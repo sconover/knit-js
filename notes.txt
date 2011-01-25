@@ -2,8 +2,6 @@ what to do about nest/unnest multi-level problem?
   late binding...
   clean up nest/unnest AT
   
-modulrize introduces a lot of code.  consider something cruder / smaller.
-
 finish app integration
 engines export row iterators (not arrays)
 

@@ -3,6 +3,12 @@ engines export row iterators (not arrays)
 
 chaining style (reuse dsl methods or vice versa)
 
+
+knit([headers(string array)]) ==> mem relation, no rows
+knit([headers(string array)], array) ==> mem relation with rows
+knit(array of js objects) ==> mem relation with rows - headers are stripped out, etc
+knit(sqlite table) => sqlite relation
+
 nest / unnest
   cost
   prove that cost is low...implement as n+1 strategy, then RF to sorts + weaving

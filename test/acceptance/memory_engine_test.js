@@ -536,33 +536,34 @@ regarding("In Memory Engine", function() {
     })
     
     test(".objects should cause nested stuff to be object-style too", function (){
-      var cityHousePersonUnnested = this.$R(function(){
-        return project(
-          join(
-            join(
-              relation("city"), 
-              relation("house"), 
-              eq(attr("city.cityId"), attr("house.cityId"))
-            ), 
-            relation("person"), 
-            eq(attr("house.houseId"), attr("person.houseId"))
-          ), 
-          attr("city.cityId", "city.name", "house.houseId", "person.personId", "person.name", "house.address", "person.age")
-        )
-      }).perform()
       
       var nested = this.$R(function(){
+        var cityHousePersonUnnested = 
+          project(
+            join(
+              join(
+                relation("city"), 
+                relation("house"), 
+                eq(attr("city.cityId"), attr("house.cityId"))
+              ), 
+              relation("person"), 
+              eq(attr("house.houseId"), attr("person.houseId"))
+            ), 
+            attr("city.cityId", "city.name", "house.houseId", "person.personId", "person.name", "house.address", "person.age")
+          )
+        
+        
          return order.asc(
            nest(
              nest(
-               this.cityHousePersonUnnested, 
+               cityHousePersonUnnested, 
                attr("people", attr("person.personId", "person.name", "person.age"))
              ),
              attr("houses", attr("house.houseId", "house.address", "people"))
            ),
            attr("city.cityId")
          )
-      }, {cityHousePersonUnnested:cityHousePersonUnnested}).perform()
+      }).perform()
       
       
       var objects = nested.objects()

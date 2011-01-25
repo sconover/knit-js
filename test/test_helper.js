@@ -34,10 +34,20 @@ assert.doubleEqual = assert.equal
 assert.equal = assert.deepEqual
 
 assert._func = function(func, expected, actual, orientation, term) {
-  assert.ok(func(expected, actual)==orientation, 
+  function simpleInspect(obj) {
+    if (typeof obj == "object") {
+      return "{" + _.map(_.keys(obj).sort(), function(key){return "" + key + "=" + obj[key]}).join(" ") + "}"
+    } else {
+      return "" + obj
+    }
+  }
+  
+  var result = func(expected, actual)==orientation
+  assert.ok(result, 
+            !result &&
             term + " failure: " + 
-            "\n    expected: " + (expected.inspect ? expected.inspect() : "" + expected) + 
-            "\n    actual:   " + (actual.inspect ? actual.inspect() : "" + actual))
+            "\n    expected: " + (expected.inspect ? expected.inspect() : simpleInspect(expected)) + 
+            "\n    actual:   " + (actual.inspect ? actual.inspect() : simpleInspect(actual)))
 }
 
 assert._equivalent = function(expected, actual, orientation, term) {
@@ -72,3 +82,18 @@ assert.arraySame = function(expected, actual) {
   })
 }
 
+assert.quacksLike = function(actualObject, expectedSignature) {
+  assert._func(function(expectedSignature, actualObject){return knit.quacksLike(actualObject, expectedSignature)}, 
+               expectedSignature, 
+               actualObject, 
+               true, 
+               "Quacks Like")
+}
+
+assert.doesntQuackLike = function(actualObject, expectedSignature) {
+  assert._func(function(expectedSignature, actualObject){return knit.quacksLike(actualObject, expectedSignature)}, 
+               expectedSignature, 
+               actualObject, 
+               false, 
+               "Doesn't Quack Like")
+}

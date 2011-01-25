@@ -3,11 +3,11 @@ require("knit/algebra/join")
 require("./test_relation")
 require("../relation_proof")
 
-relationProof("TestRelation", function(attributeNames){ return new knit.TestRelationFunction(attributeNames) } )
+relationProof("TestRelation", function(attributeNames){ return new TestRelation(attributeNames) } )
 
 regarding("TestRelation inspect", function() {
   test("inspect", function (){
-    var r = new knit.TestRelationFunction(["a", "b"])
+    var r = new TestRelation(["a", "b"])
 
     assert.equal("r[a,b]", r.inspect())
   })

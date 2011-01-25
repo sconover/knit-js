@@ -1,5 +1,8 @@
 what to do about nest/unnest multi-level problem?
   late binding...
+  clean up nest/unnest AT
+  
+modulrize introduces a lot of code.  consider something cruder / smaller.
 
 finish app integration
 engines export row iterators (not arrays)
@@ -18,7 +21,18 @@ nest / unnest
 this.newNestedAttribute = this.relationOne.newNestedAttribute
   kinda sucks
 
-modulrize introduces a lot of code.  consider something cruder / smaller.
+good errors.  knit has guardrails
+  relation doesn't exist
+  attr doesn't exist
+  foo.bar <= needs to be in this format
+  stuff is null or not of the appropriate type
+  ...anything you can put in a dsl expression should have good guardrails / error / type checking.
+
+project - *, exceptions
+
+convert before varibles from global to this.
+
+http://esa-matti.suuronen.org/projects/underscore.strings/
 
 reconsider apply
   interesting that it's in the same place as rows and objects
@@ -34,6 +48,11 @@ reconsider apply
         rows.inspect returns tab-delimited table
         objects.inspect ... hmm, pretty-printed json?  not sure.  do nothing / just use rows.inspect...
   later: rows and objects can take a callback method, jquery-style, for async support (callback with the iterator)
+
+wrap any 2d array, assigning column names, and incorporate it into a binding with a label and go to town...
+  the knit equivalent of wrapping a dom element with jquery
+  possibly convert testrelation over to whatever this is...
+  or it's already there in the form of memory relation (probably this, actually)
 
 an attributes class up in the algebra to take care of common attributes issues
   inspect

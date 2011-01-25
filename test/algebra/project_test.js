@@ -2,31 +2,33 @@ require("../test_helper.js")
 require("knit/algebra/project")
 require("./test_relation.js")
 
-regarding("order", function() {
+regarding("project lets you cut down the columns in a relation", function() {
     
   beforeEach(function() {
-    person = knit(function(){return testRelation(["id", "houseId", "name", "age"])})
-    foo = knit(function(){return testRelation(["id", "zzz"])})
+    this.$R = knit.createBuilderFunction({bindings:{
+      person:new TestRelation(["id", "houseId", "name", "age"]),
+      foo:new TestRelation(["id", "zzz"])
+    }})
   })
 
-  test("inspect", function(){knit(function(){
-    assert.equal("project(r[id,houseId,name,age],[name,age])", 
-                 project(person, [person.attr("name"), person.attr("age")]).inspect())
+  test("inspect", function(){this.$R(function(){
+    assert.equal("project(*person,[*name,*age])", 
+                 project(relation("person"), attr("person.name", "person.age")).inspect())
   })})
 
   
   regarding("sameness and equivalence", function() {
     
-    test("same if the relation and project attributes are equal", function(){knit(function(){
-      assert.same(project(person, [person.attr("name"), person.attr("age")]), project(person, [person.attr("name"), person.attr("age")]))
-      assert.notSame(project(person, [person.attr("name"), person.attr("age")]), project(person, [person.attr("name")]))
-      assert.notSame(project(person, [person.attr("id")]), project(foo, [foo.attr("id")]))
+    test("same if the relation and project attributes are equal", function(){this.$R(function(){
+      assert.same(project(relation("person"), attr("person.name", "person.age")), project(relation("person"), attr("person.name", "person.age")))
+      assert.notSame(project(relation("person"), attr("person.name"), attr("person.age")), project(relation("person"), [attr("person.name")]))
+      assert.notSame(project(relation("person"), [attr("person.id")]), project(relation("foo"), [attr("foo.id")]))
     })})
         
-    test("equivalent is like same", function(){knit(function(){
-      assert.equivalent(project(person, [person.attr("name"), person.attr("age")]), project(person, [person.attr("name"), person.attr("age")]))
-      assert.notEquivalent(project(person, [person.attr("name"), person.attr("age")]), project(person, [person.attr("name")]))
-      assert.notEquivalent(project(person, [person.attr("id")]), project(foo, [foo.attr("id")]))
+    test("equivalent is like same", function(){this.$R(function(){
+      assert.equivalent(project(relation("person"), attr("person.name", "person.age")), project(relation("person"), attr("person.name", "person.age")))
+      assert.notEquivalent(project(relation("person"), attr("person.name", "person.age")), project(relation("person"), [attr("person.name")]))
+      assert.notEquivalent(project(relation("person"), [attr("person.id")]), project(relation("foo"), [attr("foo.id")]))
     })})
         
   })

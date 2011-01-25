@@ -6,27 +6,29 @@ require("./test_relation.js")
 regarding("order", function() {
     
   beforeEach(function() {
-    person = knit(function(){return testRelation(["id", "houseId", "name", "age"])})
+    this.$R = knit.createBuilderFunction({bindings:{
+      person:new TestRelation(["id", "houseId", "name", "age"])
+    }})
   })
 
-  test("inspect", function(){knit(function(){
-    assert.equal("order.asc(r[id,houseId,name,age],name)", 
-                 order.asc(person, person.attr("name")).inspect())
+  test("inspect", function(){this.$R(function(){
+    assert.equal("order.asc(*person,*name)", 
+                 order.asc(relation("person"), attr("person.name")).inspect())
   })})
 
   
   regarding("sameness and equivalence", function() {
     
-    test("same if the sort direction and sort attribute are equal", function(){knit(function(){
-      assert.same(order.asc(person, person.attr("name")), order.asc(person, person.attr("name")))
-      assert.notSame(order.asc(person, person.attr("name")), order.desc(person, person.attr("name")))
-      assert.notSame(order.asc(person, person.attr("name")), order.asc(person, person.attr("age")))
+    test("same if the sort direction and sort attribute are equal", function(){this.$R(function(){
+      assert.same(order.asc(relation("person"), attr("person.name")), order.asc(relation("person"), attr("person.name")))
+      assert.notSame(order.asc(relation("person"), attr("person.name")), order.desc(relation("person"), attr("person.name")))
+      assert.notSame(order.asc(relation("person"), attr("person.name")), order.asc(relation("person"), attr("person.age")))
     })})
         
-    test("equivalent is like same", function(){knit(function(){
-      assert.equivalent(order.asc(person, person.attr("name")), order.asc(person, person.attr("name")))
-      assert.notEquivalent(order.asc(person, person.attr("name")), order.desc(person, person.attr("name")))
-      assert.notEquivalent(order.asc(person, person.attr("name")), order.asc(person, person.attr("age")))
+    test("equivalent is like same", function(){this.$R(function(){
+      assert.equivalent(order.asc(relation("person"), attr("person.name")), order.asc(relation("person"), attr("person.name")))
+      assert.notEquivalent(order.asc(relation("person"), attr("person.name")), order.desc(relation("person"), attr("person.name")))
+      assert.notEquivalent(order.asc(relation("person"), attr("person.name")), order.asc(relation("person"), attr("person.age")))
     })})
         
   })

@@ -6,26 +6,28 @@ require("./test_relation.js")
 regarding("unnest", function() {
     
   beforeEach(function() {
-    person = knit(function(){return testRelation(["personId", "name", "age"])})
-    house = knit(function(){return testRelation(["houseId", "address", {"people":person}])})
+    this.$R = knit.createBuilderFunction({bindings:{
+      person:new TestRelation(["personId", "houseId", "name", "age"]),
+      house:new TestRelation(["houseId", "address", {"people":new TestRelation(["personId", "houseId", "name", "age"])}])
+    }})
   })
 
-  test("inspect", function(){knit(function(){
-    assert.equal("unnest(r[houseId,address,people:r[personId,name,age]],people:r[personId,name,age])", 
-                 unnest(house, house.attr("people")).inspect())
+  test("inspect", function(){this.$R(function(){
+    assert.equal("unnest(*house,*people)", 
+                 unnest(relation("house"), attr("house.people")).inspect())
   })})
 
   
   regarding("sameness and equivalence", function() {
     
-    test("same", function(){knit(function(){
-      assert.same(unnest(house, house.attr("people")), unnest(house, house.attr("people")))
-      assert.notSame(unnest(house, house.attr("people")), unnest(house, house.attr("address")))
+    test("same", function(){this.$R(function(){
+      assert.same(unnest(relation("house"), attr("house.people")), unnest(relation("house"), attr("house.people")))
+      assert.notSame(unnest(relation("house"), attr("house.people")), unnest(relation("house"), attr("house.address")))
     })})    
   
-    test("equivalence and sameness are the same thing", function(){knit(function(){
-      assert.equivalent(unnest(house, house.attr("people")), unnest(house, house.attr("people")))
-      assert.notEquivalent(unnest(house, house.attr("people")), unnest(house, house.attr("address")))
+    test("equivalence and sameness are the same thing", function(){this.$R(function(){
+      assert.equivalent(unnest(relation("house"), attr("house.people")), unnest(relation("house"), attr("house.people")))
+      assert.notEquivalent(unnest(relation("house"), attr("house.people")), unnest(relation("house"), attr("house.address")))
     })})    
   })
   
@@ -34,27 +36,29 @@ regarding("unnest", function() {
 regarding("nest", function() {
     
   beforeEach(function() {
-    person = knit(function(){return testRelation(["personId", "name", "age"])})
-    house = knit(function(){return testRelation(["houseId", "address"])})
-    houseAndPerson = knit(function(){return join(house, person)})
+    this.$R = knit.createBuilderFunction({bindings:{
+      person:new TestRelation(["personId", "name", "age"]),
+      house:new TestRelation(["houseId", "address"])
+    }})
   })
 
-  test("inspect", function(){knit(function(){
-    assert.equal("nest(join(r[houseId,address],r[personId,name,age]),people:r[personId,name,age])", 
-                 nest(houseAndPerson, {"people":[person.attr("personId"), person.attr("name"), person.attr("age")]} ).inspect())
+  test("inspect", function(){this.$R(function(){
+    var houseAndPerson = join(relation("house"), relation("person"))
+    assert.equal("nest(join(*house,*person),*people)", 
+                 nest(houseAndPerson, attr("people", attr("person.personId", "person.name", "person.age")) ).inspect())
   })})
 
   
-  regarding("sameness and equivalence", function() {
+  xregarding("sameness and equivalence", function() {
     
-    test("same", function(){knit(function(){
-      assert.same(nest(house, {"houseIds":[house.attr("houseId")]}), nest(house, {"houseIds":[house.attr("houseId")]}))
-      assert.notSame(nest(house, {"houseIds":[house.attr("houseId")]}), nest(house, {"addresses":[house.attr("address")]}))
+    test("same", function(){this.$R(function(){      
+      assert.same(nest(relation("house"), attr("houseIds", [attr("house.houseId")])), nest(relation("house"), attr("houseIds", [attr("house.houseId")])))
+      assert.notSame(nest(relation("house"), attr("houseIds", [attr("house.houseId")])), nest(relation("house"), attr("addresses", [attr("house.addresses")])))
     })})    
   
-    test("equivalence and sameness are the same thing", function(){knit(function(){
-      assert.equivalent(nest(house, {"houseIds":[house.attr("houseId")]}), nest(house, {"houseIds":[house.attr("houseId")]}))
-      assert.notEquivalent(nest(house, {"houseIds":[house.attr("houseId")]}), nest(house, {"addresses":[house.attr("address")]}))
+    test("equivalence and sameness are the same thing", function(){this.$R(function(){
+      assert.equivalent(nest(relation("house"), attr("houseIds", [attr("house.houseId")])), nest(relation("house"), attr("houseIds", [attr("house.houseId")])))
+      assert.notEquivalent(nest(relation("house"), attr("houseIds", [attr("house.houseId")])), nest(relation("house"), attr("addresses", [attr("house.addresses")])))
     })})    
   })
   

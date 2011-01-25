@@ -1,7 +1,6 @@
-require("../test_helper")
-require("knit/algebra/join")
+require("./test_helper")
 require("./test_relation")
-require("../relation_proof")
+require("./relation_proof")
 
 relationProof("TestRelation", function(attributeNames){ return new TestRelation(attributeNames) } )
 

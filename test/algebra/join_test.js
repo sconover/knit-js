@@ -1,6 +1,6 @@
 require("../test_helper.js")
 require("knit/algebra/join")
-require("./test_relation.js")
+require("./../test_relation.js")
 
 regarding("join", function() {
     
@@ -13,7 +13,7 @@ regarding("join", function() {
   })
   
   test("combines the attributes of the two relations", function (){
-    join = this.$R(function(){return join(relation("person"), relation("house"))})
+    var join = this.$R(function(){return join(relation("person"), relation("house"))})
     names = _.map(join.attributes(), function(attr){return attr.name()})
     assert.equal(["id", "houseId", "name", "age", "houseId", "address", "cityId"], names)
   })

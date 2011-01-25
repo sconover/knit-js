@@ -1,6 +1,6 @@
 require("../test_helper.js")
 require("knit/algebra/project")
-require("./test_relation.js")
+require("./../test_relation.js")
 
 regarding("project lets you cut down the columns in a relation", function() {
     

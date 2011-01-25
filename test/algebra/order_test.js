@@ -1,7 +1,7 @@
 require("../test_helper.js")
 require("knit/algebra/join")
 require("knit/algebra/order")
-require("./test_relation.js")
+require("./../test_relation.js")
 
 regarding("order", function() {
     

@@ -19,36 +19,32 @@ TestRelation = function() {
         return new TestNestedAttribute(attributeName, nestedRelation, self)
       }
     })
-    
-  }
+  }; var p = F.prototype
 
-  F.prototype.id = function(){ return this._id }
-  F.prototype.attributes = function(){ return this._attributes }
+  p.id = function(){ return this._id }
+  p.attributes = function(){ return this._attributes }
   
-  F.prototype.attr = function(attributeName) {
+  p.attr = function(attributeName) {
     return _.detect(this.attributes(), function(attr){return attr.name() == attributeName})
   }
   
-  F.prototype.isSame = function(other) {
-    return other.id && this.id() == other.id()
-  }
+  p.isSame = function(other) { return other.id && this.id() == other.id() }
   
-  F.prototype.isEquivalent = function(other) {
+  p.isEquivalent = function(other) {
     return knit.quacksLike(other, knit.signature.relation) &&
            this.attributes().length == other.attributes().length &&
            _.detect(this.attributes(), function(attr, i){return !attr.isSame(other.attributes()[i])}) == null
   }
   
-  F.prototype.split = function(){return this}
-  F.prototype.merge = function(){return this}
+  p.split = p.merge = function(){return this}
   
-  F.prototype.newNestedAttribute = function(attributeName, attributesToNest) {
+  p.newNestedAttribute = function(attributeName, attributesToNest) {
     var nestedRelation = new TestRelation([]) 
     nestedRelation._attributes = attributesToNest
     return new TestNestedAttribute(attributeName, nestedRelation, this)
   }
   
-  F.prototype.inspect = function() {
+  p.inspect = function() {
     return "r[" + _.map(this.attributes(), function(attr){return attr.inspect()}).join(",") + "]" 
   }
   
@@ -59,20 +55,17 @@ TestAttribute = function() {
   var F = function(name, sourceRelation) {
     this._name = name
     this._sourceRelation = sourceRelation
-  }
+  }; var p = F.prototype
 
-  F.prototype.name = function() { return this._name }
-  F.prototype.sourceRelation = function() { return this._sourceRelation }
-  F.prototype.isSame = function(other) {
+  p.name = function() { return this._name }
+  p.sourceRelation = function() { return this._sourceRelation }
+  p.isSame = p.isEquivalent = function(other) {
     return knit.quacksLike(other, knit.signature.attribute) &&
            this.name() == other.name() &&
            this.sourceRelation().id() == other.sourceRelation().id()
   }
-  F.prototype.isEquivalent = F.prototype.isSame
   
-  F.prototype.inspect = function() {
-    return this.name()
-  }
+  p.inspect = function() { return this.name() }
   
   return F
 }()
@@ -82,22 +75,19 @@ TestNestedAttribute = function() {
     this._name = name
     this._nestedRelation = nestedRelation
     this._sourceRelation = sourceRelation
-  }
+  }; var p = F.prototype
   
-  F.prototype.name = function() { return this._name }
-  F.prototype.sourceRelation = function() { return this._sourceRelation }
-  F.prototype.nestedRelation = function() { return this._nestedRelation }
-  F.prototype.isSame = function(other) {
+  p.name = function() { return this._name }
+  p.sourceRelation = function() { return this._sourceRelation }
+  p.nestedRelation = function() { return this._nestedRelation }
+  p.isSame = p.isEquivalent = function(other) {
     return knit.quacksLike(other, knit.signature.nestedAttribute) &&
            this.name() == other.name() &&
            this.sourceRelation().id() == other.sourceRelation().id() &&
            this.sourceRelation().id() == other.sourceRelation().id()
   }
-  F.prototype.isEquivalent = F.prototype.isSame
-  
-  F.prototype.inspect = function() {
-    return this.name() + ":" + this.nestedRelation().inspect()
-  }
+
+  p.inspect = function() { return this.name() + ":" + this.nestedRelation().inspect() }
   
   return F
 }()

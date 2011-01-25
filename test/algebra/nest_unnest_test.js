@@ -1,7 +1,7 @@
 require("../test_helper.js")
 require("knit/algebra/join")
 require("knit/algebra/nest_unnest")
-require("./test_relation.js")
+require("./../test_relation.js")
 
 regarding("unnest", function() {
     

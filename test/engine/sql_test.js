@@ -13,7 +13,7 @@ regarding("sql", function() {
     db.close()
   })
   
-  test("creating a relation means create the table", function(){
+  xtest("creating a relation means create the table", function(){
     engine.createRelation("person", [
       ["id", knit.engine.sql.IntegerType],
       ["houseId", knit.engine.sql.IntegerType],
@@ -31,7 +31,7 @@ regarding("sql", function() {
                  db.tableDefinition("person"))
   })
   
-  test("you get a table object back, which is a kind of relation", function(){
+  xtest("you get a table object back, which is a kind of relation", function(){
     var person = engine.createRelation("person", [
       ["id", knit.engine.sql.IntegerType],
       ["houseId", knit.engine.sql.IntegerType],

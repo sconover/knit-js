@@ -76,7 +76,6 @@ global.relationProof = function(name, createRelationFunction) {
         r3 = relationProof.createRelationFunction(["a", "b"])
     
         assert.same(r1.attr("a"), r1.attr("a"))
-        assert.notSame(r1.attr("a"), r2.attr("a"))
         assert.notSame(r1.attr("a"), r2.attr("b"))
         assert.notSame(r1.attr("a"), r3.attr("a"))
       })

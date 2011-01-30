@@ -1,8 +1,7 @@
 outer joins
-  extract a general in-memory join method that takes a couple of functions...
-    label one left and one right, which are separate from the direction you drive from
   also nesting eliminates rows that are fully null / missing values...
-    
+  consider currying to further RF join methods in relation.js
+  
   finish app integration
 engines export row iterators (not arrays)
 

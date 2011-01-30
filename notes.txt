@@ -1,4 +1,9 @@
-finish app integration
+outer joins
+  extract a general in-memory join method that takes a couple of functions...
+    label one left and one right, which are separate from the direction you drive from
+  also nesting eliminates rows that are fully null / missing values...
+    
+  finish app integration
 engines export row iterators (not arrays)
 
 chaining style (reuse dsl methods or vice versa)
@@ -8,6 +13,7 @@ knit([headers(string array)]) ==> mem relation, no rows
 knit([headers(string array)], array) ==> mem relation with rows
 knit(array of js objects) ==> mem relation with rows - headers are stripped out, etc
 knit(sqlite table) => sqlite relation
+  knit.bindRelation
 
 nest / unnest
   cost

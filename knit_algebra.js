@@ -675,6 +675,33 @@ knit.createBuilderFunction.dslLocals.join = function(relationOne, relationTwo, p
 }
 
 
+knit.algebra.LeftOuterJoin = function(relationOne, relationTwo, predicate) {
+  var join = new knit.algebra.Join(relationOne, relationTwo, predicate)
+  join.perform = function() {
+    return this.relationOne.perform().performLeftOuterJoin(this.relationTwo.perform(), this.predicate)
+  }
+  return join
+}
+
+knit.createBuilderFunction.dslLocals.leftOuterJoin = function(relationOne, relationTwo, predicate) { 
+  return new knit.algebra.LeftOuterJoin(relationOne, relationTwo, predicate) 
+}
+
+
+
+knit.algebra.RightOuterJoin = function(relationOne, relationTwo, predicate) {
+  var join = new knit.algebra.Join(relationOne, relationTwo, predicate)
+  join.perform = function() {
+    return this.relationOne.perform().performRightOuterJoin(this.relationTwo.perform(), this.predicate)
+  }
+  return join
+}
+
+knit.createBuilderFunction.dslLocals.rightOuterJoin = function(relationOne, relationTwo, predicate) { 
+  return new knit.algebra.RightOuterJoin(relationOne, relationTwo, predicate) 
+}
+
+
 //knit/algebra/select ======================================================
 
 knit.algebra.Select = function() {

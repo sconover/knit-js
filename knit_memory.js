@@ -675,6 +675,33 @@ knit.createBuilderFunction.dslLocals.join = function(relationOne, relationTwo, p
 }
 
 
+knit.algebra.LeftOuterJoin = function(relationOne, relationTwo, predicate) {
+  var join = new knit.algebra.Join(relationOne, relationTwo, predicate)
+  join.perform = function() {
+    return this.relationOne.perform().performLeftOuterJoin(this.relationTwo.perform(), this.predicate)
+  }
+  return join
+}
+
+knit.createBuilderFunction.dslLocals.leftOuterJoin = function(relationOne, relationTwo, predicate) { 
+  return new knit.algebra.LeftOuterJoin(relationOne, relationTwo, predicate) 
+}
+
+
+
+knit.algebra.RightOuterJoin = function(relationOne, relationTwo, predicate) {
+  var join = new knit.algebra.Join(relationOne, relationTwo, predicate)
+  join.perform = function() {
+    return this.relationOne.perform().performRightOuterJoin(this.relationTwo.perform(), this.predicate)
+  }
+  return join
+}
+
+knit.createBuilderFunction.dslLocals.rightOuterJoin = function(relationOne, relationTwo, predicate) { 
+  return new knit.algebra.RightOuterJoin(relationOne, relationTwo, predicate) 
+}
+
+
 //knit/algebra/select ======================================================
 
 knit.algebra.Select = function() {
@@ -1154,7 +1181,7 @@ knit.engine.Memory.Relation = function() {
     return this
   }
   
-  p._rowWithAttributes = function(row, attributes) {
+  function rowWithAttributes(row, attributes) {
     var rowWithAttributes = []
     for (var i=0; i<attributes.length; i++) {
       rowWithAttributes.push([attributes[i], row[i]])
@@ -1165,7 +1192,7 @@ knit.engine.Memory.Relation = function() {
   p._rowsWithAttributes = function() {
     var self = this
     return _.map(this._rowStore.rows(), function(row){
-      return self._rowWithAttributes(row, self.attributes())
+      return rowWithAttributes(row, self.attributes())
     })
   }
   
@@ -1194,23 +1221,83 @@ knit.engine.Memory.Relation = function() {
     return this._newRelation(projectedRows, this.name(), attributes) 
   }
 
-  p.performJoin = function(relationTwo, predicate) {
-    var rows = this.rows()
-    var otherRows = relationTwo.rows()
-    var combinedAttributes = [].concat(this.attributes()).concat(relationTwo.attributes())
-    var joinRows = []
-    var self = this
+  function joinRows(combinedAttributes, outerRows, innerRows, predicate, candidateJoinRowFunction, 
+                    innerAttributes, noInnerMatchFoundFunction) {
+    var resultRows = []
     
-    _.each(rows, function(row){
-      _.each(otherRows, function(otherRow){
-        var candidateJoinRow = [].concat(row).concat(otherRow)
-        if (predicate.match(self._rowWithAttributes(candidateJoinRow, combinedAttributes))) {
-          joinRows.push(candidateJoinRow)
+    _.each(outerRows, function(outerRow){
+      var innerRowMatchFound = false
+      _.each(innerRows, function(innerRow){
+        var candidateJoinRow = candidateJoinRowFunction(outerRow, innerRow) 
+        if (predicate.match(rowWithAttributes(candidateJoinRow, combinedAttributes))) {
+          resultRows.push(candidateJoinRow)
+          innerRowMatchFound = true
         }
       })
+      
+      if ( noInnerMatchFoundFunction && ! innerRowMatchFound) {
+        noInnerMatchFoundFunction(innerAttributes, outerRow, resultRows)
+      }
     })
 
-    return this._newRelation(joinRows, this.name() + "__" + relationTwo.name(), combinedAttributes) 
+    return resultRows
+  }
+
+
+  p.performJoin = function(relationTwo, predicate) {
+    var combinedAttributes = [].concat(this.attributes()).concat(relationTwo.attributes())           
+    return this._newRelation(
+      joinRows(
+        combinedAttributes,
+        this.rows(),
+        relationTwo.rows(),
+        predicate,
+        function(leftRow, rightRow){return [].concat(leftRow).concat(rightRow)}
+      ), 
+      this.name() + "__" + relationTwo.name(), 
+      combinedAttributes)
+  }
+
+  p.performLeftOuterJoin = function(relationTwo, predicate) {
+    var combinedAttributes = [].concat(this.attributes()).concat(relationTwo.attributes())           
+    return this._newRelation(
+      joinRows(
+        combinedAttributes,
+        this.rows(),
+        relationTwo.rows(),
+        predicate,
+        function(leftRow, rightRow){return [].concat(leftRow).concat(rightRow)},
+        relationTwo.attributes(),
+        function(rightAttributes, leftRow, joinRows){
+          var rightAsNulls = []
+          _.times(rightAttributes.length, function(){rightAsNulls.push(null)})
+          var leftRowWithNullRightValues = [].concat(leftRow).concat(rightAsNulls)
+          joinRows.push(leftRowWithNullRightValues)
+        }
+      ), 
+      this.name() + "__" + relationTwo.name(), 
+      combinedAttributes)
+  }
+
+  p.performRightOuterJoin = function(relationTwo, predicate) {
+    var combinedAttributes = [].concat(this.attributes()).concat(relationTwo.attributes())           
+    return this._newRelation(
+      joinRows(
+        combinedAttributes,
+        relationTwo.rows(),
+        this.rows(),
+        predicate,
+        function(rightRow, leftRow){return [].concat(leftRow).concat(rightRow)},
+        this.attributes(),
+        function(leftAttributes, rightRow, joinRows){
+          var leftAsNulls = []
+          _.times(leftAttributes.length, function(){leftAsNulls.push(null)})
+          var rightRowWithNullLeftValues = [].concat(leftAsNulls).concat(rightRow)
+          joinRows.push(rightRowWithNullLeftValues)
+        }
+      ), 
+      this.name() + "__" + relationTwo.name(), 
+      combinedAttributes)
   }
 
   p.performOrder = function(orderAttribute, direction) {
@@ -1268,9 +1355,10 @@ knit.engine.Memory.Relation = function() {
     _.each(this.rows(), function(row) {
       var flatValuesForThisRow = _.map(oldFlatPositions, function(flatPosition){return row[flatPosition]})
       var nestedValuesForThisRow = _.map(oldNestedPositions, function(nestedPosition){return row[nestedPosition]})
-
+      var allValuesAreNull = _.without(nestedValuesForThisRow, null).length==0
+      
       if (_.isEqual(flatValuesForThisRow, currentFlatValues)) {
-        currentNewRow[nestedAttributePosition].push(nestedValuesForThisRow)
+        if ( ! allValuesAreNull) currentNewRow[nestedAttributePosition].push(nestedValuesForThisRow)
       } else {
         if (currentNewRow) {
           newRows.push(currentNewRow)
@@ -1278,7 +1366,7 @@ knit.engine.Memory.Relation = function() {
         
         currentNewRow = _.map(newAttributeArrangement, function(attr, newPos){
           if (attr.isSame(nestedAttribute)) {
-            return [nestedValuesForThisRow]
+            return allValuesAreNull ? [] : [nestedValuesForThisRow]
           } else {
             var oldPos = newFlatAttrPositionToOldFlatAttrPosition[newPos]
             return row[oldPos]

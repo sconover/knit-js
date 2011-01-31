@@ -1,4 +1,5 @@
 require("knit/core")
+require("knit/algebra/attributes")
 
 TestRelation = function() {
   var _id = 0
@@ -7,7 +8,7 @@ TestRelation = function() {
     _id += 1
     this._id = "test_" + _id
     var self = this
-    this._attributes = _.map(attributeNames, function(attr){
+    var attributes = _.map(attributeNames, function(attr){
       if (attr.name) {
         return attr
       } else if (typeof attr == "string") {
@@ -19,6 +20,8 @@ TestRelation = function() {
         return new TestNestedAttribute(attributeName, nestedRelation, self)
       }
     })
+    
+    this._attributes = new knit.algebra.Attributes(attributes)
   }; var p = F.prototype
 
   p.id = function(){ return this._id }
@@ -32,8 +35,7 @@ TestRelation = function() {
   
   p.isEquivalent = function(other) {
     return knit.quacksLike(other, knit.signature.relation) &&
-           this.attributes().length == other.attributes().length &&
-           _.detect(this.attributes(), function(attr, i){return !attr.isSame(other.attributes()[i])}) == null
+           this.attributes().isSame(other.attributes())
   }
   
   p.split = p.merge = function(){return this}

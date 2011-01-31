@@ -36,7 +36,7 @@ regarding("In Memory Engine", function() {
           ), 
           attr("city.cityId", "city.name", "house.houseId", "person.personId", "person.name", "house.address", "person.age")
         )
-      
+
        return order.asc(
          nest(
            nest(

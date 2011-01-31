@@ -14,6 +14,9 @@ knit(array of js objects) ==> mem relation with rows - headers are stripped out,
 knit(sqlite table) => sqlite relation
   knit.bindRelation
 
+consider inner join
+  defaults to join predicate that takes leftnameId and matches to the same on the right
+
 nest / unnest
   cost
   prove that cost is low...implement as n+1 strategy, then RF to sorts + weaving

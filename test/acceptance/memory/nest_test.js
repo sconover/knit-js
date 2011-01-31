@@ -106,6 +106,57 @@ regarding("In Memory Engine", function() {
     
   })
   
+  
+  test("nest eliminates blank rows, so we can use this with outer joins.  " +
+       "not sure whether this automatic behavior is good in the long run, one might " +
+       "want this to be optional / overridable.", function (){
+    
+    this.house.merge([
+      [104, "Ashbury", 1001]
+    ])
+     
+    var housePersonUnnested = this.$R(function(){
+      return project(
+               leftOuterJoin(relation("house"), relation("person"), eq(attr("house.houseId"), attr("person.houseId"))), 
+               attr("house.houseId", "person.personId", "person.name", "house.address", "person.age")
+             )
+    }).perform()
+
+    assert.equal({
+      name:"house__person",
+      attributes:["houseId", "personId", "name", "address", "age"],
+      rows:[
+        [101,  1, "Jane", "Chimney Hill", 5],
+        [101,  2, "Puck", "Chimney Hill", 12],
+        [102,  3, "Fanny", "Parnassus", 30],
+        [103,  4, "Amy", "Canal", 6],
+        [104,  null, null, "Ashbury", null]
+      ]
+    }, relationContents(housePersonUnnested))
+
+
+
+    var housePeopleNested = this.$R(function(){
+      return order.asc(
+        nest(this.housePersonUnnested, attr("people", attr("person.personId", "person.name", "person.age"))),
+        attr("house.houseId")
+      )
+    }, {housePersonUnnested:housePersonUnnested}).perform()
+
+    assert.equal({
+      name:"house__person",
+      attributes:["houseId", {"people":["personId", "name", "age"]}, "address"],
+      rows:[
+        [101, [[1, "Jane", 5],
+               [2, "Puck", 12]], "Chimney Hill"],          
+        [102, [[3, "Fanny", 30]], "Parnassus"],
+        [103, [[4, "Amy", 6]], "Canal"],
+        [104, [], "Ashbury"]
+      ]
+    }, relationContents(housePeopleNested))
+    
+  })
+  
 
 })
 

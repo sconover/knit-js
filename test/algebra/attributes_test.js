@@ -18,7 +18,6 @@ regarding("attributes", function() {
                  new knit.algebra.Attributes([attr("house.people"), attr("person.name")]).inspect())
   })})
 
-  
   regarding("sameness and equivalence", function() {
     test("same", function(){this.$R(function(){
       assert.same(new knit.algebra.Attributes([attr("house.people"), attr("person.name")]), 
@@ -34,5 +33,16 @@ regarding("attributes", function() {
                            new knit.algebra.Attributes([attr("house.people"), attr("person.name")]))
     })})    
   })
-  
+
+  test("concat", function(){this.$R(function(){
+    assert.same(new knit.algebra.Attributes([attr("house.people"), attr("person.name")]), 
+                new knit.algebra.Attributes([attr("house.people")]).concat(new knit.algebra.Attributes([attr("person.name")])))
+  })})
+
+  test("iterable in underscore", function(){this.$R(function(){
+    assert.equal(["people", "name"], 
+                 _.map(new knit.algebra.Attributes([attr("house.people"), attr("person.name")]), function(attr){return attr.name()}))
+  })})
+
+    
 })

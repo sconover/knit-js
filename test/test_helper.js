@@ -2,7 +2,7 @@ require.paths.push("test")
 require.paths.push("lib")
 require.paths.push("../node-sqlite")
 
-require("underscore")
+global._ = require("underscore")
 
 require("../../jasmine-node/lib/jasmine")
 

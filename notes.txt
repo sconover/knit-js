@@ -1,3 +1,10 @@
+an attributes class up in the algebra to take care of common attributes issues
+  inspect
+  sameness
+  attr lookup
+
+attributes...simulate star attrs as real attrs...
+
 outer joins
   also nesting eliminates rows that are fully null / missing values...
   consider currying to further RF join methods in relation.js
@@ -54,11 +61,6 @@ wrap any 2d array, assigning column names, and incorporate it into a binding wit
   the knit equivalent of wrapping a dom element with jquery
   possibly convert testrelation over to whatever this is...
   or it's already there in the form of memory relation (probably this, actually)
-
-an attributes class up in the algebra to take care of common attributes issues
-  inspect
-  sameness
-  attr lookup
 
 quacksLike...anything out there?  underscore method?
 

@@ -702,6 +702,43 @@ knit.createBuilderFunction.dslLocals.rightOuterJoin = function(relationOne, rela
 }
 
 
+
+knit.algebra.NaturalJoin = function(relationOne, relationTwo) {
+  var join = new knit.algebra.Join(relationOne, relationTwo, new knit.algebra.predicate.True())
+
+  join.perform = function() {
+    var relationOneAttributeNames = _.map(this.relationOne.attributes(), function(attr){return attr.name()})
+    var relationTwoAttributeNames = _.map(this.relationTwo.attributes(), function(attr){return attr.name()})
+    var commonAttributeNames = _.intersect(relationOneAttributeNames, relationTwoAttributeNames)
+    var commonIdAttributeNames = _.select(commonAttributeNames, function(attributeName){return attributeName.match(/Id$/)})
+
+    function attributeNamesToPredicate(attributeNames, relationOne, relationTwo) {
+      if (attributeNames.length == 1) {
+        var attributeName = attributeNames.shift()
+        return new knit.algebra.predicate.Equality(relationOne.attr(attributeName), relationTwo.attr(attributeName))
+      } else if (attributeNames.length > 1) {
+        var attributeOne = attributeNames.shift()
+        return new knit.algebra.predicate.Conjunction(attributeNamesToPredicate([attributeOne], relationOne, relationTwo), 
+                                                      attributeNamesToPredicate(attributeNames, relationOne, relationTwo))
+      } else {
+        return new knit.algebra.predicate.True()
+      }
+    }
+
+    var predicate = attributeNamesToPredicate(commonIdAttributeNames, this.relationOne, this.relationTwo)
+    
+    return this.relationOne.perform().performRightOuterJoin(this.relationTwo.perform(), predicate)
+  }
+
+  return join
+}
+
+knit.createBuilderFunction.dslLocals.naturalJoin = function(relationOne, relationTwo) { 
+  return new knit.algebra.NaturalJoin(relationOne, relationTwo) 
+}
+
+
+
 //knit/algebra/select ======================================================
 
 knit.algebra.Select = function() {

@@ -41,7 +41,7 @@ regarding("attributes", function() {
 
   test("shallow copy", function(){this.$R(function(){
     var original = new knit.algebra.Attributes([attr("house.people"), attr("person.name")])
-    var copy = original.shallowCopy()
+    var copy = original.clone()
 
     assert.same(original, copy)
     

@@ -1,3 +1,5 @@
+give up and convert to standard describe / it / expect
+
 an attributes class up in the algebra to take care of common attributes issues
   inspect
   sameness

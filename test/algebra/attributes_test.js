@@ -64,5 +64,10 @@ regarding("attributes", function() {
     assert.equal(2, new knit.algebra.Attributes([attr("house.people"), attr("person.name")]).length())
   })})
 
+  test("names", function(){this.$R(function(){
+    assert.equal(["people", "name"], 
+                 new knit.algebra.Attributes([attr("house.people"), attr("person.name")]).names())
+  })})
+
     
 })

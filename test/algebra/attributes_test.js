@@ -35,21 +35,6 @@ regarding("attributes", function() {
     })})    
   })
 
-  test("concat", function(){this.$R(function(){
-    assert.same(new knit.algebra.Attributes([attr("house.people"), attr("person.name")]), 
-                new knit.algebra.Attributes([attr("house.people")]).concat(new knit.algebra.Attributes([attr("person.name")])))
-  })})
-
-  test("shallow copy", function(){this.$R(function(){
-    var original = new knit.algebra.Attributes([attr("house.people"), attr("person.name")])
-    var copy = original.clone()
-
-    assert.same(original, copy)
-    
-    copy.attributeArray.push(attr("house.address")) //breaking encapsulation to prove this
-    assert.notSame(original, copy)
-  })})
-
   test("iterable in underscore", function(){this.$R(function(){
     assert.equal(["people", "name"], 
                  _.map(new knit.algebra.Attributes([attr("house.people"), attr("person.name")]), function(attr){return attr.name()}))
@@ -61,8 +46,8 @@ regarding("attributes", function() {
     assert.equal(["people", "address"], _.map(original, function(attr){return attr.name()}))
   })})
     
-  test("length", function(){this.$R(function(){
-    assert.equal(2, new knit.algebra.Attributes([attr("house.people"), attr("person.name")]).length())
+  test("size", function(){this.$R(function(){
+    assert.equal(2, new knit.algebra.Attributes([attr("house.people"), attr("person.name")]).size())
   })})
 
   test("names", function(){this.$R(function(){

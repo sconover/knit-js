@@ -110,6 +110,47 @@ acceptance suite
       instead of "test"
 
 =========
+rows()
+
+  rows().map(function(item){return "x" + item})
+  
+    .collection()
+      new collection
+      map.into(collectionAppender)
+      ...just a convenience wrapper for appending?
+  
+    rows().all() (collection, renamed in knit)
+    rows().first()
+      knit._.each(rows(), function(item) {
+  
+      }) ... can handle a stream
+    rows()
+    rows()(10) ...makes a collection?
+    rows().into(appender)
+    rows().into(relation("foo").append)
+      ...could internally optimize this in engine implementations.  batch inserts in mysql.
+  
+    stream = .rows()
+  
+    stream() => row, stream() => row, stream() => row
+    stream.remaining() => collection
+             ^ method name is configurable
+    ...rename collection to all in knit
+  
+    **?? using a sql engine, generate select into...
+
+  var map = rows().map(function(item){return "x" + item})
+  map() -> next thing
+  map() -> next thing
+  map.into(function(item){/*stuff*/})
+
+
+  stream...
+    .collection() -> read it all in and return a collection
+      collection is user-configurable...
+
+
+=========
 Knit needs to be stream-based
   use jquery / sequel / datamapper results set style (rows, rows.first [applies limit 1 relation at the last minute?], rows.all)
   engine implementers should have to implement something like forEach

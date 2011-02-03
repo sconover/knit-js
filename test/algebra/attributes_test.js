@@ -7,9 +7,10 @@ require("./../test_relation.js")
 regarding("attributes", function() {
     
   beforeEach(function() {
+    var person = new TestRelation(["personId", "houseId", "name", "age"])
     this.$R = knit.createBuilderFunction({bindings:{
-      person:new TestRelation(["personId", "houseId", "name", "age"]),
-      house:new TestRelation(["houseId", "address", {"people":new TestRelation(["personId", "houseId", "name", "age"])}])
+      person:person,
+      house:new TestRelation(["houseId", "address", {"people":person}])
     }})
   })
 
@@ -68,6 +69,17 @@ regarding("attributes", function() {
     assert.equal(["people", "name"], 
                  new knit.algebra.Attributes([attr("house.people"), attr("person.name")]).names())
   })})
+
+  test("splice nested attribute - puts the nested attribute in the first place one " +
+       "of the consitutent attributes is found, then removes the constituent attributes from the top level", function(){
+    var original = this.$R(function(){
+      return new knit.algebra.Attributes(attr("house.houseId", "person.personId", "person.name", "house.address", "person.age"))
+    })
+    var house = this.$R(function(){return relation("house")})
+
+    var splicedIn = original.spliceInNestedAttribute(house.attr("people"))
+    assert.equal(["houseId", "people", "address"], _.map(splicedIn, function(attr){return attr.name()}))
+  })
 
     
 })

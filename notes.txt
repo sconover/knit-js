@@ -1,5 +1,8 @@
 give up and convert to standard describe / it / expect
 
+make attributes class faster/more efficient by specifying more features in CF creation (oh boy is this cool)
+  also need to make differ sort-based in CF to get rid of n^2
+
 an attributes class up in the algebra to take care of common attributes issues
   inspect
   sameness

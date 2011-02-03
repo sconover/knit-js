@@ -55,6 +55,16 @@ regarding("attributes", function() {
                  new knit.algebra.Attributes([attr("house.people"), attr("person.name")]).names())
   })})
 
+  test("get single", function(){this.$R(function(){
+    var attributes = new knit.algebra.Attributes([attr("house.people"), attr("person.name")])
+    assert.equal(attr("house.people"), attributes.get("people"))
+  })})
+
+  test("get multiple", function(){this.$R(function(){
+    var attributes = new knit.algebra.Attributes([attr("house.people"), attr("person.name")])
+    assert.same(new knit.algebra.Attributes([attr("house.people"), attr("person.name")]), attributes.get("people", "name"))
+  })})
+
   test("splice nested attribute - puts the nested attribute in the first place one " +
        "of the consitutent attributes is found, then removes the constituent attributes from the top level", function(){
     var original = this.$R(function(){

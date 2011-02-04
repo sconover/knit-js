@@ -35,12 +35,6 @@ regarding("attributes", function() {
     })})    
   })
 
-  test("splice", function(){this.$R(function(){
-    var original = new knit.algebra.Attributes([attr("house.people"), attr("person.name")])
-    original.splice(1,1,attr("house.address"))
-    assert.equal(["people", "address"], original.map(function(attr){return attr.name()}))
-  })})
-
   test("names", function(){this.$R(function(){
     assert.equal(["people", "name"], 
                  new knit.algebra.Attributes([attr("house.people"), attr("person.name")]).names())
@@ -64,7 +58,7 @@ regarding("attributes", function() {
     var house = this.$R(function(){return relation("house")})
 
     var splicedIn = original.spliceInNestedAttribute(house.attr("people"))
-    assert.equal(["houseId", "people", "address"], _.map(splicedIn, function(attr){return attr.name()}))
+    assert.equal(["houseId", "people", "address"], splicedIn.names())
   })
 
     

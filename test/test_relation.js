@@ -2,35 +2,40 @@ require("knit/core")
 require("knit/algebra/attributes")
 
 TestRelation = function() {
+  var _A = CollectionFunctions.Array.functions
+  
   var _id = 0
   
   var F = function(attributeNames) {
     _id += 1
     this._id = "test_" + _id
     var self = this
-    var attributes = _.map(attributeNames, function(attr){
-      if (attr.name) {
-        return attr
-      } else if (typeof attr == "string") {
-        var attributeName = attr
-        return new TestAttribute(attributeName, self)
-      } else {
-        var attributeName = _.keys(attr)[0]
-        var nestedRelation = _.values(attr)[0]
-        return new TestNestedAttribute(attributeName, nestedRelation, self)
-      }
-    })
     
-    this._attributes = new knit.algebra.Attributes(attributes)
+    if (attributeNames.constructor == knit.algebra.Attributes) {
+      this._attributes = attributeNames
+    } else {
+      this._attributes = new knit.algebra.Attributes(
+        _A.map(attributeNames, function(attr){
+          if (attr.name) {
+            return attr
+          } else if (typeof attr == "string") {
+            var attributeName = attr
+            return new TestAttribute(attributeName, self)
+          } else {
+            var attributeName = _.keys(attr)[0]
+            var nestedRelation = _.values(attr)[0]
+            return new TestNestedAttribute(attributeName, nestedRelation, self)
+          }      
+        })
+      )
+    }
+    
   }; var p = F.prototype
 
   p.id = function(){ return this._id }
   p.attributes = function(){ return this._attributes }
   
-  p.attr = function(attributeName) {
-    return _.detect(this.attributes(), function(attr){return attr.name() == attributeName})
-  }
-  
+  p.attr = function(attributeName) { return this.attributes().get(attributeName) }
   p.isSame = function(other) { return other.id && this.id() == other.id() }
   
   p.isEquivalent = function(other) {
@@ -47,7 +52,7 @@ TestRelation = function() {
   }
   
   p.inspect = function() {
-    return "r[" + _.map(this.attributes(), function(attr){return attr.inspect()}).join(",") + "]" 
+    return "r[" + this.attributes().inspect() + "]" 
   }
   
   return F

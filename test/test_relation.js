@@ -1,5 +1,5 @@
 require("knit/core")
-require("knit/algebra/attributes")
+require("knit/attributes")
 
 TestRelation = function() {
   var _A = CollectionFunctions.Array.functions
@@ -11,10 +11,10 @@ TestRelation = function() {
     this._id = "test_" + _id
     var self = this
     
-    if (attributeNames.constructor == knit.algebra.Attributes) {
+    if (attributeNames.constructor == knit.Attributes) {
       this._attributes = attributeNames
     } else {
-      this._attributes = new knit.algebra.Attributes(
+      this._attributes = new knit.Attributes(
         _A.map(attributeNames, function(attr){
           if (attr.name) {
             return attr

@@ -7,26 +7,596 @@
 //knit/core ======================================================
 if (!(typeof window === 'undefined')) global=window
 
+
+
+//vendor/collection_functions ======================================================
+CollectionFunctions = (function(){  
+
+  var standardArrayFeatures = {
+    iterator:function(collection){
+      var position = 0
+      return {
+        next: function() {
+          var result = collection[position]
+          position += 1
+          return result
+        },
+        hasNext: function(){return position<collection.length}
+      }
+    },
+    nothing:function(){return null},
+    get:function(array, index){return array[index]},
+    equals:function(a,b){return a == b},
+    newCollection:function(){return []},
+    append:function(array, item){ array.push(item) },
+    isCollection:function(thing){ return typeof thing.length != "undefined" },
+    size:function(array){ return array.length },
+    sort:function(array){ return [].concat(array).sort() },
+    concat:function(){
+      var firstArray = arguments[0]
+      var otherArrays = []
+      for(var i=1; i<arguments.length; i++) {otherArrays[i-1] = arguments[i]}
+      return firstArray.concat.apply(firstArray, otherArrays)
+    }
+  }
+
+  var mainFunction = function(userFeatures) {
+    
+    var factory = (function me(features, arrayFunctions, createAcrossCF) {
+      
+      //============ SETUP ============
+      
+      var featureRequirementBug = function(featureName){
+        throw new Error("BUG: a missing feature is required in order to perform this operation. " +
+                        "The developer should have prevented this function from being exported.")
+      }
+      
+      var featureNames = ["iterator", "nothing", "equals", "newCollection", "append", 
+                          "isCollection", "size", "concat", "comparator", "sort", "get"]
+      for (var i=0; i<featureNames.length; i++) {
+        var featureName = featureNames[i],
+            halt = featureRequirementBug
+        halt.unavailable = true
+        features[featureName] = features[featureName] || halt
+      }
+
+      function feature(featureName) {
+        return !features[featureName].unavailable
+      }
+
+      function getFeatureIfAvailable(featureName) {
+        var feature = features[featureName]
+        return feature.unavailable ? undefined : feature
+      }
+      
+      var createAcrossCF = createAcrossCF==false ? false : true,
+          breaker = {},
+          functionsForExport = {}
+            
+            
+      
+      //============ COLLECTION FUNCTIONS ============
+            
+      var iteratorHolder = {iteratorFunction:features.iterator} //so we can wrap/override later
+      function iterator(collection) {
+        return iteratorHolder.iteratorFunction(collection)
+      }
+      if (feature("iterator")) 
+        functionsForExport.iterator = iterator
+      
+      var getOne = getFeatureIfAvailable("get") ||
+                     function(collection, index) {
+                       var itemAtIndex = features.nothing()
+                       each(collection, function(item, i){
+                         if (i == index) {
+                           itemAtIndex = item
+                           return breaker
+                         }
+                       })
+                       return itemAtIndex
+                     }
+      
+      function get(collection, indexOrIndexes) {
+        if (typeof indexOrIndexes.length != "undefined") {
+          var indexes = indexOrIndexes
+          return arrayFunctions.map(indexes, function(index){return getOne(collection, index)})
+        } else {
+          var index = indexOrIndexes
+          return getOne(collection, index)
+        }
+      }
+      if (functionsForExport.iterator ||
+            feature("get")) 
+        functionsForExport.get = get
+
+      function each(collection, callback) {
+        var count = 0
+  
+        var iteratorInstance = iterator(collection)
+        while (iteratorInstance.hasNext()) {
+          var item=iteratorInstance.next(),
+              result = callback(item, count)
+          if (result === breaker) break
+          count += 1
+        }
+      }
+      if (functionsForExport.iterator) 
+        functionsForExport.each = each
+
+      function detect(collection, matcher) {
+        var hit = features.nothing()
+        each(collection, function(item, i){
+          if (matcher(item, i)) {
+            hit = item
+            return breaker
+          }
+        })
+        return hit
+      }
+      if (functionsForExport.each && 
+          feature("nothing")) 
+        functionsForExport.detect = detect
+
+      function select(collection, matcher) {
+        var newCollection = features.newCollection()
+        each(collection, function(item, i){
+          if (matcher(item, i)) features.append(newCollection, item)
+        })
+        return newCollection
+      }
+      if (functionsForExport.each && 
+          feature("newCollection") && 
+          feature("append")) 
+        functionsForExport.select = select
+
+      function map(collection, transformer, newCollectionF, appenderF) {
+        newCollectionF = newCollectionF || function(){return []}
+        appenderF = appenderF  || function(arr, item){arr.push(item)}
+  
+        var newCollection = newCollectionF()
+        each(collection, function(item, i){
+          appenderF(newCollection, transformer(item, i))
+        })
+        return newCollection
+      }
+      if (functionsForExport.each && 
+          feature("newCollection") && 
+          feature("append")) 
+        functionsForExport.map = map
+      
+      function pluck(collection, property) {
+        return map(collection, function(item){
+          var value = item[property]
+          if (typeof value == "function") value = value.apply(item, [])
+          return value
+        })
+      }
+      if (functionsForExport.map) 
+        functionsForExport.pluck = pluck
+
+      function toCollection(thing, iteratorF) {
+        iteratorF = iteratorF || arrayFunctions.iterator
+        
+        var newCollection = features.newCollection(),
+            iteratorInstance = iteratorF(thing)
+        while (iteratorInstance.hasNext()) features.append(newCollection, iteratorInstance.next())
+        return newCollection
+      }
+      if (feature("newCollection") && 
+          feature("append")) 
+        functionsForExport.toCollection = toCollection
+
+      function isSorted(collection) {
+        var sorted = true,
+            previousItem = null
+        each(collection, function(item, i){
+          if (i>=1 && features.comparator(previousItem, item) < 0) {
+            sorted = false
+            return breaker
+          }
+          previousItem = item
+        })
+        return sorted
+      }
+      if (functionsForExport.each && 
+          feature("comparator")) 
+        functionsForExport.isSorted = isSorted
+      
+      var sort = getFeatureIfAvailable("sort") || 
+                   function(collection) {
+                     var array = map(collection, function(item){return item})
+                     array.sort(features.comparator())
+                     var sortedCollection = map(array, function(item){return item}, features.newCollection, features.append)
+                     return sortedCollection
+                   }
+      if (feature("sort") || 
+            functionsForExport.map && 
+            feature("comparator")) 
+        functionsForExport.sort = sort
+      
+                                  //evaluator?  word?
+      function sortBy(collection, evaluator) {
+        var array = map(collection, function(item){return item})
+        array.sort(function(a,b){
+          var aValue = evaluator(a),
+              bValue = evaluator(b)
+          return aValue==bValue ? 0 : (aValue>bValue ? 1 : -1)
+        })
+        var sortedCollection = map(array, function(item){return item}, features.newCollection, features.append)
+        return sortedCollection
+      }
+      if (functionsForExport.map) 
+        functionsForExport.sortBy = sortBy
+      
+      function indexOf(collection, findMe) {
+        var index = features.nothing()
+        detect(collection, function(item, i){
+          if (features.equals(item, findMe)) {
+            index = i
+            return true
+          }
+        })
+        return index
+      }
+      
+      function indexesOf(collection, findCollection) { //anglo-saxon rules win every time in this library
+        return map(findCollection, function(item){return indexOf(collection, item)})
+      }
+      
+      function include(collection, findMe) {
+        return indexOf(collection, findMe) != features.nothing()
+      }
+      if (functionsForExport.detect && 
+          feature("nothing") && 
+          feature("equals")) {
+        functionsForExport.indexOf = indexOf
+        functionsForExport.indexesOf = indexesOf
+        functionsForExport.include = include
+      }
+      
+      function uniq(collection) {
+        var newCollection = features.newCollection()
+        each(collection, function(item){
+          if (!include(newCollection, item)) features.append(newCollection, item)
+        })
+        return newCollection
+      }
+      if (functionsForExport.each && 
+          functionsForExport.include && 
+          feature("newCollection") && 
+          feature("append"))
+        functionsForExport.uniq = uniq
+      
+      
+      function overlap(collectionA, collectionB, acceptor) {
+        var result = select(collectionA, function(itemA) {
+          return include(collectionB, itemA) == acceptor
+        })
+        result = uniq(result)
+        return result
+      }
+      function intersect(collectionA, collectionB) { return overlap(collectionA, collectionB, true) }
+      function differ(collectionA, collectionB) { return overlap(collectionA, collectionB, false) }
+      if (functionsForExport.select && 
+          functionsForExport.include && 
+          functionsForExport.uniq) {
+        functionsForExport.intersect = intersect
+        functionsForExport.differ = differ
+      }
+         
+      function without(collection, dontWantThisItem) {
+        return select(collection, function(item) {
+          return !features.equals(item, dontWantThisItem)
+        })
+      }
+      if (functionsForExport.select && 
+          feature("equals")) 
+        functionsForExport.without = without
+      
+      function remove(collection, indexWeDontWant) {
+        var newCollection = features.newCollection()
+        each(collection, function(item,i) {
+          if (i!=indexWeDontWant) features.append(newCollection, item)
+        })
+        return newCollection
+      }
+      if (functionsForExport.each && 
+          feature("newCollection") && 
+          feature("append"))
+        functionsForExport.remove = remove
+
+      function flatten(collection) {
+        var newCollection = features.newCollection()
+        each(collection, function(item){
+          if (features.isCollection(item)) {
+            var itemFlattened = flatten(item)
+            each(itemFlattened, function(item) {
+              features.append(newCollection, item)
+            })
+          } else {
+            features.append(newCollection, item)
+          }
+        })
+        return newCollection
+      }
+      if (functionsForExport.each && 
+          feature("newCollection") && 
+          feature("isCollection") && 
+          feature("append")) 
+        functionsForExport.flatten = flatten
+      
+      var concat = getFeatureIfAvailable("concat") || 
+                     function() {
+                       var newCollection = features.newCollection()
+                       arrayFunctions.each(arguments, function(collection){
+                         each(collection, function(item){features.append(newCollection, item)})
+                       })
+                       return newCollection
+                     }
+      if (feature("concat") || 
+            feature("newCollection") && 
+            feature("append")) 
+        functionsForExport.all = 
+        functionsForExport.clone = 
+        functionsForExport.concat = concat
+      
+      function repeat(collection, times) {
+        var repeated = features.newCollection()
+        for (var i=0; i<times; i++) repeated = concat(repeated, collection)
+        return repeated
+      }
+      if (functionsForExport.concat && 
+          feature("newCollection"))
+        functionsForExport.repeat = repeat
+      
+      /*
+      Hey look my head is hurting too.  But this is worth it, I think! (?)
+      We're expressing multi-collection capability through CF itself,
+      meaning you get multi-collection detect, map, etc for free.  Yay!
+      */
+      var acrossCF = arrayFunctions && createAcrossCF ?
+        me({iterator:function(collections){
+                      var iteratorInstances = arrayFunctions.map(collections, function(collection){return iterator(collection)})
+  
+                      return {
+                        next: function() {
+                          return arrayFunctions.map(iteratorInstances, function(iterator){
+                            return iterator.hasNext() ? iterator.next() : features.nothing()
+                          }, features.newCollection, features.append)
+                        },
+                        hasNext: function(){
+                          return arrayFunctions.detect(iteratorInstances, function(iterator){return iterator.hasNext()})
+                        }
+                      }
+                    },
+            equals:function(collectionA, collectionB){return equals(collectionA, collectionB)},
+            nothing:features.nothing,
+            newCollection:features.newCollection,
+            append:features.append,
+            isCollection:undefined, //doesn't make sense when dealing with multiple collections
+          },
+          arrayFunctions,
+          false //to stop recursion
+        ) :
+        function(){throw "across not supported in this context"}
+  
+      function across() {
+        var collections = arguments
+        return acrossCF.makeObjectStyleFunctions(function(){return collections})
+      }
+  
+      function zip() {
+        var lastArgument = arguments[arguments.length-1]
+    
+        if (typeof lastArgument == "function") {
+          var collections = arrayFunctions.slice(arguments, [0,-2]),
+              callback = lastArgument
+      
+          across.apply(null, collections).each(function(entryCollection, i){
+            callback.apply(null, arrayFunctions.map(entryCollection, function(item){return item}).concat([i]) )
+          })
+        } else {
+          var collections = arguments
+          return across.apply(null, collections).all()
+        }
+      }
+      if (createAcrossCF) { //can't do across across because we would all die
+        functionsForExport.across = across
+        functionsForExport.zip = zip
+      }
+
+      function equals(collectionA, collectionB) {
+        var acrossAB = across(collectionA, collectionB)
+        var foundNotEqual = acrossAB.detect(function(pairCollection){
+          var iter = features.iterator(pairCollection)
+          var a = iter.next()
+          var b = iter.next()
+          return !features.equals(a, b)
+        })
+        return !foundNotEqual
+      }
+      if (functionsForExport.detect && 
+          feature("iterator") && 
+          feature("equals") && 
+          feature("newCollection")) 
+        functionsForExport.equals = equals
+      
+      var size = getFeatureIfAvailable("size") || 
+                   function(collection) {
+                     var count = 0
+                     each(collection, function() { count += 1 })
+                     return count          
+                   }
+      
+      function empty(collection) { return size(collection) == 0 }
+      if (feature("size") || functionsForExport.each) {
+        functionsForExport.size = size
+        functionsForExport.empty = empty
+      }
+
+      function slice(collection, a, b) {
+        function sliceStartPlusLength(collection, startPos, length) {
+          var newCollection = features.newCollection()
+          each(collection, function(item, i) {
+            if (i>=startPos) features.append(newCollection, item)
+            if (i==(startPos+length-1)) return breaker
+          })
+    
+          return newCollection
+        }
+  
+        function sliceRange(collection, range) {
+          var startPos = range[0],
+              endPos = range[1]
+    
+          if (startPos>=0 && endPos>=0) {
+            return sliceStartPlusLength(collection, startPos, endPos-startPos+1)
+          } else {
+            var theSize = size(collection),
+                positiveStartPos = startPos<0 ? theSize + startPos : startPos,
+                positiveEndPos = endPos<0 ? theSize + endPos : endPos
+            return sliceRange(collection, [positiveStartPos, positiveEndPos])
+          }
+        }
+  
+        if (typeof a.length != "undefined") {
+          var range = a
+          return sliceRange(collection, range)
+        } else {
+          var startPos = a,
+              length = b
+          return sliceStartPlusLength(collection, startPos, length)
+        }
+      }
+      if (functionsForExport.each && 
+          feature("newCollection") && 
+          feature("append")) 
+        functionsForExport.slice = slice
+
+      function splice(mainCollection, spliceInCollection, insertAtIndex, overwriteLength) {
+        overwriteLength = overwriteLength || 0
+        return concat(slice(mainCollection, [0, insertAtIndex-1]),
+                      spliceInCollection, 
+                      slice(mainCollection, [insertAtIndex + overwriteLength, -1]))
+      }
+      if (functionsForExport.concat && 
+          functionsForExport.slice) 
+        functionsForExport.splice = splice
+      
+      function inspect(collection) {
+        var strings = []
+        each(collection, function(item){ 
+          strings.push(typeof item.inspect == "function" ? item.inspect() : "" + item)
+        })
+        return strings.join(",")
+      }
+      if (functionsForExport.each) functionsForExport.inspect = inspect
+
+
+
+
+      //============ CONCLUSION ============
+
+      function specialCurry(func, collectionFunc) {
+        return function() {
+          var args = []
+          for(key in arguments){args[key] = arguments[key]}
+
+          args.unshift(collectionFunc.apply(this, []))
+          return func.apply(null, args)
+        }
+      }
+
+      function makeObjectStyleFunctions(collectionGetter) {
+        var curried = {}
+        for(k in functionsForExport){curried[k] = specialCurry(functionsForExport[k], collectionGetter)}
+        return curried
+      }
+      
+      function layerOnCostTracking(functions) {
+        iteratorHolder._callsToNext = 0
+        var wrappedFunctions = {}
+        
+        function makeCostResettingWrapper(inner) {
+          return function() {
+            iteratorHolder._callsToNext = 0
+            var args = arrayFunctions.map(arguments, function(arg){return arg}),
+                result = inner.apply(this, args)
+            return result                      
+          }
+        }
+        
+        for (k in functions) wrappedFunctions[k] = makeCostResettingWrapper(functions[k])
+        
+        var innerIteratorFunction = iteratorHolder.iteratorFunction
+        iteratorHolder.iteratorFunction = function(collection) {
+          var realIterator = innerIteratorFunction(collection)
+
+          var realNext = realIterator.next
+          realIterator.next = function() {
+            iteratorHolder._callsToNext += 1
+            return realNext()
+          }
+          return realIterator
+        }
+        
+        wrappedFunctions.lastCost = function() { return iteratorHolder._callsToNext }
+        
+        return wrappedFunctions
+      }
+      
+      function makeExports(functions) {
+        return {
+          functions:functions,
+          decorate: function(target){for(k in functions){target[k] = functions[k]}},
+          makeObjectStyleFunctions: makeObjectStyleFunctions,
+          decorateObjectStyle: function(target, collectionGetter){
+            var curriedFunctions = makeObjectStyleFunctions(collectionGetter)
+            for(k in curriedFunctions){target[k] = curriedFunctions[k]}
+          }
+        }        
+      }
+      
+      var originalExports = makeExports(functionsForExport),
+          layeredStatsExports = makeExports(layerOnCostTracking(functionsForExport))
+      originalExports.withStatTracking = layeredStatsExports
+      return originalExports
+    }) //end factory
+    
+    
+    var arrayCF = factory.apply(null, [standardArrayFeatures])
+
+    var f = factory(userFeatures, arrayCF.functions)
+    f.appendFeatures = function(newFeatures) {
+      var combined = {}
+      for(var k in userFeatures) {combined[k] = userFeatures[k]}
+      for(var k in newFeatures) {combined[k] = newFeatures[k]}
+      return factory(combined, arrayCF.functions)
+    }
+    
+    return f
+  }
+  
+  var externalArrayCF = mainFunction.apply(null, [standardArrayFeatures]) //convenience
+  externalArrayCF.functions.toArray = externalArrayCF.functions.toCollection
+  externalArrayCF.withStatTracking.functions.toArray = externalArrayCF.withStatTracking.functions.toCollection
+  delete externalArrayCF.functions.toCollection
+  delete externalArrayCF.withStatTracking.functions.toCollection
+  mainFunction.Array = externalArrayCF
+
+  return mainFunction
+})()
+
 global.knit = {
   algebra: {predicate:{}},
   mixin:{},
-  engine:{  /*hrm.  begone.*/ sql:{statement:{}}  }
+  engine:{  /*hrm.  begone.*/ sql:{statement:{}}  },
+  _:CollectionFunctions.Array.functions //handy underscore-like array functions...each, map, etc
 }
 
 
 
 //knit/util ======================================================
-knit.indexOfSame = function(things, thing) {
-  var index = null
-  for(var i=0; i<things.length; i++) {
-    if (things[i].isSame(thing)) {
-      index = i
-      break
-    }
-  }
-  return index
-}
-
 //see http://javascript.crockford.com/prototypal.html
 knit.createObject = function() {
   var o = arguments[0]
@@ -77,249 +647,249 @@ knit.quacksLike = function(object, signature) {
 
 
 //knit/reference ======================================================
+;(function(){
 
-knit.RelationReference = function(){
-  var F = function(relationName) {
-    this._relation = new knit.UnresolvedRelationReference(relationName)
-  }; var p = F.prototype
+  var _A = CollectionFunctions.Array.functions
   
-  p.resolve = function(bindings) { 
-    if (this._relation.resolve) this._relation = this._relation.resolve(bindings) 
-    return this
-  }
+  knit.RelationReference = function(){
+    var F = function(relationName) {
+      this._relation = new knit.UnresolvedRelationReference(relationName)
+    }; var p = F.prototype
   
-  _.each(["id", "attributes", "attr", "inspect", "merge", "split", "newNestedAttribute", "perform"], function(methodNameToDelegate) {
-    p[methodNameToDelegate] = function() { 
-      return this._relation[methodNameToDelegate].apply(this._relation, arguments) 
+    p.resolve = function(bindings) { 
+      if (this._relation.resolve) this._relation = this._relation.resolve(bindings) 
+      return this
     }
-  })
   
-  p.isSame = p.isEquivalent = function(other) { 
-    return this._relation.isSame(other) || !!(other._relation && this._relation.isSame(other._relation))
-  }
+    _A.each(["id", "attributes", "attr", "inspect", "merge", "split", "newNestedAttribute", "perform"], function(methodNameToDelegate) {
+      p[methodNameToDelegate] = function() { 
+        return this._relation[methodNameToDelegate].apply(this._relation, arguments) 
+      }
+    })
   
-  return F
-}()
-
-knit.UnresolvedRelationReference = function(){
-  var _id = 0
-  
-  var F = function(relationName) {
-    this._relationName = relationName
-    _id += 1
-    this._id = "unresolvedRelation_" + _id
-  }; var p = F.prototype
-  
-  p.id = function(bindings) { return this._id }
-  p.resolve = function(bindings) { return bindings[this._relationName] }
-
-  _.each(["attributes", "attr", "merge", "split", "newNestedAttribute", "perform"], function(methodNameToDelegate) {
-    p[methodNameToDelegate] = function() { 
-      throw(methodNameToDelegate + " not available until after resolve (and refs are bound to real relations)")
+    p.isSame = p.isEquivalent = function(other) { 
+      return this._relation.isSame(other) || !!(other._relation && this._relation.isSame(other._relation))
     }
-  })
   
-  p.isSame = p.isEquivalent = function(other) {
-    return other.constructor == F &&
-           this._relationName == other._relationName
-  }
-  
-  p.inspect = function(){return "*" + this._relationName }
-  
-  return F
-}()
+    return F
+  }()
 
-knit.NullRelation = function(){
-  var F = function() {}; var p = F.prototype
-  p.resolve = function(bindings) { return this }
-  p.id = function() { return "nullRelation_id" }
-  p.attributes = function() { return [] }
-  p.attr = function() { throw("Null Relation has no attributes") }
-  p.inspect = function() { return "nullRelation" }
-  p.merge = function() { return this }
-  p.split = function() { return this }
-  p.newNestedAttribute = function() { throw("It doesn't make sense for Null Relation to create attributes") }
-  p.perform = function() { return this }
-  p.isSame = p.isEquivalent = function(other) { return this === other }
-  return new F()  
-}()
+  knit.UnresolvedRelationReference = function(){
+    var _id = 0
+  
+    var F = function(relationName) {
+      this._relationName = relationName
+      _id += 1
+      this._id = "unresolvedRelation_" + _id
+    }; var p = F.prototype
+  
+    p.id = function(bindings) { return this._id }
+    p.resolve = function(bindings) { return bindings[this._relationName] }
 
-knit.AttributeReference = function(){
-  var F = function(relationRef, attributeName) {
-    this._attribute = new knit.UnresolvedAttributeReference(relationRef, attributeName)
-  }; var p = F.prototype
+    _A.each(["attributes", "attr", "merge", "split", "newNestedAttribute", "perform"], function(methodNameToDelegate) {
+      p[methodNameToDelegate] = function() { 
+        throw(methodNameToDelegate + " not available until after resolve (and refs are bound to real relations)")
+      }
+    })
   
-  p.resolve = function(bindings) { 
-    if (this._attribute.resolve) this._attribute = this._attribute.resolve(bindings) 
-    return this
-  }
+    p.isSame = p.isEquivalent = function(other) {
+      return other.constructor == F &&
+             this._relationName == other._relationName
+    }
   
-  p.name = function() { return this._attribute.name() }
-  p.sourceRelation = function() { return this._attribute.sourceRelation() }
+    p.inspect = function(){return "*" + this._relationName }
+  
+    return F
+  }()
 
-  p.isSame = p.isEquivalent = function(other) { 
-    return this._attribute.isSame(other)
-  }
-  
-  p.inspect = function(){return this._attribute.inspect()}
-  
-  return F
-}()
+  knit.NullRelation = function(){
+    var F = function() {}; var p = F.prototype
+    p.resolve = function(bindings) { return this }
+    p.id = function() { return "nullRelation_id" }
+    p.attributes = function() { return new knit.Attributes([]) }
+    p.attr = function() { throw("Null Relation has no attributes") }
+    p.inspect = function() { return "nullRelation" }
+    p.merge = function() { return this }
+    p.split = function() { return this }
+    p.newNestedAttribute = function() { throw("It doesn't make sense for Null Relation to create attributes") }
+    p.perform = function() { return this }
+    p.isSame = p.isEquivalent = function(other) { return this === other }
+    return new F()  
+  }()
 
-knit.UnresolvedAttributeReference = function(){
-  var F = function(relationRef, attributeName) {
-    this._relationRef = relationRef
-    this._attributeName = attributeName
-  }; var p = F.prototype
+  knit.AttributeReference = function(){
+    var F = function(relationRef, attributeName) {
+      this._attribute = new knit.UnresolvedAttributeReference(relationRef, attributeName)
+    }; var p = F.prototype
   
-  p.resolve = function(bindings) {
-    return this._relationRef.resolve(bindings).attr(this._attributeName)
-  }
+    p.resolve = function(bindings) { 
+      if (this._attribute.resolve) this._attribute = this._attribute.resolve(bindings) 
+      return this
+    }
+  
+    p.name = function() { return this._attribute.name() }
+    p.sourceRelation = function() { return this._attribute.sourceRelation() }
+    p.isSame = p.isEquivalent = function(other) { return this._attribute.isSame(other) }
+    p.inspect = function(){return this._attribute.inspect()}
+  
+    return F
+  }()
 
-  p.name = function() { return this._attributeName }
-  p.sourceRelation = function() { return this._relationRef }
+  knit.UnresolvedAttributeReference = function(){
+    var F = function(relationRef, attributeName) {
+      this._relationRef = relationRef
+      this._attributeName = attributeName
+    }; var p = F.prototype
   
-  p.isSame = p.isEquivalent = function(other) {
-    return knit.quacksLike(other, knit.signature.attribute) &&
-           this.sourceRelation().isSame(other.sourceRelation()) &&
-           this.name() == other.name()
-  }
-  
-  p.inspect = function(){return "*" + this._attributeName}
-  
-  return F
-}()
+    p.resolve = function(bindings) {
+      return this._relationRef.resolve(bindings).attr(this._attributeName)
+    }
 
-knit.NestedAttributeReference = function(){
+    p.name = function() { return this._attributeName }
+    p.sourceRelation = function() { return this._relationRef }
   
-  var F = function(attributeName, nestedAttributes) {
-    this._attribute = new knit.UnresolvedNestedAttributeReference(attributeName, nestedAttributes)
-  }; var p = F.prototype
+    p.isSame = p.isEquivalent = function(other) {
+      return knit.quacksLike(other, knit.signature.attribute) &&
+             this.sourceRelation().isSame(other.sourceRelation()) &&
+             this.name() == other.name()
+    }
   
-  p.resolve = function(bindings) { 
-    if (this._attribute.resolve)  this._attribute = this._attribute.resolve(bindings) 
-    return this
-  }
+    p.inspect = function(){return "*" + this._attributeName}
   
-  p.name = function() { return this._attribute.name() }
-  p.setSourceRelation = function(sourceRelation) { return this._attribute.setSourceRelation(sourceRelation) }
-  p.sourceRelation = function() { return this._attribute.sourceRelation() }
-  p.nestedRelation = function() { return this._attribute.nestedRelation() }
-  
-  p.isSame = p.isEquivalent = function(other) {
-    return knit.quacksLike(other, knit.signature.attribute) &&
-           this._attribute.isSame(other)
-  }
-  
-  p.inspect = function(){return this._attribute.inspect()}
-  
-  return F
-}()
+    return F
+  }()
 
-knit.UnresolvedNestedAttributeReference = function(){
-  var F = function(attributeName, nestedAttributes) {
-    this._attributeName = attributeName
-    this._nestedAttributes = nestedAttributes
-    this._sourceRelation = knit.NullRelation
-  }; var p = F.prototype
+  knit.NestedAttributeReference = function(){
+  
+    var F = function(attributeName, nestedAttributes) {
+      this._attribute = new knit.UnresolvedNestedAttributeReference(attributeName, nestedAttributes)
+    }; var p = F.prototype
+  
+    p.resolve = function(bindings) { 
+      if (this._attribute.resolve)  this._attribute = this._attribute.resolve(bindings) 
+      return this
+    }
+  
+    p.name = function() { return this._attribute.name() }
+    p.setSourceRelation = function(sourceRelation) { return this._attribute.setSourceRelation(sourceRelation) }
+    p.sourceRelation = function() { return this._attribute.sourceRelation() }
+    p.nestedRelation = function() { return this._attribute.nestedRelation() }
+  
+    p.isSame = p.isEquivalent = function(other) {
+      return knit.quacksLike(other, knit.signature.attribute) &&
+             this._attribute.isSame(other)
+    }
+  
+    p.inspect = function(){return this._attribute.inspect()}
+  
+    return F
+  }()
 
-  p.resolve = function(bindings) { 
-    _.each(this._nestedAttributes, function(nestedAttribute){nestedAttribute.resolve(bindings)})
-    return this.sourceRelation().newNestedAttribute(this._attributeName, this._nestedAttributes)
-  }
+  knit.UnresolvedNestedAttributeReference = function(){
+    var F = function(attributeName, nestedAttributes) {
+      this._attributeName = attributeName
+      this._nestedAttributes = nestedAttributes
+      this._sourceRelation = knit.NullRelation
+    }; var p = F.prototype
+
+    p.resolve = function(bindings) { 
+      _A.each(this._nestedAttributes, function(nestedAttribute){nestedAttribute.resolve(bindings)})
+      return this.sourceRelation().newNestedAttribute(this._attributeName, this._nestedAttributes)
+    }
   
-  p.name = function() { return this._attributeName }
-  p.sourceRelation = function() { return this._sourceRelation }
-  p.setSourceRelation = function(sourceRelation) { this._sourceRelation = sourceRelation; return this }
-  p.nestedRelation = function() { throw("nestedRelation is not available until after resolve") }
+    p.name = function() { return this._attributeName }
+    p.sourceRelation = function() { return this._sourceRelation }
+    p.setSourceRelation = function(sourceRelation) { this._sourceRelation = sourceRelation; return this }
+    p.nestedRelation = function() { throw("nestedRelation is not available until after resolve") }
   
-  p.isSame = p.isEquivalent = function(other) {
-    return knit.quacksLike(other, knit.signature.attribute) &&
-           this.sourceRelation().isSame(other.sourceRelation()) &&
-           this.name() == other.name()
-  }
+    p.isSame = p.isEquivalent = function(other) {
+      return knit.quacksLike(other, knit.signature.attribute) &&
+             this.sourceRelation().isSame(other.sourceRelation()) &&
+             this.name() == other.name()
+    }
   
-  p.inspect = function(){return "*" + this._attributeName}
+    p.inspect = function(){return "*" + this._attributeName}
   
-  return F
-}()
+    return F
+  }()
 
 
-knit.ReferenceEnvironment = function(){
-  var F = function() {
-    this._keyToRef = {}
-  }; var p = F.prototype
+  knit.ReferenceEnvironment = function(){
+    var F = function() {
+      this._keyToRef = {}
+    }; var p = F.prototype
   
-  p.relation = function(relationName) {
-    var relationRef = this._keyToRef[relationName] = this._keyToRef[relationName] || new knit.RelationReference(relationName)
-    return relationRef
-  }
+    p.relation = function(relationName) {
+      var relationRef = this._keyToRef[relationName] = this._keyToRef[relationName] || new knit.RelationReference(relationName)
+      return relationRef
+    }
   
-  function regularAttr(relationNameDotAttributeName) {
-    var key = relationNameDotAttributeName
-    var parts = relationNameDotAttributeName.split(".")
-    var relationRef = this.relation(parts[0])
-    var attributeName = parts[1]
-    var attributeRef = this._keyToRef[key] = this._keyToRef[key] || new knit.AttributeReference(relationRef, attributeName)
-    return attributeRef
-  }
+    function regularAttr(relationNameDotAttributeName) {
+      var key = relationNameDotAttributeName
+      var parts = relationNameDotAttributeName.split(".")
+      var relationRef = this.relation(parts[0])
+      var attributeName = parts[1]
+      var attributeRef = this._keyToRef[key] = this._keyToRef[key] || new knit.AttributeReference(relationRef, attributeName)
+      return attributeRef
+    }
   
-  function nestedAttr(attributeName, nestedAttributeRefs) {
-    var key = attributeName
-    var attributeRef = this._keyToRef[key] = this._keyToRef[key] || new knit.NestedAttributeReference(attributeName, nestedAttributeRefs)
-    return attributeRef
-  }
+    function nestedAttr(attributeName, nestedAttributeRefs) {
+      var key = attributeName
+      var attributeRef = this._keyToRef[key] = this._keyToRef[key] || new knit.NestedAttributeReference(attributeName, nestedAttributeRefs)
+      return attributeRef
+    }
   
-  p.attr = function() {
-    var args = _.toArray(arguments)
+    p.attr = function() {
+      var args = _A.toArray(arguments)
     
-    if (args.length == 1) {
-      var relationNameDotAttributeName = args[0]
-      return _.bind(regularAttr, this)(relationNameDotAttributeName)
-    } else if (args.length==2 && _.isArray(args[1]) ){
-      var attributeName = args[0]
-      var nestedAttributeRefs = args[1]
-      return _.bind(nestedAttr, this)(attributeName, nestedAttributeRefs)
-    } else {
+      if (args.length == 1) {
+        var relationNameDotAttributeName = args[0]
+        return _.bind(regularAttr, this)(relationNameDotAttributeName)
+      } else if (args.length==2 && _.isArray(args[1]) ){
+        var attributeName = args[0]
+        var nestedAttributeRefs = args[1]
+        return _.bind(nestedAttr, this)(attributeName, nestedAttributeRefs)
+      } else {
+        var self = this
+        return _A.map(args, function(relationNameDotAttributeName){return self.attr(relationNameDotAttributeName)})
+      }
+    }
+  
+    p.resolve = function(bindings) {
       var self = this
-      return _.map(args, function(relationNameDotAttributeName){return self.attr(relationNameDotAttributeName)})
-    }
-  }
-  
-  p.resolve = function(bindings) {
-    var self = this
     
-    var resolved = []
-    _.each(_.keys(bindings), function(relationKey){
+      var resolved = []
+      _A.each(_.keys(bindings), function(relationKey){
       
-      self.relation(relationKey).resolve(bindings)
-      resolved.push(relationKey)
+        self.relation(relationKey).resolve(bindings)
+        resolved.push(relationKey)
       
-      _.each(bindings[relationKey].attributes(), function(attribute){
-        var attributeKey = relationKey + "." + attribute.name()
-        self.attr(attributeKey).resolve(bindings)
-        resolved.push(attributeKey)
+        _A.each(bindings[relationKey].attributes(), function(attribute){
+          var attributeKey = relationKey + "." + attribute.name()
+          self.attr(attributeKey).resolve(bindings)
+          resolved.push(attributeKey)
+        })
       })
-    })
     
-    var stillToResolve = _.without.apply(null, [_.keys(this._keyToRef)].concat(resolved))
-    _.each(stillToResolve, function(key){
-      self._keyToRef[key].resolve(bindings)
-    })
+      var stillToResolve = _A.without.apply(null, [_.keys(this._keyToRef)].concat(resolved))
+      _A.each(stillToResolve, function(key){
+        self._keyToRef[key].resolve(bindings)
+      })
     
-    return this
-  }
+      return this
+    }
   
-  p.decorate = function(target, bindings) {
-    target.relation = _.bind(this.relation, this)
-    target.attr = _.bind(this.attr, this)
-    var resolveF = _.bind(this.resolve, this)
-    target.resolve = function(){resolveF(bindings())}
-    return target
-  }
+    p.decorate = function(target, bindings) {
+      target.relation = _.bind(this.relation, this)
+      target.attr = _.bind(this.attr, this)
+      var resolveF = _.bind(this.resolve, this)
+      target.resolve = function(){resolveF(bindings())}
+      return target
+    }
   
-  return F
-}()
+    return F
+  }()
+})()
 
 
 //knit/signatures ======================================================
@@ -366,6 +936,8 @@ knit.signature = function(){
 //see http://alexyoung.org/2009/10/22/javascript-dsl/
 
 global.DSLFunction = (function() {
+  var _A = CollectionFunctions.Array.functions
+  
   var dslLocals = {}
   var outerFunction = function(userFunction, what_theKeywordThis_IsSupposedToBe){
     if (what_theKeywordThis_IsSupposedToBe == undefined) {
@@ -374,7 +946,7 @@ global.DSLFunction = (function() {
     
     var localNames = []
     var localValues = []
-    _.each(_.keys(dslLocals), function(key){
+    _A.each(_.keys(dslLocals), function(key){
       localNames.push(key)
       localValues.push(dslLocals[key])
     })
@@ -424,6 +996,7 @@ knit.createBuilderFunction.dslLocals = {}
 
 
 
+
 //knit/rows_and_objects ======================================================
 
 knit.mixin.RowsAndObjects = function(proto) {
@@ -432,10 +1005,73 @@ knit.mixin.RowsAndObjects = function(proto) {
 }
 
 
+//knit/attributes ======================================================
+
+knit.Attributes = function() {
+  
+  var F = function(attributeArray) {
+    this._attributeArray = attributeArray
+  }; var p = F.prototype
+
+  var _A = CollectionFunctions.Array.functions
+  
+  var localCF = CollectionFunctions({
+    iterator:function(attributes) { return _A.iterator(attributes._attributeArray)}, 
+    nothing:function(){return null}, 
+    equals:function(a,b){return a && b && a.isSame && b.isSame && a.isSame(b)},
+    newCollection:function(){return new F([])},
+    append:function(attributes, attribute){attributes._attributeArray.push(attribute)}
+  })
+  
+  var _ = localCF.functions
+  var objectStyleCF = localCF.makeObjectStyleFunctions(function(){return this})
+  _A.each(["clone", "concat", "inspect", "without", "map",
+           "each", "indexOf", "size", "differ", "empty", "indexOf", "indexesOf"], function(functionName) {
+    p[functionName] = objectStyleCF[functionName]
+  })
+  p.isSame = p.isEquivalent = objectStyleCF.equals
+  p.splice = objectStyleCF.splice
+  
+  p.names = function(){return _.pluck(this, 'name')}
+  p.get = function() { 
+    if (arguments.length==1) {
+      var name = arguments[0]
+      return _.detect(this, function(attr){return attr.name() == name}) 
+    } else {
+      var args = _A.toArray(arguments)
+      return _.select(this, function(attr){return _A.include(args, attr.name())}) 
+    }
+  }
+  
+  p.spliceInNestedAttribute = function(nestedAttribute) {
+    var firstNestedAttributePosition = _.indexesOf(this, nestedAttribute.nestedRelation().attributes()).sort()[0]
+    var withoutAttributesToNest = _.differ(this, nestedAttribute.nestedRelation().attributes())
+    return _.splice(withoutAttributesToNest, new F([nestedAttribute]), firstNestedAttributePosition)
+  }
+  
+  p.makeObjectFromRow = function(row) {
+    var object = {}
+    _.each(this, function(attr, columnPosition) {
+      var value = row[columnPosition]
+      var propertyName = attr.name()
+      if (attr.nestedRelation) {
+        object[propertyName] = attr.nestedRelation().objects(value)
+      } else {
+        object[propertyName] = value
+      }
+    })
+    return object
+  }
+  
+  return F
+}()
+
+
 
 //knit/algebra/predicate/equality ======================================================
 
 knit.algebra.predicate.Equality = function() {
+  var _A = CollectionFunctions.Array.functions
   
   var F = function(leftAtom, rightAtom) {
     this.leftAtom = leftAtom
@@ -454,36 +1090,33 @@ knit.algebra.predicate.Equality = function() {
     if (this._isAttribute(this.rightAtom)) { 
       attributes.push(this.rightAtom)
     } 
-    return attributes
+    return new knit.Attributes(attributes)
   }
   
   p._attributesFromRelations = function(relations) {
-    var attributesFromRelations = []
-    _.each(relations, function(r){attributesFromRelations = attributesFromRelations.concat(r.attributes())})
-    return attributesFromRelations
+    var allAttributes = new knit.Attributes([])
+    _A.each(relations, function(r){allAttributes = allAttributes.concat(r.attributes())})
+    return allAttributes
   }
 
-  p.concernedWithNoOtherRelationsBesides = function() {
-    var expectedExclusiveRelations = _.toArray(arguments)
-    var expectedExclusiveRelationAttributes = _.flatten(_.map(expectedExclusiveRelations, function(r){return r.attributes()}))
+  p.concernedWithNoOtherRelationsBesides = function() {    
+    var expectedExclusiveRelations = _A.toArray(arguments)
+    var allAttributes = new knit.Attributes([])
+    _A.each(expectedExclusiveRelations, function(r){allAttributes = allAttributes.concat(r.attributes())})
     
-    var foundAnAttributeNotContainedByExpectedExclusiveRelations = 
-      _.detect(this._attributesReferredTo(), function(attributeReferredTo){
-        return !(_.detect(expectedExclusiveRelationAttributes, function(expectedAttr){return attributeReferredTo.isSame(expectedAttr)}))
-      })
-    return !foundAnAttributeNotContainedByExpectedExclusiveRelations
+    return this._attributesReferredTo().differ(allAttributes).empty()
   }
     
   p.concernedWithAllOf = function() {
-    var expectedRelations = _.toArray(arguments)
+    var expectedRelations = _A.toArray(arguments)
     var myAttributes = this._attributesReferredTo()
     
-    _.each(this._attributesReferredTo(), function(attr){
-      var relationToCheckOff = _.detect(expectedRelations, function(r){return attr.sourceRelation().isSame(r)})
-      if (relationToCheckOff) expectedRelations = _.without(expectedRelations, relationToCheckOff)
+    this._attributesReferredTo().each(function(attr){
+      var relationToCheckOff = _A.detect(expectedRelations, function(r){return attr.sourceRelation().isSame(r)})
+      if (relationToCheckOff) expectedRelations = _A.without(expectedRelations, relationToCheckOff)
     })
 
-    return _.isEmpty(expectedRelations)
+    return _A.empty(expectedRelations)
   }
     
 
@@ -505,7 +1138,7 @@ knit.algebra.predicate.Equality = function() {
   }
 
   p._inspectAtom = function(value) {
-    if (this._isAttribute(value)) {
+    if (value.inspect) {
       return value.inspect()
     } else if (typeof value == "string") {
       return "'" + value + "'"
@@ -545,27 +1178,28 @@ knit.createBuilderFunction.dslLocals.FALSE = new knit.algebra.predicate.False()
 //knit/algebra/predicate/conjunction ======================================================
 
 knit.algebra.predicate.Conjunction = function(){
-
+  var _A = CollectionFunctions.Array.functions
+  
   var F = function(leftPredicate, rightPredicate) { //har
     this.leftPredicate = leftPredicate
     this.rightPredicate = rightPredicate
   }; var p = F.prototype
 
   p.concernedWithNoOtherRelationsBesides = function() {
-    var expectedExclusiveRelations = _.toArray(arguments)
+    var expectedExclusiveRelations = _A.toArray(arguments)
     return this.leftPredicate.concernedWithNoOtherRelationsBesides.apply(this.leftPredicate, expectedExclusiveRelations) &&
            this.rightPredicate.concernedWithNoOtherRelationsBesides.apply(this.rightPredicate, expectedExclusiveRelations)
   }
   
   p.concernedWithAllOf = function() {
-    var expectedRelations = _.toArray(arguments)
+    var expectedRelations = _A.toArray(arguments)
   
     var self = this
-    var remainingRelations = _.reject(expectedRelations, function(relation){
-      return self.leftPredicate.concernedWithAllOf(relation) || self.rightPredicate.concernedWithAllOf(relation)
+    var remainingRelations = _A.select(expectedRelations, function(relation){
+      return ! (self.leftPredicate.concernedWithAllOf(relation) || self.rightPredicate.concernedWithAllOf(relation))
     })
 
-    return _.isEmpty(remainingRelations)
+    return _A.empty(remainingRelations)
   }
       
   p.isSame = function(other) {
@@ -704,13 +1338,14 @@ knit.createBuilderFunction.dslLocals.rightOuterJoin = function(relationOne, rela
 
 
 knit.algebra.NaturalJoin = function(relationOne, relationTwo) {
+  var _A = CollectionFunctions.Array.functions
+  
   var join = new knit.algebra.Join(relationOne, relationTwo, new knit.algebra.predicate.True())
 
   join.perform = function() {
-    var relationOneAttributeNames = _.map(this.relationOne.attributes(), function(attr){return attr.name()})
-    var relationTwoAttributeNames = _.map(this.relationTwo.attributes(), function(attr){return attr.name()})
-    var commonAttributeNames = _.intersect(relationOneAttributeNames, relationTwoAttributeNames)
-    var commonIdAttributeNames = _.select(commonAttributeNames, function(attributeName){return attributeName.match(/Id$/)})
+    var commonAttributeNames = _A.intersect(this.relationOne.attributes().names(), 
+                                            this.relationTwo.attributes().names())
+    var commonIdAttributeNames = _A.select(commonAttributeNames, function(attributeName){return attributeName.match(/Id$/)})
 
     function attributeNamesToPredicate(attributeNames, relationOne, relationTwo) {
       if (attributeNames.length == 1) {
@@ -742,6 +1377,7 @@ knit.createBuilderFunction.dslLocals.naturalJoin = function(relationOne, relatio
 //knit/algebra/select ======================================================
 
 knit.algebra.Select = function() {
+  var _A = CollectionFunctions.Array.functions
   
   var F = function(relation, criteria) {
     this.relation = relation
@@ -796,7 +1432,6 @@ knit.algebra.Select = function() {
         return this
       }
     } else if (this.relation.push) {
-  
       var innerPushResult = this.relation.push()
       if (innerPushResult===this.relation) { //bounce
         // me(
@@ -889,18 +1524,18 @@ knit.algebra.Project = function() {
   p.isSame = p.isEquivalent = function(other) {
     return other.constructor == F && 
            this.relation.isSame(other.relation) &&
-           _.isEqual(this.attributes(), other.attributes())
+           this.attributes().isSame(other.attributes())
   }
   
   p.inspect = function(){return "project(" + this.relation.inspect() + "," + 
-                                  "[" + _.map(this.attributes(), function(attr){return attr.inspect()}).join(",") + "])"}
+                                "[" + this.attributes().inspect() + "])"}
 
   return F
 }()
 
 
 knit.createBuilderFunction.dslLocals.project = function(relation, attributes) {
-  return new knit.algebra.Project(relation, attributes)
+  return new knit.algebra.Project(relation, new knit.Attributes(attributes))
 }
 
 
@@ -998,27 +1633,14 @@ knit.algebra.Nest = function(){
   p.perform = function() {
     //impose order for now
     var relation = this.relation
-    
-    var forceOrderOnTheseAttributes = _.without(this.attributes(), this.nestedAttribute)
-    while(forceOrderOnTheseAttributes.length > 0) {
-      var orderByAttr = forceOrderOnTheseAttributes.shift()
+    this.attributes().without(this.nestedAttribute).each(function(orderByAttr){
       relation = new knit.algebra.Order(relation, orderByAttr, knit.algebra.Order.ASC)
-    }
-    
+    })
     return relation.perform().performNest(this.nestedAttribute, this.attributes())
   }
   
   p.attributes = function(){ 
-    var result = [].concat(this.relation.attributes())
-    var self = this
-    var attributePositions = _.map(this.nestedAttribute.nestedRelation().attributes(), function(attribute){return knit.indexOfSame(result, attribute)})
-    attributePositions.sort()
-    var firstAttributePosition = attributePositions.shift()
-    result.splice(firstAttributePosition,1,this.nestedAttribute)
-  
-    attributePositions.reverse()
-    _.each(attributePositions, function(pos){result.splice(pos,1)})
-    return result
+    return this.relation.attributes().spliceInNestedAttribute(this.nestedAttribute)
   }
   
   p.newNestedAttribute = function() {

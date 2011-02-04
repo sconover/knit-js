@@ -10,7 +10,7 @@ function buildFile(fromScript, outputFile) {
   sys.debug(cmd)
   exec(cmd, function (error, stdout, stderr) {
     if (error !== null) {
-      console.log("error creating " + allInOneFile + ": " + error)
+      console.log("error creating " + outputFile + ": " + error)
     }
   })  
   

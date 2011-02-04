@@ -1,7 +1,8 @@
 var path = require('path')
 var fs = require('fs')
 var sys = require('sys')
-require(path.join(__dirname, "../test/underscore"))
+var _ = require(path.join(__dirname, "../test/underscore"))
+
 
 printFile = function(baseDir, f, alreadyReadIn) {
   var requireRegex = /^\s*require\((.*)?\)\s*$/

@@ -34,9 +34,11 @@ assert.doubleEqual = assert.equal
 assert.equal = assert.deepEqual
 
 assert._func = function(func, expected, actual, orientation, term) {
+  var _A = CollectionFunctions.Array.functions
+  
   function simpleInspect(obj) {
     if (typeof obj == "object") {
-      return "{" + _.map(_.keys(obj).sort(), function(key){return "" + key + "=" + obj[key]}).join(" ") + "}"
+      return "{" + _A.map(_.keys(obj).sort(), function(key){return "" + key + "=" + obj[key]}).join(" ") + "}"
     } else {
       return "" + obj
     }

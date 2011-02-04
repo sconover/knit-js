@@ -3,6 +3,8 @@ require("knit/engine/sql")
 require("knit/engine/sql/db/sqlite")
 
 regarding("sql", function() {
+  var _A = CollectionFunctions.Array.functions
+
   beforeEach(function(){
     db = new knit.engine.sql.Sqlite(":memory:")
     db.open()
@@ -41,7 +43,7 @@ regarding("sql", function() {
     
     assert.equal("person", person.name())
     assert.equal(["id", "houseId", "name", "age"], 
-                 _.map(person.attributes(), function(attr){return attr.name()}))
+                 _A.map(person.attributes(), function(attr){return attr.name()}))
   })
   
   // test("attribute equality", function(){

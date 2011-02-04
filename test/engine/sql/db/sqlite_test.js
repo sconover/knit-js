@@ -4,6 +4,8 @@ require("knit/engine/sql/statements")
 
 regarding("sqlite db", function() {
   
+  var _A = CollectionFunctions.Array.functions
+  
   beforeEach(function(){
     db = new knit.engine.sql.Sqlite(":memory:")
     db.open()
@@ -21,7 +23,7 @@ regarding("sqlite db", function() {
       from("foo")
     }))
     
-    var justRows = _.map(result, function(row){return row})
+    var justRows = _A.map(result, function(row){return row})
     assert.equal([{"color":"red"}], justRows)
   })
   

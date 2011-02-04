@@ -41,7 +41,7 @@ relationContents = function(relation) {
 }
 
 getAttributes = function(relation) {
-  return _.map(relation.attributes(), function(attribute){
+  return relation.attributes().map(function(attribute){
     if (attribute.nestedRelation) {
       var mapping = {}
       mapping[attribute.name()] = getAttributes(attribute.nestedRelation())

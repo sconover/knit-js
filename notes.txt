@@ -10,16 +10,10 @@ an attributes class up in the algebra to take care of common attributes issues
 
 attributes...simulate star attrs as real attrs...
 
-move attributes out of algebra and to top-level?
-
 up ahead.  do i need to build / find a js iterator library?
-  ...something that checks for iterator methods and falls back to native / array-style
-  ...what about self-instantiating support?
-    _.flatten(collection) => another collection, of the same type as the caller
-      if newInstance then newInstance(newstuff) else return newstuff
     ...all streamed?
-    assume methods to get at indexes, etc?
     cache / memoize?
+    ...what about Set, Hash?
 
 outer joins
   also nesting eliminates rows that are fully null / missing values...
@@ -124,7 +118,7 @@ rows()
   
     rows().all() (collection, renamed in knit)
     rows().first()
-      knit._.each(rows(), function(item) {
+      _A.each(rows(), function(item) {
   
       }) ... can handle a stream
     rows()

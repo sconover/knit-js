@@ -14,8 +14,7 @@ regarding("join", function() {
   
   test("combines the attributes of the two relations", function (){
     var join = this.$R(function(){return join(relation("person"), relation("house"))})
-    names = _.map(join.attributes(), function(attr){return attr.name()})
-    assert.equal(["id", "houseId", "name", "age", "houseId", "address", "cityId"], names)
+    assert.equal(["id", "houseId", "name", "age", "houseId", "address", "cityId"], join.attributes().names())
   })
   
   test("inspect", function(){this.$R(function(){

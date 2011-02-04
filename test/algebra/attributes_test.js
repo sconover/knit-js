@@ -35,19 +35,10 @@ regarding("attributes", function() {
     })})    
   })
 
-  test("iterable in underscore", function(){this.$R(function(){
-    assert.equal(["people", "name"], 
-                 _.map(new knit.algebra.Attributes([attr("house.people"), attr("person.name")]), function(attr){return attr.name()}))
-  })})
-
   test("splice", function(){this.$R(function(){
     var original = new knit.algebra.Attributes([attr("house.people"), attr("person.name")])
     original.splice(1,1,attr("house.address"))
-    assert.equal(["people", "address"], _.map(original, function(attr){return attr.name()}))
-  })})
-    
-  test("size", function(){this.$R(function(){
-    assert.equal(2, new knit.algebra.Attributes([attr("house.people"), attr("person.name")]).size())
+    assert.equal(["people", "address"], original.map(function(attr){return attr.name()}))
   })})
 
   test("names", function(){this.$R(function(){

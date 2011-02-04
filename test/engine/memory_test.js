@@ -44,20 +44,32 @@ regarding("memory", function() {
       assert.equal(false, FALSE.match([[attr("r.b"),1]]))
     })})
 
-    test("equality match", function(){this.$R(function(){
-      assert.equal(true, equality(attr("r.b"), 1).match([[attr("r.b"),1]]))
-      assert.equal(false, equality(attr("r.b"), 1).match([[attr("r.b"),2]]))
-      assert.equal(false, equality(attr("r.b"), 1).match([[attr("r.a"),1]]))
-    })})
+    test("equality match", function(){
+      assert.equal(true, new knit.algebra.predicate.Equality(this.r.attr("b"), 1).match(this.r.attributes(), [0,1]))
+      assert.equal(false, new knit.algebra.predicate.Equality(this.r.attr("b"), 1).match(this.r.attributes(), [0,2]))
+      assert.equal(false, new knit.algebra.predicate.Equality(this.r.attr("b"), 1).match(this.r.attributes(), [1,0]))
+    })
 
-    test("conjunction match", function(){this.$R(function(){
-      assert.equal(true, conjunction(equality(attr("r.b"), 1), equality(attr("r.a"), 999)).
-                           match([[attr("r.a"),999], [attr("r.b"),1]]))
-      assert.equal(false, conjunction(equality(attr("r.b"), 2), equality(attr("r.a"), 999)).
-                            match([[attr("r.a"),999], [attr("r.b"),1]]))
-      assert.equal(false, conjunction(equality(attr("r.b"), 1), equality(attr("r.a"), 888)).
-                            match([[attr("r.a"),999], [attr("r.b"),1]]))
-    })})
+    test("conjunction match", function(){
+      assert.equal(true, 
+        new knit.algebra.predicate.Conjunction(
+          new knit.algebra.predicate.Equality(this.r.attr("b"), 1),
+          new knit.algebra.predicate.Equality(this.r.attr("a"), 999)
+        ).match(this.r.attributes(), [999,1])
+      )
+      assert.equal(false, 
+        new knit.algebra.predicate.Conjunction(
+          new knit.algebra.predicate.Equality(this.r.attr("b"), 2),
+          new knit.algebra.predicate.Equality(this.r.attr("a"), 999)
+        ).match(this.r.attributes(), [999,1])
+      )
+      assert.equal(false, 
+        new knit.algebra.predicate.Conjunction(
+          new knit.algebra.predicate.Equality(this.r.attr("b"), 1),
+          new knit.algebra.predicate.Equality(this.r.attr("a"), 888)
+        ).match(this.r.attributes(), [999,1])
+      )          
+    })
   })
   
   

@@ -1,13 +1,13 @@
 require("../helper")
 require("knit/engine/memory")
 
-regarding("In Memory Engine", function() {
+describe("In Memory Engine", function() {
     
   beforeEach(function() {
-    _.bind(setupAcceptanceFixtures, this)(new knit.engine.Memory())
+    knit.bind(setupAcceptanceFixtures, this)(new knit.engine.Memory())
   })
 
-  regarding("unnest.  take grouped up 'subrows' and flatten them into the parent structure.", function() {
+  describe("unnest.  take grouped up 'subrows' and flatten them into the parent structure.", function() {
 
     beforeEach(function() {
       this.simplePerson = this.$R(function(){return project(relation("person"), attr("person.personId", "person.name", "person.age"))}).perform()

@@ -1,13 +1,13 @@
 require("../helper")
 require("knit/engine/memory")
 
-regarding("In Memory Engine", function() {
+describe("In Memory Engine", function() {
     
   beforeEach(function() {
-    _.bind(setupAcceptanceFixtures, this)(new knit.engine.Memory())
+    knit.bind(setupAcceptanceFixtures, this)(new knit.engine.Memory())
   })
 
-  regarding("Selection pushing and cost", function() {
+  describe("Selection pushing and cost", function() {
     test("pushing in a select is less costly than leaving it outside, unnecessarily", function (){
       
       var expression = this.$R(function(){

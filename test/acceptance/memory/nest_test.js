@@ -1,13 +1,13 @@
 require("../helper")
 require("knit/engine/memory")
 
-regarding("In Memory Engine", function() {
+describe("In Memory Engine", function() {
     
   beforeEach(function() {
-    _.bind(setupAcceptanceFixtures, this)(new knit.engine.Memory())
+    knit.bind(setupAcceptanceFixtures, this)(new knit.engine.Memory())
   })
 
-  regarding("nest.  matching on duplicate/ordered parent rows, and take the other columns and group them into 'subrows'.", function() {
+  describe("nest.  matching on duplicate/ordered parent rows, and take the other columns and group them into 'subrows'.", function() {
 
     test("simple.  works with intermingled nested/non-nested columns.", function (){
       var housePersonUnnested = this.$R(function(){

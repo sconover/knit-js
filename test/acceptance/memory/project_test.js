@@ -1,13 +1,13 @@
 require("../helper")
 require("knit/engine/memory")
 
-regarding("In Memory Engine", function() {
+describe("In Memory Engine", function() {
     
   beforeEach(function() {
-    _.bind(setupAcceptanceFixtures, this)(new knit.engine.Memory())
+    knit.bind(setupAcceptanceFixtures, this)(new knit.engine.Memory())
   })
 
-  regarding("Projection", function() {
+  describe("Projection", function() {
 
     test("project a subset of attributes over the relation", function (){
       var narrowerRelation = this.$R(function(){

@@ -1,10 +1,10 @@
 require("../helper")
 require("knit/engine/memory")
 
-regarding("In Memory Engine", function() {
+describe("In Memory Engine", function() {
     
   beforeEach(function() {
-    _.bind(setupAcceptanceFixtures, this)(new knit.engine.Memory())
+    knit.bind(setupAcceptanceFixtures, this)(new knit.engine.Memory())
     
     this.house.merge([
       [104, "Ashbury", 1001]
@@ -12,7 +12,7 @@ regarding("In Memory Engine", function() {
 
   })
 
-  regarding("right outer join", function() {
+  describe("right outer join", function() {
 
     test("create joined rows where the predicate matches, " +
          "or if there's no predicate match for to a row on the left, " +

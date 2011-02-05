@@ -1,8 +1,8 @@
 var path = require('path')
 var fs = require('fs')
 var sys = require('sys')
-var _ = require(path.join(__dirname, "../test/underscore"))
-
+require(path.join(__dirname, "../lib/vendor/collection_functions"))
+var _A = CollectionFunctions.Array.functions
 
 printFile = function(baseDir, f, alreadyReadIn) {
   var requireRegex = /^\s*require\((.*)?\)\s*$/
@@ -17,7 +17,7 @@ printFile = function(baseDir, f, alreadyReadIn) {
     forEach(function (line) { 
       if (line.match(requireRegex)) {
         var newFile = line.match(requireRegex)[1].replace(/["']/g, "")
-        if (!_.include(alreadyReadIn, newFile)) {
+        if (!_A.include(alreadyReadIn, newFile)) {
           printFile(baseDir, newFile, alreadyReadIn)
         }
       } else {

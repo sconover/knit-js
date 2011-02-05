@@ -2,8 +2,6 @@ require.paths.push("test")
 require.paths.push("lib")
 require.paths.push("../node-sqlite")
 
-global._ = require("underscore")
-
 require("../../jasmine-node/lib/jasmine")
 
 jasmine.Env.prototype.regarding = jasmine.Env.prototype.describe
@@ -34,7 +32,8 @@ assert.doubleEqual = assert.equal
 assert.equal = assert.deepEqual
 
 assert._func = function(func, expected, actual, orientation, term) {
-  var _A = CollectionFunctions.Array.functions
+  var _A = CollectionFunctions.Array.functions,
+      _ = knit._util
   
   function simpleInspect(obj) {
     if (typeof obj == "object") {
@@ -79,7 +78,7 @@ assert.notSame = function(expected, actual) {
 
 
 assert.arraySame = function(expected, actual) {
-  _.each(expected, function(item, i){
+  CollectionFunctions.Array.functions.each(expected, function(item, i){
     assert.same(item, actual[i])
   })
 }

@@ -29,7 +29,7 @@ knit([headers(string array)]) ==> mem relation, no rows
 knit([headers(string array)], array) ==> mem relation with rows
 knit(array of js objects) ==> mem relation with rows - headers are stripped out, etc
 knit(sqlite table) => sqlite relation
-  knit.bindRelation
+  knit._util.bindRelation
 
 consider inner join
   defaults to join predicate that takes leftnameId and matches to the same on the right

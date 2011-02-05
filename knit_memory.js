@@ -29,7 +29,7 @@ CollectionFunctions = (function(){
     equals:function(a,b){return a == b},
     newCollection:function(){return []},
     append:function(array, item){ array.push(item) },
-    isCollection:function(thing){ return typeof thing.length != "undefined" },
+    isCollection:function(thing){ return typeof thing.length != "undefined" && typeof thing.push != "undefined" },
     size:function(array){ return array.length },
     sort:function(array){ return [].concat(array).sort() },
     concat:function(){
@@ -597,22 +597,38 @@ global.knit = {
 
 
 //knit/util ======================================================
-//see http://javascript.crockford.com/prototypal.html
-knit.createObject = function() {
-  var o = arguments[0]
+//internal utilities
+knit._util = {
 
-  function __F() {}
-  __F.prototype = o
-  var newObj = new __F()
-
-  if (arguments.length==2) {
-    var additions = arguments[1]
-    _.extend(newObj, additions)
+  bind: function(f, objectThatShouldBeThis) {
+    return function() {
+      var args = CollectionFunctions.Array.functions.toArray(arguments)
+      return f.apply(objectThatShouldBeThis, args)
+    }
+  },
+  
+  extend: function(mergee, toMerge) {
+    for(k in toMerge) mergee[k] = toMerge[k]
+    return mergee
+  },
+  
+  keys: function(obj) {
+    var keys = []
+    for (var k in obj) keys.push(k)
+    return keys
+  },
+  
+  values: function(obj) {
+    var values = []
+    for (var k in obj) values.push(obj[k])
+    return values
+  },
+  
+  isArray: function(thing){ 
+    return typeof thing.length != "undefined" && typeof thing.push != "undefined" 
   }
-
-  return newObj
+  
 }
-
 
 
 //knit/quacks_like ======================================================
@@ -649,7 +665,8 @@ knit.quacksLike = function(object, signature) {
 //knit/reference ======================================================
 ;(function(){
 
-  var _A = CollectionFunctions.Array.functions
+  var _A = CollectionFunctions.Array.functions,
+      _ = knit._util
   
   knit.RelationReference = function(){
     var F = function(relationName) {
@@ -844,11 +861,11 @@ knit.quacksLike = function(object, signature) {
     
       if (args.length == 1) {
         var relationNameDotAttributeName = args[0]
-        return _.bind(regularAttr, this)(relationNameDotAttributeName)
+        return knit._util.bind(regularAttr, this)(relationNameDotAttributeName)
       } else if (args.length==2 && _.isArray(args[1]) ){
         var attributeName = args[0]
         var nestedAttributeRefs = args[1]
-        return _.bind(nestedAttr, this)(attributeName, nestedAttributeRefs)
+        return knit._util.bind(nestedAttr, this)(attributeName, nestedAttributeRefs)
       } else {
         var self = this
         return _A.map(args, function(relationNameDotAttributeName){return self.attr(relationNameDotAttributeName)})
@@ -880,9 +897,9 @@ knit.quacksLike = function(object, signature) {
     }
   
     p.decorate = function(target, bindings) {
-      target.relation = _.bind(this.relation, this)
-      target.attr = _.bind(this.attr, this)
-      var resolveF = _.bind(this.resolve, this)
+      target.relation = knit._util.bind(this.relation, this)
+      target.attr = knit._util.bind(this.attr, this)
+      var resolveF = knit._util.bind(this.resolve, this)
       target.resolve = function(){resolveF(bindings())}
       return target
     }
@@ -894,6 +911,8 @@ knit.quacksLike = function(object, signature) {
 
 //knit/signatures ======================================================
 knit.signature = function(){
+  var _ = knit._util
+  
   var like = {
     isSame:Function, 
     isEquivalent:Function
@@ -936,7 +955,8 @@ knit.signature = function(){
 //see http://alexyoung.org/2009/10/22/javascript-dsl/
 
 global.DSLFunction = (function() {
-  var _A = CollectionFunctions.Array.functions
+  var _A = CollectionFunctions.Array.functions,
+      _ = knit._util
   
   var dslLocals = {}
   var outerFunction = function(userFunction, what_theKeywordThis_IsSupposedToBe){
@@ -951,7 +971,7 @@ global.DSLFunction = (function() {
       localValues.push(dslLocals[key])
     })
     
-    var userFunctionBody = "(_.bind(" + userFunction.toString().replace(/\s+$/, "") + ",this))()"
+    var userFunctionBody = "(knit._util.bind(" + userFunction.toString().replace(/\s+$/, "") + ",this))()"
     var wrappingFunctionBody = "(function(" + localNames.join(",") + "){return " + userFunctionBody + "})"
     return eval(wrappingFunctionBody).apply(what_theKeywordThis_IsSupposedToBe, localValues)
   }
@@ -980,7 +1000,7 @@ knit.createBuilderFunction = function(setup) {
 
   var referenceResolvingWrapper = function() {
     var dslFunction = new DSLFunction()
-    _.extend(dslFunction.dslLocals, knit.createBuilderFunction.dslLocals)
+    knit._util.extend(dslFunction.dslLocals, knit.createBuilderFunction.dslLocals)
     var environment = new knit.ReferenceEnvironment()
     environment.decorate(dslFunction.dslLocals, bindings)
 
@@ -1023,7 +1043,7 @@ knit.Attributes = function() {
     append:function(attributes, attribute){attributes._attributeArray.push(attribute)}
   })
   
-  var _ = localCF.functions
+  var _O = localCF.functions
   var objectStyleCF = localCF.makeObjectStyleFunctions(function(){return this})
   _A.each(["clone", "concat", "inspect", "without", "map",
            "each", "indexOf", "size", "differ", "empty", "indexOf", "indexesOf"], function(functionName) {
@@ -1032,26 +1052,26 @@ knit.Attributes = function() {
   p.isSame = p.isEquivalent = objectStyleCF.equals
   p.splice = objectStyleCF.splice
   
-  p.names = function(){return _.pluck(this, 'name')}
+  p.names = function(){return _O.pluck(this, 'name')}
   p.get = function() { 
     if (arguments.length==1) {
       var name = arguments[0]
-      return _.detect(this, function(attr){return attr.name() == name}) 
+      return _O.detect(this, function(attr){return attr.name() == name}) 
     } else {
       var args = _A.toArray(arguments)
-      return _.select(this, function(attr){return _A.include(args, attr.name())}) 
+      return _O.select(this, function(attr){return _A.include(args, attr.name())}) 
     }
   }
   
   p.spliceInNestedAttribute = function(nestedAttribute) {
-    var firstNestedAttributePosition = _.indexesOf(this, nestedAttribute.nestedRelation().attributes()).sort()[0]
-    var withoutAttributesToNest = _.differ(this, nestedAttribute.nestedRelation().attributes())
-    return _.splice(withoutAttributesToNest, new F([nestedAttribute]), firstNestedAttributePosition)
+    var firstNestedAttributePosition = _O.indexesOf(this, nestedAttribute.nestedRelation().attributes()).sort()[0]
+    var withoutAttributesToNest = _O.differ(this, nestedAttribute.nestedRelation().attributes())
+    return _O.splice(withoutAttributesToNest, new F([nestedAttribute]), firstNestedAttributePosition)
   }
   
   p.makeObjectFromRow = function(row) {
     var object = {}
-    _.each(this, function(attr, columnPosition) {
+    _O.each(this, function(attr, columnPosition) {
       var value = row[columnPosition]
       var propertyName = attr.name()
       if (attr.nestedRelation) {
@@ -1734,7 +1754,8 @@ knit.engine.Memory.NestedAttribute = function(){
 //knit/engine/memory/relation ======================================================
 knit.engine.Memory.Relation = function() {
   
-  var _A = CollectionFunctions.Array.functions
+  var _A = CollectionFunctions.Array.functions,
+      _ = knit._util
   
   var _id = 0
   

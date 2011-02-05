@@ -2,7 +2,8 @@ require("knit/core")
 require("knit/attributes")
 
 TestRelation = function() {
-  var _A = CollectionFunctions.Array.functions
+  var _A = CollectionFunctions.Array.functions,
+      _ = knit._util
   
   var _id = 0
   

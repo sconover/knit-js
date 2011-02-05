@@ -4,7 +4,7 @@ require("knit/engine/memory")
 describe("In Memory Engine", function() {
     
   beforeEach(function() {
-    knit.bind(setupAcceptanceFixtures, this)(new knit.engine.Memory())
+    knit._util.bind(setupAcceptanceFixtures, this)(new knit.engine.Memory())
   })
 
   describe("unnest.  take grouped up 'subrows' and flatten them into the parent structure.", function() {

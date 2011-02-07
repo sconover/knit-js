@@ -1,0 +1,76 @@
+require("../helper")
+require("knit/engine/memory")
+
+regarding("In Memory Engine", function() {
+    
+  beforeEach(function() {
+    knit._util.bind(setupAcceptanceFixtures, this)(new knit.engine.Memory())
+  })
+
+  regarding("Divide - relational divsion (think: opposite of cartesian join)", function() {
+
+   test("divide cartesian product by a relation", function (){
+      
+      allPeopleCombinedWithAllHouses = this.$R(function(){
+        return naturalJoin(relation("person"), relation("house"))
+      }).perform()
+      
+      assert.equal({
+        name:"person__house",
+        attributes:["personId", "houseId", "name", "age", "houseId", "address", "cityId"],
+        rows:[
+          [1, 101, "Jane", 5, 101, "Chimney Hill", 1001],
+          [2, 101, "Puck", 12, 101, "Chimney Hill", 1001],
+          [3, 102, "Fanny", 30, 102, "Parnassus", 1001],
+          [4, 103, "Amy", 6, 103, "Canal", 1002]
+        ]
+      }, relationContents(allPeopleCombinedWithAllHouses))
+
+
+      allPeopleCombinedWithAllHousesBackToPeople = this.$R(function(){
+        return divide(join(relation("person"), relation("house")), relation("house"))
+      }).perform()
+
+      assert.equal({
+        name:"person__house$$house",
+        attributes:["personId", "houseId", "name", "age"],
+        rows:[
+          [1, 101, "Jane", 5],
+          [4, 103, "Amy", 6],
+          [2, 101, "Puck", 12],
+          [3, 102, "Fanny", 30]
+        ]
+      }, relationContents(allPeopleCombinedWithAllHousesBackToPeople))
+      
+    })
+    
+    test("only populate quotient rows based on rows present in the dividend and in the divisor", function (){
+      this.house.merge([
+        [109, "Broderick", 1001]
+      ])
+      
+      allPeopleCombinedWithAllHousesBackToPeople = this.$R(function(){
+        return divide(
+                 naturalJoin(relation("person"), relation("house")), 
+                 select(relation("house"), eq(attr("house.address"), "Chimney Hill"))
+               )
+      }).perform()
+       
+      assert.equal({
+        name:"person__house$$house",
+        attributes:["personId", "houseId", "name", "age"],
+        rows:[
+          [1, 101, "Jane", 5],
+          [2, 101, "Puck", 12]
+        ]
+      }, relationContents(allPeopleCombinedWithAllHousesBackToPeople))
+
+
+
+    })
+    
+    
+  })
+    
+})
+

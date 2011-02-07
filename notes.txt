@@ -1,3 +1,18 @@
+use google closure set?
+
+RA concepts:
+  relational division ("divide ?") http://en.wikipedia.org/wiki/Relational_algebra#Division
+    http://www.simple-talk.com/sql/t-sql-programming/divided-we-stand-the-sql-of-relational-division/
+    http://vadimtropashko.wordpress.com/why-relational-division-is-so-uncommon/
+  equijoin
+  semijoin
+  antijoin
+  full outer join
+  
+easy way to rename joins / divides?
+  or just implement rename?
+  or implement rename, then make a shortcut?  or not?
+
 give up and convert to standard describe / it / expect
 
 make attributes class faster/more efficient by specifying more features in CF creation (oh boy is this cool)

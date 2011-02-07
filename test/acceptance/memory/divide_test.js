@@ -12,7 +12,7 @@ regarding("In Memory Engine", function() {
    test("divide cartesian product by a relation", function (){
       
       allPeopleCombinedWithAllHouses = this.$R(function(){
-        return naturalJoin(relation("person"), relation("house"))
+        return join(relation("person"), relation("house"))
       }).perform()
       
       assert.equal({
@@ -20,8 +20,16 @@ regarding("In Memory Engine", function() {
         attributes:["personId", "houseId", "name", "age", "houseId", "address", "cityId"],
         rows:[
           [1, 101, "Jane", 5, 101, "Chimney Hill", 1001],
+          [1, 101, "Jane", 5, 102, "Parnassus", 1001],
+          [1, 101, "Jane", 5, 103, "Canal", 1002],
           [2, 101, "Puck", 12, 101, "Chimney Hill", 1001],
+          [2, 101, "Puck", 12, 102, "Parnassus", 1001],
+          [2, 101, "Puck", 12, 103, "Canal", 1002],
+          [3, 102, "Fanny", 30, 101, "Chimney Hill", 1001],
           [3, 102, "Fanny", 30, 102, "Parnassus", 1001],
+          [3, 102, "Fanny", 30, 103, "Canal", 1002],
+          [4, 103, "Amy", 6, 101, "Chimney Hill", 1001],
+          [4, 103, "Amy", 6, 102, "Parnassus", 1001],
           [4, 103, "Amy", 6, 103, "Canal", 1002]
         ]
       }, relationContents(allPeopleCombinedWithAllHouses))

@@ -2,19 +2,19 @@ require("../../test_helper")
 require("./sql_fakes.js")
 require("knit/translation/sql")
 
-regarding("project", function() {
+regarding("select", function() {
   
   beforeEach(function(){ setupPersonHouseCity(this, function(name, attributeNames){return new FakeTable(name, attributeNames)}) })
   var sql = knit.translation.sql
   
-  test("convert a project(proh-JEKT) to sql", function(){
+  test("convert a select to sql", function(){
     var project = this.$R(function(){
-      return project(relation("person"), attr("person.name", "person.age"))
+      return select(relation("person"), eq(attr("person.name"), "Jane"))
     })
     assert.equal(
       new sql.Select().
-        what(new sql.Column("person.name"), new sql.Column("person.age")).
-        from("person"),
+        from("person").
+        where(new sql.predicate.Equals(new sql.Column("person.name"), "Jane")),
       project.toSql()
     )
   })

@@ -10,10 +10,11 @@ FakeTable = function() {
   
   var F = function(name, attributeNames) {
     this._testRelation = new TestRelation(attributeNames)
-    this._name = name
+    this._testRelation.name = function(){return name}
+    
+    var self = this
+    this.name = function(){return self._testRelation.name()}
   }; var p = F.prototype
-
-  p.name = function(){ return this._name }
   
   _A.each(["id", "attributes", "attr", "isSame", "isEquivalent", "split", "merge", "newNestedAttribute"], 
           function(methodName){

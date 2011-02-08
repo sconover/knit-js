@@ -2,19 +2,16 @@ require("../../test_helper")
 require("./sql_fakes.js")
 require("knit/translation/sql")
 
-regarding("starting relation", function() {
+regarding("predicates", function() {
   
   beforeEach(function(){ setupPersonHouseCity(this, function(name, attributeNames){return new FakeTable(name, attributeNames)}) })
   var sql = knit.translation.sql
   
-  test("convert a straight relation reference to sql", function(){
-    var relation = this.$R(function(){
-      return relation("person")
-    })
+  test("convert an equality to sql", function(){
+    var equality = this.$R(function(){return eq(attr("person.name"), "Jane")})
     assert.equal(
-      new sql.Select().
-        from("person"),
-      relation.toSql()
+      new sql.predicate.Equals(new sql.Column("person.name"), "Jane"),
+      equality.toSql()
     )
   })
 

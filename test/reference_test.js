@@ -1,5 +1,6 @@
 require("./test_helper.js")
 require("knit/reference")
+require("knit/algebra/rename")
 require("./test_relation.js")
 
 regarding("references allow late-binding of core relations and attributes. " +
@@ -223,9 +224,32 @@ regarding("references allow late-binding of core relations and attributes. " +
         resolve()
         assert.same(relation("person"), this.outerPerson)
         assert.same(attr("person.houseId"), this.outerPerson.attr("houseId"))
-      }, {outerPerson:this.person})
-        
+      }, {outerPerson:this.person})        
     })
+    
+    test("relation renames register themselves with the environment.  references to renames are replaced with the renamed relations", function(){
+      var $R = knit.createBuilderFunction({bindings:{person:this.person}})
+      
+      var martian = $R(function(){
+        rename(relation("person"), "martian")
+        return relation("martian")
+      }, {person:this.person})        
+      
+      assert.same(martian, new knit.algebra.RenameRelation(this.person, "martian"))
+    })
+    
+    test("attribute renames register themselves with the environment.  references to renames are replaced with the renamed attributes", function(){
+      var $R = knit.createBuilderFunction({bindings:{person:this.person}})
+      
+      var oldness = $R(function(){
+        rename(attr("person.age"), "oldness")
+        return attr("oldness")
+      }, {person:this.person})        
+
+      assert.same(oldness, new knit.algebra.RenameAttribute(this.person.attr("age"), "oldness"))
+    })
+    
+    
   })
   
 })

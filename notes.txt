@@ -13,7 +13,11 @@ easy way to rename joins / divides?
   or just implement rename?
   or implement rename, then make a shortcut?  or not?
 
+RF more complex functions using local functions
+
 give up and convert to standard describe / it / expect
+
+relation ref equality doesn't go both ways...
 
 make attributes class faster/more efficient by specifying more features in CF creation (oh boy is this cool)
   also need to make differ sort-based in CF to get rid of n^2
@@ -112,6 +116,19 @@ what's a sensible way to break apart memory relation?
 =========
 readme
   examples of nesting and unnesting, examples
+
+=========
+features supported
+  some features won't be supported by some engines
+  use collection_function - style feature capability?
+    so, check the performXXX of the relation for an implementation?  blow up if not supported...
+      NullRelation / ExplodingRelation
+        mix engine relation with exploding relation?
+        feature("foo")...
+        methods just simply aren't present if you don't have the right features...just like CF
+        ...only pull in the code you need based on the features you want?
+          use the node tool plus some sort of declaration thing?
+  
 
 =========
 acceptance suite

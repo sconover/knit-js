@@ -2,7 +2,7 @@ require("../../test_helper")
 require("./sql_fakes.js")
 require("knit/translation/sql")
 
-regarding("starting relation", function() {
+regarding("project", function() {
   
   beforeEach(function(){
     setupPersonHouseCity(this, function(name, attributeNames){return new FakeTable(name, attributeNames)})
@@ -10,12 +10,13 @@ regarding("starting relation", function() {
   
   var sql = knit.translation.sql
   
-  test("convert a straight relation reference", function(){
-    var relation = this.$R(function(){return relation("person")})
+  test("convert a project statement", function(){
+    var project = this.$R(function(){return project(relation("person"), attr("person.name", "person.age"))})
     assert.equal(
       new sql.Select().
+        what(new sql.Column("person.name"), new sql.Column("person.age")).
         from("person"),
-      relation.toSql()
+      project.toSql()
     )
   })
 

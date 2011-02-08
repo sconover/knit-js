@@ -25,9 +25,5 @@ FakeTable = function() {
   
   p.inspect = function() { return this.name() + "[" + this.attributes().inspect() + "]" }
   
-  p.toSql = function() {
-    return new knit.translation.sql.From(this.name())
-  }
-  
   return F
 }()

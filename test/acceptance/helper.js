@@ -3,10 +3,8 @@ require("../test_helper.js")
 setupAcceptanceFixtures = function(engine) {
   this.engine = engine
   
-  this.person = this.engine.createRelation("person", ["personId", "houseId", "name", "age"])
-  this.house = this.engine.createRelation("house", ["houseId", "address", "cityId"])
-  this.city = this.engine.createRelation("city", ["cityId", "name"])
-
+  setupPersonHouseCity(this, this.engine.createRelation)
+  
   this.person.merge([
     [1, 101, "Jane", 5],
     [2, 101, "Puck", 12],
@@ -25,11 +23,6 @@ setupAcceptanceFixtures = function(engine) {
     [1002, "New Orleans"]
   ])
   
-  this.$R = knit.createBuilderFunction({bindings:{
-    person:this.person,
-    house:this.house,
-    city:this.city
-  }})    
 }
 
 relationContents = function(relation) {

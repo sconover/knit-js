@@ -26,6 +26,19 @@ for(var key in jasmine) {
 }
 
 
+setupPersonHouseCity = function(target, createRelationFunction) {
+  target.person = createRelationFunction("person", ["personId", "houseId", "name", "age"])
+  target.house = createRelationFunction("house", ["houseId", "address", "cityId"])
+  target.city = createRelationFunction("city", ["cityId", "name"])  
+  
+  target.$R = knit.createBuilderFunction({bindings:{
+    person:target.person,
+    house:target.house,
+    city:target.city
+  }})    
+  
+}
+
 assert = require('assert')
 
 assert.doubleEqual = assert.equal

@@ -52,9 +52,7 @@ TestRelation = function() {
     return new TestNestedAttribute(attributeName, nestedRelation, this)
   }
   
-  p.inspect = function() {
-    return "r[" + this.attributes().inspect() + "]" 
-  }
+  p.inspect = function() { return "r[" + this.attributes().inspect() + "]" }
   
   return F
 }()

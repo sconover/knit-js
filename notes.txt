@@ -1,3 +1,5 @@
+give up and convert to standard describe / it / expect
+
 use google closure set?
 
 RA concepts:
@@ -14,8 +16,6 @@ easy way to rename joins / divides?
   or implement rename, then make a shortcut?  or not?
 
 RF more complex functions using local functions
-
-give up and convert to standard describe / it / expect
 
 relation ref equality doesn't go both ways...
 

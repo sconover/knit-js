@@ -2,7 +2,7 @@ require("../../test_helper")
 require("./sql_fakes.js")
 require("knit/translation/sql")
 
-regarding("project", function() {
+regarding("project(proh-JEKT)", function() {
   
   beforeEach(function(){ setupPersonHouseCity(this, function(name, attributeNames){return new FakeTable(name, attributeNames)}) })
   var sql = knit.translation.sql

@@ -6,14 +6,8 @@ regarding("sqlite db", function() {
   var _A = CollectionFunctions.Array.functions
   var type = knit.attributeType
   
-  beforeEach(function(){
-    this.db = new knit.engine.sqlite.Database(":memory:")
-    this.db.open()
-  })
-  
-  afterEach(function(){
-    this.db.close()
-  })
+  beforeEach(function(){ this.db = new knit.engine.sqlite.Database(":memory:"); this.db.open() })
+  afterEach(function(){ this.db.close() })
   
   test("execute, query", function(){
     this.db.execute({sql:"create table foo(color string)"})

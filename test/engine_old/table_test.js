@@ -1,7 +1,7 @@
 // require("../../test_helper")
-// require("knit/engine/sql/statements/ddl")
-// require("knit/engine/sql/table")
-// require("knit/engine/sql/db/sqlite")
+// require("knit/engine/sqlite/statements/ddl")
+// require("knit/engine/sqlite/table")
+// require("knit/engine/sqlite/db/sqlite")
 
 xregarding("sql - table", function() {
   beforeEach(function(){

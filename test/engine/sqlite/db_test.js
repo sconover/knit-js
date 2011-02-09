@@ -1,7 +1,7 @@
-require("../../../test_helper")
-require("knit/engine/sql/create_table")
-require("knit/engine/sql/insert")
-require("knit/engine/sql/db/sqlite")
+require("../../test_helper")
+require("knit/engine/sqlite/create_table")
+require("knit/engine/sqlite/insert")
+require("knit/engine/sqlite/db")
 
 regarding("sqlite db", function() {
   

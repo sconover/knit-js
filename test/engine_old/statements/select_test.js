@@ -1,5 +1,5 @@
 // require("../../../test_helper")
-// require("knit/engine/sql/statements/select")
+// require("knit/engine/sqlite/statements/select")
 
 xregarding("select statement", function() {
   

@@ -1,5 +1,5 @@
 // require("../../../test_helper")
-// require("knit/engine/sql/statements/insert")
+// require("knit/engine/sqlite/statements/insert")
 
 xregarding("insert statement", function() {
   

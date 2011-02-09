@@ -1,5 +1,5 @@
 // require("../../../test_helper")
-// require("knit/engine/sql/statements/ddl")
+// require("knit/engine/sqlite/statements/ddl")
 
 xregarding("ddl statements", function() {
   

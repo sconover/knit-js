@@ -34,7 +34,7 @@ regarding("sqlite db", function() {
       this.db.createTable("foo", [["id",type.Integer], ["color",type.String]], ["id"])
       
       assert.equal(
-        [{name:"id", type:"int", pk:"0"},
+        [{name:"id", type:"int", pk:"1"},
          {name:"color", type:"string", pk:"0"}],
         this.db.columnInformation("foo")
       )

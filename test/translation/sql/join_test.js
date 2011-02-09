@@ -52,5 +52,14 @@ regarding("join to sql", function() {
       )
     })    
     
+    test("and values", function(){
+      assert.equal(
+        {sql:"select * from person join house on house.houseId = ?", values:[101]},
+        new sql.Select().
+          join(new sql.Join("person", "house", new sql.predicate.Equals(new sql.Column("house.houseId"), 101))).
+          toStatement()
+      )
+    })    
+    
   })
 })

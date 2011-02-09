@@ -29,7 +29,7 @@ CollectionFunctions = (function(){
     equals:function(a,b){return a == b},
     newCollection:function(){return []},
     append:function(array, item){ array.push(item) },
-    isCollection:function(thing){ return typeof thing.length != "undefined" && typeof thing.push != "undefined" },
+    isCollection:function(thing){ return typeof thing.length != "undefined" },
     size:function(array){ return array.length },
     sort:function(array){ return [].concat(array).sort() },
     concat:function(){
@@ -597,38 +597,22 @@ global.knit = {
 
 
 //knit/util ======================================================
-//internal utilities
-knit._util = {
+//see http://javascript.crockford.com/prototypal.html
+knit.createObject = function() {
+  var o = arguments[0]
 
-  bind: function(f, objectThatShouldBeThis) {
-    return function() {
-      var args = CollectionFunctions.Array.functions.toArray(arguments)
-      return f.apply(objectThatShouldBeThis, args)
-    }
-  },
-  
-  extend: function(mergee, toMerge) {
-    for(k in toMerge) mergee[k] = toMerge[k]
-    return mergee
-  },
-  
-  keys: function(obj) {
-    var keys = []
-    for (var k in obj) keys.push(k)
-    return keys
-  },
-  
-  values: function(obj) {
-    var values = []
-    for (var k in obj) values.push(obj[k])
-    return values
-  },
-  
-  isArray: function(thing){ 
-    return typeof thing.length != "undefined" && typeof thing.push != "undefined" 
+  function __F() {}
+  __F.prototype = o
+  var newObj = new __F()
+
+  if (arguments.length==2) {
+    var additions = arguments[1]
+    _.extend(newObj, additions)
   }
-  
+
+  return newObj
 }
+
 
 
 //knit/quacks_like ======================================================
@@ -665,8 +649,7 @@ knit.quacksLike = function(object, signature) {
 //knit/reference ======================================================
 ;(function(){
 
-  var _A = CollectionFunctions.Array.functions,
-      _ = knit._util
+  var _A = CollectionFunctions.Array.functions
   
   knit.RelationReference = function(){
     var F = function(relationName) {
@@ -861,11 +844,11 @@ knit.quacksLike = function(object, signature) {
     
       if (args.length == 1) {
         var relationNameDotAttributeName = args[0]
-        return knit._util.bind(regularAttr, this)(relationNameDotAttributeName)
+        return _.bind(regularAttr, this)(relationNameDotAttributeName)
       } else if (args.length==2 && _.isArray(args[1]) ){
         var attributeName = args[0]
         var nestedAttributeRefs = args[1]
-        return knit._util.bind(nestedAttr, this)(attributeName, nestedAttributeRefs)
+        return _.bind(nestedAttr, this)(attributeName, nestedAttributeRefs)
       } else {
         var self = this
         return _A.map(args, function(relationNameDotAttributeName){return self.attr(relationNameDotAttributeName)})
@@ -897,9 +880,9 @@ knit.quacksLike = function(object, signature) {
     }
   
     p.decorate = function(target, bindings) {
-      target.relation = knit._util.bind(this.relation, this)
-      target.attr = knit._util.bind(this.attr, this)
-      var resolveF = knit._util.bind(this.resolve, this)
+      target.relation = _.bind(this.relation, this)
+      target.attr = _.bind(this.attr, this)
+      var resolveF = _.bind(this.resolve, this)
       target.resolve = function(){resolveF(bindings())}
       return target
     }
@@ -911,8 +894,6 @@ knit.quacksLike = function(object, signature) {
 
 //knit/signatures ======================================================
 knit.signature = function(){
-  var _ = knit._util
-  
   var like = {
     isSame:Function, 
     isEquivalent:Function
@@ -955,8 +936,7 @@ knit.signature = function(){
 //see http://alexyoung.org/2009/10/22/javascript-dsl/
 
 global.DSLFunction = (function() {
-  var _A = CollectionFunctions.Array.functions,
-      _ = knit._util
+  var _A = CollectionFunctions.Array.functions
   
   var dslLocals = {}
   var outerFunction = function(userFunction, what_theKeywordThis_IsSupposedToBe){
@@ -971,7 +951,7 @@ global.DSLFunction = (function() {
       localValues.push(dslLocals[key])
     })
     
-    var userFunctionBody = "(knit._util.bind(" + userFunction.toString().replace(/\s+$/, "") + ",this))()"
+    var userFunctionBody = "(_.bind(" + userFunction.toString().replace(/\s+$/, "") + ",this))()"
     var wrappingFunctionBody = "(function(" + localNames.join(",") + "){return " + userFunctionBody + "})"
     return eval(wrappingFunctionBody).apply(what_theKeywordThis_IsSupposedToBe, localValues)
   }
@@ -1000,7 +980,7 @@ knit.createBuilderFunction = function(setup) {
 
   var referenceResolvingWrapper = function() {
     var dslFunction = new DSLFunction()
-    knit._util.extend(dslFunction.dslLocals, knit.createBuilderFunction.dslLocals)
+    _.extend(dslFunction.dslLocals, knit.createBuilderFunction.dslLocals)
     var environment = new knit.ReferenceEnvironment()
     environment.decorate(dslFunction.dslLocals, bindings)
 
@@ -1043,7 +1023,7 @@ knit.Attributes = function() {
     append:function(attributes, attribute){attributes._attributeArray.push(attribute)}
   })
   
-  var _O = localCF.functions
+  var _ = localCF.functions
   var objectStyleCF = localCF.makeObjectStyleFunctions(function(){return this})
   _A.each(["clone", "concat", "inspect", "without", "map",
            "each", "indexOf", "size", "differ", "empty", "indexOf", "indexesOf"], function(functionName) {
@@ -1052,26 +1032,26 @@ knit.Attributes = function() {
   p.isSame = p.isEquivalent = objectStyleCF.equals
   p.splice = objectStyleCF.splice
   
-  p.names = function(){return _O.pluck(this, 'name')}
+  p.names = function(){return _.pluck(this, 'name')}
   p.get = function() { 
     if (arguments.length==1) {
       var name = arguments[0]
-      return _O.detect(this, function(attr){return attr.name() == name}) 
+      return _.detect(this, function(attr){return attr.name() == name}) 
     } else {
       var args = _A.toArray(arguments)
-      return _O.select(this, function(attr){return _A.include(args, attr.name())}) 
+      return _.select(this, function(attr){return _A.include(args, attr.name())}) 
     }
   }
   
   p.spliceInNestedAttribute = function(nestedAttribute) {
-    var firstNestedAttributePosition = _O.indexesOf(this, nestedAttribute.nestedRelation().attributes()).sort()[0]
-    var withoutAttributesToNest = _O.differ(this, nestedAttribute.nestedRelation().attributes())
-    return _O.splice(withoutAttributesToNest, new F([nestedAttribute]), firstNestedAttributePosition)
+    var firstNestedAttributePosition = _.indexesOf(this, nestedAttribute.nestedRelation().attributes()).sort()[0]
+    var withoutAttributesToNest = _.differ(this, nestedAttribute.nestedRelation().attributes())
+    return _.splice(withoutAttributesToNest, new F([nestedAttribute]), firstNestedAttributePosition)
   }
   
   p.makeObjectFromRow = function(row) {
     var object = {}
-    _O.each(this, function(attr, columnPosition) {
+    _.each(this, function(attr, columnPosition) {
       var value = row[columnPosition]
       var propertyName = attr.name()
       if (attr.nestedRelation) {
@@ -1690,18 +1670,18 @@ knit.createBuilderFunction.dslLocals.nest = function(relation, nestedAttribute) 
 
 //knit/engine/memory ======================================================
 
-knit.engine.Memory = function() {
+knit.engine.memory = function() {
 }
 
-knit.engine.Memory.prototype.createRelation = function(name, attributeNames, primaryKey) {
-  return new knit.engine.Memory.MutableRelation(name, attributeNames, primaryKey)
+knit.engine.memory.prototype.this.createRelation = function(name, attributeNames, primaryKey) {
+  return new knit.engine.memory.MutableRelation(name, attributeNames, primaryKey)
 }
 
 
 
 
 //knit/engine/memory/attribute ======================================================
-knit.engine.Memory.Attribute = function(){
+knit.engine.memory.Attribute = function(){
 
   var F = function(name, sourceRelation) {
     this._name = name
@@ -1724,7 +1704,7 @@ knit.engine.Memory.Attribute = function(){
   return F
 }()
 
-knit.engine.Memory.NestedAttribute = function(){
+knit.engine.memory.NestedAttribute = function(){
 
   var F = function(name, nestedRelation, sourceRelation) {
     this._name = name
@@ -1752,10 +1732,9 @@ knit.engine.Memory.NestedAttribute = function(){
 
 
 //knit/engine/memory/relation ======================================================
-knit.engine.Memory.Relation = function() {
+knit.engine.memory.Relation = function() {
   
-  var _A = CollectionFunctions.Array.functions,
-      _ = knit._util
+  var _A = CollectionFunctions.Array.functions
   
   var _id = 0
   
@@ -1776,11 +1755,11 @@ knit.engine.Memory.Relation = function() {
           attrToAdd = attr
         } else if (typeof attr == "string") {
           var attributeName = attr
-          attrToAdd = new knit.engine.Memory.Attribute(attributeName, self)
+          attrToAdd = new knit.engine.memory.Attribute(attributeName, self)
         } else {
           var attributeName = _.keys(attr)[0]
           var nestedRelation = _.values(attr)[0]
-          attrToAdd = new knit.engine.Memory.NestedAttribute(attributeName, nestedRelation, self)
+          attrToAdd = new knit.engine.memory.NestedAttribute(attributeName, nestedRelation, self)
         }
     
         attributes.push(attrToAdd)
@@ -1791,7 +1770,7 @@ knit.engine.Memory.Relation = function() {
     this._pkAttributeNames = primaryKey || []
     var pkPositions = _A.indexesOf(this._attributes.names(), this._pkAttributeNames)
 
-    this._rowStore = new knit.engine.Memory.StandardRowStore(pkPositions, rows || [])
+    this._rowStore = new knit.engine.memory.StandardRowStore(pkPositions, rows || [])
     this.cost = costSoFar || 0
   }; var p = F.prototype
 
@@ -1823,12 +1802,12 @@ knit.engine.Memory.Relation = function() {
     var newAttributes = attributes || this.attributes()
     
     //curry?
-    return new knit.engine.Memory.Relation(newName, newAttributes, this._pkAttributeNames, rows, this.cost + rows.length) 
+    return new knit.engine.memory.Relation(newName, newAttributes, this._pkAttributeNames, rows, this.cost + rows.length) 
   }
   
   p.newNestedAttribute = function(attributeName, attributesToNest) {
-    var nestedRelation = new knit.engine.Memory.Relation("(nested)", attributesToNest, [], [], 0) 
-    return new knit.engine.Memory.NestedAttribute(attributeName, nestedRelation, this)
+    var nestedRelation = new knit.engine.memory.Relation("(nested)", attributesToNest, [], [], 0) 
+    return new knit.engine.memory.NestedAttribute(attributeName, nestedRelation, this)
   }
 
   
@@ -2003,8 +1982,8 @@ knit.engine.Memory.Relation = function() {
   return F
 }()
 
-knit.engine.Memory.MutableRelation = function(name, attributeNames, primaryKey) {
-  var result = new knit.engine.Memory.Relation(name, attributeNames, primaryKey)
+knit.engine.memory.MutableRelation = function(name, attributeNames, primaryKey) {
+  var result = new knit.engine.memory.Relation(name, attributeNames, primaryKey)
   _.extend(result, {
     merge: function(rowsToAdd) {
       this._rowStore.merge(rowsToAdd)
@@ -2045,7 +2024,7 @@ knit.algebra.predicate.Conjunction.prototype.match = function(attributes, row) {
 
 
 //knit/engine/memory/standard_row_store ======================================================
-knit.engine.Memory.StandardRowStore = function(){
+knit.engine.memory.StandardRowStore = function(){
   var _A = CollectionFunctions.Array.functions
   
   var F = function(keyColumns, initialRows) {

@@ -1,7 +1,7 @@
-require("../helper")
-require("knit/engine/memory")
+require("./helper")
+//require("knit/engine/sqlite")
 
-regarding("In Memory Engine", function() {
+xregarding("Sqlite Engine", function() {
     
   beforeEach(function() {
     knit._util.bind(setupAcceptanceFixtures, this)(knit.engine.memory.createRelation)

@@ -5,7 +5,7 @@ require("knit/engine/memory/standard_row_store")
 regarding("set row store - backed by a set", function() {
   
   test("stores rows, sends them all back using 'all'", function(){
-    var rowStore = new knit.engine.Memory.StandardRowStore([], [])
+    var rowStore = new knit.engine.memory.StandardRowStore([], [])
     
     rowStore.merge(
       [[1,2],
@@ -18,7 +18,7 @@ regarding("set row store - backed by a set", function() {
   })
 
   test("with no key, just append new rows", function(){
-    var rowStore = new knit.engine.Memory.StandardRowStore([], [])
+    var rowStore = new knit.engine.memory.StandardRowStore([], [])
     
     rowStore.merge(
       [[1,2],
@@ -40,7 +40,7 @@ regarding("set row store - backed by a set", function() {
   })
 
   test("can have a key.  overwrites a row with a new row if the keys match.", function(){
-    var rowStore = new knit.engine.Memory.StandardRowStore([0], [])
+    var rowStore = new knit.engine.memory.StandardRowStore([0], [])
     
     rowStore.merge(
       [[1,"a"],
@@ -60,7 +60,7 @@ regarding("set row store - backed by a set", function() {
   })
 
   test("compound key", function(){
-    var rowStore = new knit.engine.Memory.StandardRowStore([0, 2], [])
+    var rowStore = new knit.engine.memory.StandardRowStore([0, 2], [])
     
     rowStore.merge(
       [[1,"a", true],

@@ -1,10 +1,10 @@
 require("../test_helper.js")
 
-setupAcceptanceFixtures = function(engine) {
-  this.engine = engine
-  
-  setupPersonHouseCity(this, this.engine.createRelation)
-  
+setupAcceptanceFixtures = function(createRelation) {
+  setupPersonHouseCity(this, createRelation)
+
+  this.createRelation = createRelation
+
   this.person.merge([
     [1, 101, "Jane", 5],
     [2, 101, "Puck", 12],

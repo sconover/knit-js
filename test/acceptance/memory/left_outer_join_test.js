@@ -4,7 +4,7 @@ require("knit/engine/memory")
 describe("In Memory Engine", function() {
     
   beforeEach(function() {
-    knit._util.bind(setupAcceptanceFixtures, this)(new knit.engine.Memory())
+    knit._util.bind(setupAcceptanceFixtures, this)(knit.engine.memory.createRelation)
     
     this.person.merge([
       [5, 104, "Felix", 10]

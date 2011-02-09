@@ -2,24 +2,24 @@ require("../test_helper")
 require("knit/engine/memory")
 require("../relation_proof")
 
-regarding("memory", function() {
+xregarding("memory", function() {
   beforeEach(function(){
-    var r = knit.engine.memory.createRelation("foo", ["a", "b"])
+    var r = this.createRelation("foo", ["a", "b"])
     this.r = r
     this.$R = knit.createBuilderFunction({bindings:{
       r:r
     }})
   })
   
-  relationProof("MemoryRelation", function(attributeNames){ return knit.engine.memory.createRelation("x", attributeNames) } )
+  relationProof("SqliteRelation", function(attributeNames){ return new knit.engine.Sqlite().this.createRelation("x", attributeNames) } )
   
-  regarding("MemoryRelation inspect", function() {
+  xregarding("MemoryRelation inspect", function() {
     test("inspect", function(){
       assert.equal("foo[a,b]", this.r.inspect())
     })
   })
 
-  regarding(".rows / .objects", function() {
+  xregarding(".rows / .objects", function() {
     test("they cause the relation to be applied", function(){this.$R(function(){
       resolve()
       
@@ -35,44 +35,9 @@ regarding("memory", function() {
       ], select(relation("r"), equality(attr("r.b"), 98)).rows())
     })
   })})
-
-  regarding("memory predicate - match", function() {
-  
-    test("true false match", function(){this.$R(function(){
-      assert.equal(true, TRUE.match([[attr("r.b"),1]]))
-      assert.equal(false, FALSE.match([[attr("r.b"),1]]))
-    })})
-
-    test("equality match", function(){
-      assert.equal(true, new knit.algebra.predicate.Equality(this.r.attr("b"), 1).match(this.r.attributes(), [0,1]))
-      assert.equal(false, new knit.algebra.predicate.Equality(this.r.attr("b"), 1).match(this.r.attributes(), [0,2]))
-      assert.equal(false, new knit.algebra.predicate.Equality(this.r.attr("b"), 1).match(this.r.attributes(), [1,0]))
-    })
-
-    test("conjunction match", function(){
-      assert.equal(true, 
-        new knit.algebra.predicate.Conjunction(
-          new knit.algebra.predicate.Equality(this.r.attr("b"), 1),
-          new knit.algebra.predicate.Equality(this.r.attr("a"), 999)
-        ).match(this.r.attributes(), [999,1])
-      )
-      assert.equal(false, 
-        new knit.algebra.predicate.Conjunction(
-          new knit.algebra.predicate.Equality(this.r.attr("b"), 2),
-          new knit.algebra.predicate.Equality(this.r.attr("a"), 999)
-        ).match(this.r.attributes(), [999,1])
-      )
-      assert.equal(false, 
-        new knit.algebra.predicate.Conjunction(
-          new knit.algebra.predicate.Equality(this.r.attr("b"), 1),
-          new knit.algebra.predicate.Equality(this.r.attr("a"), 888)
-        ).match(this.r.attributes(), [999,1])
-      )          
-    })
-  })
   
   
-  regarding("the 'cost' of a perform using the memory engine is the sum of all the rows of all relations created", function() {
+  xregarding("the 'cost' of a perform using the memory engine is the sum of all the rows of all relations created", function() {
 
     test("just performing a relation and doing nothing else is zero cost", function(){this.$R(function(){
       resolve()
@@ -94,9 +59,9 @@ regarding("memory", function() {
     })})
     
     test("join cost usually depends greatly on whether a good join predicate is available", function(){this.$R(function(){
-      var person = knit.engine.memory.createRelation("person", ["id", "houseId", "name", "age"])
-      var house = knit.engine.memory.createRelation("house", ["houseId", "address", "cityId"])
-      var city = knit.engine.memory.createRelation("city", ["cityId", "name"])
+      var person = this.createRelation("person", ["id", "houseId", "name", "age"])
+      var house = this.createRelation("house", ["houseId", "address", "cityId"])
+      var city = this.createRelation("city", ["cityId", "name"])
       
       person.merge([
         [1, 101, "Jane", 5],
@@ -120,7 +85,7 @@ regarding("memory", function() {
       assert.equal(3, join(person, house, equality(person.attr("houseId"), house.attr("houseId"))).perform().cost)
       assert.equal(3 + 3, join(join(person, house, equality(person.attr("houseId"), house.attr("houseId"))),
                                city, equality(house.attr("cityId"), city.attr("cityId"))).perform().cost)
-    })})
+    }, this)})
     
     test("the numbers of rows involved in an order is the cost", function(){this.$R(function(){
       resolve()

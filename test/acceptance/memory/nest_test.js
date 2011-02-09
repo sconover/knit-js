@@ -4,7 +4,7 @@ require("knit/engine/memory")
 describe("In Memory Engine", function() {
     
   beforeEach(function() {
-    knit._util.bind(setupAcceptanceFixtures, this)(new knit.engine.Memory())
+    knit._util.bind(setupAcceptanceFixtures, this)(knit.engine.memory.createRelation)
   })
 
   describe("nest.  matching on duplicate/ordered parent rows, and take the other columns and group them into 'subrows'.", function() {

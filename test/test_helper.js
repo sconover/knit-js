@@ -26,10 +26,10 @@ for(var key in jasmine) {
 }
 
 
-setupPersonHouseCity = function(target, createRelationFunction) {
-  target.person = createRelationFunction("person", ["personId", "houseId", "name", "age"])
-  target.house = createRelationFunction("house", ["houseId", "address", "cityId"])
-  target.city = createRelationFunction("city", ["cityId", "name"])  
+setupPersonHouseCity = function(target, createRelation) {
+  target.person = createRelation("person", ["personId", "houseId", "name", "age"])
+  target.house = createRelation("house", ["houseId", "address", "cityId"])
+  target.city = createRelation("city", ["cityId", "name"])  
   
   target.$R = knit.createBuilderFunction({bindings:{
     person:target.person,

@@ -4,7 +4,7 @@ require("knit/engine/memory")
 regarding("In Memory Engine", function() {
     
   beforeEach(function() {
-    knit._util.bind(setupAcceptanceFixtures, this)(new knit.engine.Memory())
+    knit._util.bind(setupAcceptanceFixtures, this)(knit.engine.memory.createRelation)
   })
 
   regarding("Divide - relational divsion (think: opposite of cartesian join)", function() {

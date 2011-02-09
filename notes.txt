@@ -120,7 +120,7 @@ jasmine-node at-exit merge
 style: property or function?  name vs name().  cost, or cost() ?  etc
   general style audit
 
-what's the point of knit.engine.Memory?
+what's the point of knit.engine.memory?
 
 organization...
   implementations of different parts of the algebra

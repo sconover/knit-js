@@ -16,7 +16,7 @@ xregarding("sql", function() {
   })
   
   xtest("creating a relation means create the table", function(){
-    engine.createRelation("person", [
+    engine.this.createRelation("person", [
       ["id", knit.engine.sql.IntegerType],
       ["houseId", knit.engine.sql.IntegerType],
       ["name", knit.engine.sql.StringType],
@@ -34,7 +34,7 @@ xregarding("sql", function() {
   })
   
   xtest("you get a table object back, which is a kind of relation", function(){
-    var person = engine.createRelation("person", [
+    var person = engine.this.createRelation("person", [
       ["id", knit.engine.sql.IntegerType],
       ["houseId", knit.engine.sql.IntegerType],
       ["name", knit.engine.sql.StringType],
@@ -47,12 +47,12 @@ xregarding("sql", function() {
   })
   
   // test("attribute equality", function(){
-  //   var person = engine.createRelation("person", [
+  //   var person = engine.this.createRelation("person", [
   //     ["id", knit.engine.sql.IntegerType],
   //     ["houseId", knit.engine.sql.IntegerType]
   //   ])
   //   
-  //   var house = engine.createRelation("house", [
+  //   var house = engine.this.createRelation("house", [
   //     ["houseId", knit.engine.sql.IntegerType]
   //   ])
   //   

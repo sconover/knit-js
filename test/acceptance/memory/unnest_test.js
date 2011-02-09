@@ -4,7 +4,7 @@ require("knit/engine/memory")
 describe("In Memory Engine", function() {
     
   beforeEach(function() {
-    knit._util.bind(setupAcceptanceFixtures, this)(new knit.engine.Memory())
+    knit._util.bind(setupAcceptanceFixtures, this)(knit.engine.memory.createRelation)
   })
 
   describe("unnest.  take grouped up 'subrows' and flatten them into the parent structure.", function() {
@@ -15,7 +15,7 @@ describe("In Memory Engine", function() {
 
     test("simple.  flattens the nested relation by distributing.", function (){
       var housePeopleNested = 
-        this.engine.createRelation(
+        this.createRelation(
           "housePeople", 
           [
            this.house.attr("houseId"), 
@@ -49,7 +49,7 @@ describe("In Memory Engine", function() {
     
     test("multiple levels of unnesting", function (){
       var housePeople = 
-        this.engine.createRelation(
+        this.createRelation(
           "housePeople", 
           [
            this.house.attr("houseId"), this.house.attr("address"),
@@ -57,7 +57,7 @@ describe("In Memory Engine", function() {
           ])
       
       var cityHousesPeopleNested = 
-        this.engine.createRelation(
+        this.createRelation(
           "cityHousesPeople", 
           [
            this.city.attr("cityId"), this.city.attr("name"), 

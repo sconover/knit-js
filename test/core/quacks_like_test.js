@@ -1,6 +1,7 @@
-require("./test_helper.js")
-require("knit/quacks_like")
-require("./algebra/../test_relation.js")
+require("../test_helper.js")
+require("knit/namespaces")
+require("knit/core/quacks_like")
+require("../test_relation.js")
 
 regarding("slightly-more-formal duck typing support. " +
           "see http://fitzgeraldnick.com/weblog/39/", function() {

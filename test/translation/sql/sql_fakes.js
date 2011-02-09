@@ -1,5 +1,4 @@
 require("knit/core")
-require("knit/attributes")
 
 require("test_relation")
 

@@ -1,5 +1,5 @@
 require("../test_helper.js")
-require("knit/attributes")
+require("knit/core")
 require("./../test_relation.js")
 
 //does this really belong under algebra?

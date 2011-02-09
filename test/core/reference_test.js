@@ -1,7 +1,8 @@
-require("./test_helper.js")
-require("knit/reference")
+require("../test_helper.js")
+require("knit/namespaces")
+require("knit/core/reference")
 require("knit/algebra/rename")
-require("./test_relation.js")
+require("../test_relation.js")
 
 regarding("references allow late-binding of core relations and attributes. " +
           "and it allows knit to support situations where relations and attributes are brought into being late in runtime " +

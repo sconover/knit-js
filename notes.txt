@@ -20,9 +20,15 @@ an engine "executes" a relation and brings back rows(tuples)
 
 more complex sql translations
 
-give up and convert to standard describe / it / expect
+good errors.  knit has guardrails
+  ...anything you can put in a dsl expression should have good guardrails / error / type checking.
+  List places that need guardrails:
+    relation doesn't exist
+    attr doesn't exist
+    foo.bar <= needs to be in this format
+    stuff is null or not of the appropriate type    
 
-use google closure set?
+give up and convert to standard describe / it / expect
 
 RA concepts:
   relational division ("divide ?") http://en.wikipedia.org/wiki/Relational_algebra#Division
@@ -33,10 +39,6 @@ RA concepts:
   antijoin
   full outer join
   
-easy way to rename joins / divides?
-  or just implement rename?
-  or implement rename, then make a shortcut?  or not?
-
 RF more complex functions using local functions
 
 relation ref equality doesn't go both ways...
@@ -72,20 +74,10 @@ knit(array of js objects) ==> mem relation with rows - headers are stripped out,
 knit(sqlite table) => sqlite relation
   knit._util.bindRelation
 
-consider inner join
-  defaults to join predicate that takes leftnameId and matches to the same on the right
-
 nest / unnest
   cost
   prove that cost is low...implement as n+1 strategy, then RF to sorts + weaving
     ...should it impose its own order.asc on the relation?
-
-good errors.  knit has guardrails
-  relation doesn't exist
-  attr doesn't exist
-  foo.bar <= needs to be in this format
-  stuff is null or not of the appropriate type
-  ...anything you can put in a dsl expression should have good guardrails / error / type checking.
 
 project - *, exceptions
 

@@ -34,6 +34,17 @@ regarding("select", function() {
       )
     })
     
+    test("'and' is implied between wheres", function(){
+      assert.equal(
+        {sql:"select * from person where person.name = ? and person.age = ? and ? = ?", values:["Jane", 5, 7, 7]},
+        new sql.Select().
+          from("person").
+          where(new sql.predicate.Equals(new sql.Column("person.name"), "Jane")).
+          where(new sql.predicate.Equals(new sql.Column("person.age"), 5)).
+          where(new sql.predicate.Equals(7, 7)).toStatement()
+      )
+    })
+    
     test("where clause - conjunction", function(){
       assert.equal(
         {sql:"select * from person where person.name = ? and person.age = ?", values:["Jane", 5]},

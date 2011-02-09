@@ -27,6 +27,5 @@ regarding("join to sql", function() {
         join(new sql.Join("person", "house", new sql.predicate.Equals(new sql.Column("house.houseId"), new sql.Column("person.houseId")))),
       join.toSql()
     )
-  })
-
+  })  
 })

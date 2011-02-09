@@ -17,5 +17,23 @@ regarding("starting relation", function() {
       relation.toSql()
     )
   })
+  
+  regarding("to statement", function(){
 
+    test("simple select statement.  what defaults to star.", function(){
+      assert.equal(
+        "select * from person",
+        new sql.Select().from("person").toStatement()
+      )
+    })
+    
+    test("multiple froms", function(){
+      assert.equal(
+        "select * from person, house",
+        new sql.Select().from("person", "house").toStatement()
+      )
+    })
+    
+  })
+  
 })

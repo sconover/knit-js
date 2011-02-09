@@ -7,7 +7,7 @@ regarding("project(proh-JEKT)", function() {
   beforeEach(function(){ setupPersonHouseCity(this, function(name, attributeNames){return new FakeTable(name, attributeNames)}) })
   var sql = knit.translation.sql
 
-  regarding("translate relation to sql object", function(){  
+  regarding("expression to sql object", function(){  
 
     test("convert a project(proh-JEKT) to sql", function(){
       var project = this.$R(function(){

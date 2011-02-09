@@ -7,7 +7,7 @@ regarding("starting relation", function() {
   beforeEach(function(){ setupPersonHouseCity(this, function(name, attributeNames){return new FakeTable(name, attributeNames)}) })
   var sql = knit.translation.sql
   
-  regarding("translate relation to sql object", function(){
+  regarding("translate expression to sql object", function(){
     
     test("convert a straight relation reference to sql", function(){
       var relation = this.$R(function(){

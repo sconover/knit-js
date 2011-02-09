@@ -734,7 +734,7 @@ or perhaps it's the joiner that makes the decision:
 
 ===========
 
-set up all the namespaces for a module in one place?
+set up all the namespace for a module in one place?
 
 require("arel/attributes/namespace")
 

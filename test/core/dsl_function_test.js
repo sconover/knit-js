@@ -1,5 +1,5 @@
 require("../test_helper.js")
-require("knit/namespaces")
+require("knit/namespace")
 require("knit/core/dsl_function")
 
 regarding("a dsl function presents a set of objects to a user-defined function as locals", function() {

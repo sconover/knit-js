@@ -1,5 +1,5 @@
 require("../test_helper.js")
-require("knit/namespaces")
+require("knit/namespace")
 require("knit/core/reference")
 require("knit/algebra/rename")
 require("../test_relation.js")

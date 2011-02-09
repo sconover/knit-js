@@ -1,6 +1,4 @@
 require("../../test_helper")
-require("knit/engine/sqlite/create_table")
-require("knit/engine/sqlite/insert")
 require("knit/engine/sqlite/db")
 
 regarding("sqlite db", function() {
@@ -8,7 +6,7 @@ regarding("sqlite db", function() {
   var _A = CollectionFunctions.Array.functions
   
   beforeEach(function(){
-    db = new knit.engine.sql.Sqlite(":memory:")
+    db = new knit.engine.sqlite.Database(":memory:")
     db.open()
   })
   

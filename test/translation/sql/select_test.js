@@ -34,12 +34,17 @@ regarding("select", function() {
       )
     })
     
-    xtest("where clause - nested", function(){
+    test("where clause - conjunction", function(){
       assert.equal(
-        {sql:"select * from person where person.name = ?", values:["Jane"]},
+        {sql:"select * from person where person.name = ? and person.age = ?", values:["Jane", 5]},
         new sql.Select().
           from("person").
-          where(new sql.predicate.Equals(new sql.Column("person.name"), "Jane")).toStatement()
+          where(
+            new sql.predicate.And(
+              new sql.predicate.Equals(new sql.Column("person.name"), "Jane"),
+              new sql.predicate.Equals(new sql.Column("person.age"), 5)
+            )
+          ).toStatement()
       )
     })
     

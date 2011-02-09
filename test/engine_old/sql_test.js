@@ -1,8 +1,8 @@
-require("../test_helper")
-require("knit/engine/sql")
-require("knit/engine/sql/db/sqlite")
+// require("../test_helper")
+// require("knit/engine/sql")
+// require("knit/engine/sql/db/sqlite")
 
-regarding("sql", function() {
+xregarding("sql", function() {
   var _A = CollectionFunctions.Array.functions
 
   beforeEach(function(){

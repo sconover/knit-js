@@ -1,7 +1,7 @@
-require("../../../test_helper")
-require("knit/engine/sql/statements/ddl")
+// require("../../../test_helper")
+// require("knit/engine/sql/statements/ddl")
 
-regarding("ddl statements", function() {
+xregarding("ddl statements", function() {
   
   regarding("create table", function() {
 

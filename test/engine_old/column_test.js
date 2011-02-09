@@ -1,7 +1,6 @@
-require("../../test_helper")
-require("knit/engine/sql/Column")
 
-regarding("sql - Column", function() {
+
+xregarding("sql - Column", function() {
   test("two Columns are the same if they have the same name and table name", function(){
     assert.same(new knit.engine.sql.Column("houseId", "person"),
                 new knit.engine.sql.Column("houseId", "person"))

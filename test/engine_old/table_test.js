@@ -1,9 +1,9 @@
-require("../../test_helper")
-require("knit/engine/sql/statements/ddl")
-require("knit/engine/sql/table")
-require("knit/engine/sql/db/sqlite")
+// require("../../test_helper")
+// require("knit/engine/sql/statements/ddl")
+// require("knit/engine/sql/table")
+// require("knit/engine/sql/db/sqlite")
 
-regarding("sql - table", function() {
+xregarding("sql - table", function() {
   beforeEach(function(){
     db = new knit.engine.sql.Sqlite(":memory:")
     db.open()

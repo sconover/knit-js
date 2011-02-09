@@ -1,7 +1,7 @@
-require("../../../test_helper")
-require("knit/engine/sql/statements/insert")
+// require("../../../test_helper")
+// require("knit/engine/sql/statements/insert")
 
-regarding("insert statement", function() {
+xregarding("insert statement", function() {
   
   regarding("to sql", function() {
 

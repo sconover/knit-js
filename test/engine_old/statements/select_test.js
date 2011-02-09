@@ -1,7 +1,7 @@
-require("../../../test_helper")
-require("knit/engine/sql/statements/select")
+// require("../../../test_helper")
+// require("knit/engine/sql/statements/select")
 
-regarding("select statement", function() {
+xregarding("select statement", function() {
   
   regarding("to sql", function() {
     beforeEach(function(){

@@ -1,10 +1,11 @@
 ok now get the *sqlite* engine working
-  junk the previous engine/sql/sqlite stuff
+  an attribute has a type
   implement merge, a basic relation
   forget about types?  can I?
     ...or push types up?
   drive toward working integration test
-
+  ...may not be able to assume row order with sqlite...
+    use a set just for assertion purposes right now?
 a translation converts a relation to another form
 an engine "executes" a relation and brings back rows(tuples)
   an engine may find it convenient to translate a relation and then execute the translation.

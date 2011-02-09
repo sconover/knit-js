@@ -30,6 +30,7 @@ regarding("sqlite db", function() {
   
   
   regarding("create table", function(){
+
     test("requires attribute type information and information about the primary key",function(){
       this.db.createTable("foo", [["id",type.Integer], ["color",type.String]], ["id"])
       
@@ -37,9 +38,15 @@ regarding("sqlite db", function() {
         [{name:"id", type:"int", pk:"1"},
          {name:"color", type:"string", pk:"0"}],
         this.db.columnInformation("foo")
-      )
-      
-    })    
+      )      
+    }) 
+           
+    xtest("a table object quacks like a relation",function(){
+      var table = this.db.createTable("foo", [["id",type.Integer], ["color",type.String]], ["id"])
+      assert.quacksLike(table, knit.signature.relation)
+    }) 
+    
+       
   })
   
   // xtest("table definition", function(){

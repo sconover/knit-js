@@ -1,5 +1,6 @@
 require("../../test_helper")
 require("knit/core")
+require("knit/engine/sqlite/type_mapping")
 require("knit/engine/sqlite/table")
 require("knit/engine/sqlite/column")
 
@@ -13,6 +14,11 @@ regarding("column", function() {
   
   test("quackslike attribute", function(){
     assert.quacksLike(new sqlite.Column({name:"color", type:"string"}, fooTable), knit.signature.attribute)
+  })
+  
+  test("type is general knit type", function(){
+    assert.equal(type.String, new sqlite.Column({name:"color", type:"string"}, fooTable).type())
+    assert.equal(type.Integer, new sqlite.Column({name:"color", type:"int"}, fooTable).type())
   })
   
   test("sameness and equivalence", function(){

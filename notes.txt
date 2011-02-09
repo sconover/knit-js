@@ -1,3 +1,5 @@
+attribute signature should include type
+
 ok now get the *sqlite* engine working
   an attribute has a type
   implement merge, a basic relation
@@ -27,6 +29,7 @@ good errors.  knit has guardrails
     attr doesn't exist
     foo.bar <= needs to be in this format
     stuff is null or not of the appropriate type    
+    unknown column type
 
 give up and convert to standard describe / it / expect
 

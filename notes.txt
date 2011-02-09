@@ -4,6 +4,13 @@ an engine "executes" a relation and brings back rows(tuples)
   you might think of an engine as a relation implementation
     or a relation evaluation/execution environment
       ...actually engine isn't a bad word
+  an engine may speak a certain dialect
+    translate to sql
+      ...sql dialect is the translation classes specially modified?
+      ...so, can translation classes go to a canonical sql?
+        yes
+
+more complex sql translations
 
 give up and convert to standard describe / it / expect
 

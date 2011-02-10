@@ -46,4 +46,8 @@ regarding("table", function() {
                    new sqlite.Table("foo", [{name:"zzz", type:"string", pk:"0"}], this.db))
   })
   
+  test("quacks like relation", function(){
+    assert.quacksLike(new sqlite.Table("foo", [{name:"color", type:"string", pk:"0"}], this.db), knit.signature.relation)
+  })
+  
 })

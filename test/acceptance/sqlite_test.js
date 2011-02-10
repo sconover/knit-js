@@ -1,11 +1,14 @@
 require("./helper")
-//require("knit/engine/sqlite")
+require("knit/engine/sqlite")
 
 xregarding("Sqlite Engine", function() {
     
   beforeEach(function() {
-    knit._util.bind(setupAcceptanceFixtures, this)(knit.engine.memory.createRelation)
+    this.db = new knit.engine.sqlite.Database(":memory:"); this.db.open()
+    knit._util.bind(setupAcceptanceFixtures, this)(knit._util.bind(this.db.createTable,this.db))
   })
+  
+  afterEach(function(){ this.db.close() })
 
   regarding("Basics", function() {
 

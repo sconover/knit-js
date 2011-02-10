@@ -35,6 +35,22 @@ regarding("table", function() {
       assert.notSame(foo.attr("color"), bar.attr("color"))
     })
     
+    test("objects", function(){
+      this.db.execute({sql:"create table foo(id int primary key, color string)"})
+      this.db.execute({sql:"insert into foo values(1, 'blue')"})
+      this.db.execute({sql:"insert into foo values(2, 'red')"})
+      this.db.execute({sql:"insert into foo values(3, 'green')"})
+
+      var foo = sqlite.Table.load(this.db, "foo")
+      assert.equal([
+          {id:1, color:'blue'},
+          {id:2, color:'red'},
+          {id:3, color:'green'}
+        ],
+        foo.objects()
+      )
+      
+    })
   })
   
   test("same", function(){

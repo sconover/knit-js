@@ -34,11 +34,6 @@ regarding("sqlite db", function() {
         this.db.columnInformation("foo")
       )      
     }) 
-           
-    xtest("a table object quacks like a relation",function(){
-      var table = this.db.createTable("foo", [["id",type.Integer],["color",type.String]], ["id"])
-      assert.quacksLike(table, knit.signature.relation)
-    }) 
     
   })
   

@@ -1,3 +1,3 @@
 require("./test_helper")
 
-jasmine.requireAllSpecFiles(__dirname)
+jasmine.requireAllSpecFiles(__dirname, "^.+\.(_test.js)$")

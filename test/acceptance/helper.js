@@ -1,5 +1,7 @@
 require("../test_helper.js")
 
+feature = {}
+
 setupAcceptanceFixtures = function(createRelation) {
   setupPersonHouseCity(this, createRelation)
 

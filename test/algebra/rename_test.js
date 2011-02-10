@@ -4,11 +4,7 @@ require("./../test_relation.js")
 
 regarding("rename", function() {
     
-  beforeEach(function() {
-    this.$R = knit.createBuilderFunction({bindings:{
-      person:new TestRelation(["id", "houseId", "name", "age"])
-    }})
-  })
+  beforeEach(function(){ setupPersonHouseCity(this) })
 
   test("inspect", function(){this.$R(function(){
     assert.equal("rename(*person,martian)", 

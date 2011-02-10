@@ -4,14 +4,14 @@ require("../relation_proof")
 
 regarding("memory", function() {
   beforeEach(function(){
-    var r = knit.engine.memory.createRelation("foo", ["a", "b"])
+    var r = knit.engine.memory.createRelation("foo", [["a",knit.attributeType.Integer], ["b",knit.attributeType.String]])
     this.r = r
     this.$R = knit.createBuilderFunction({bindings:{
       r:r
     }})
   })
   
-  relationProof("MemoryRelation", function(attributeNames){ return knit.engine.memory.createRelation("x", attributeNames) } )
+  relationProof("MemoryRelation", function(attributeNamesAndTypes){ return knit.engine.memory.createRelation("x", attributeNamesAndTypes) } )
   
   regarding("MemoryRelation inspect", function() {
     test("inspect", function(){
@@ -94,9 +94,15 @@ regarding("memory", function() {
     })})
     
     test("join cost usually depends greatly on whether a good join predicate is available", function(){this.$R(function(){
-      var person = knit.engine.memory.createRelation("person", ["id", "houseId", "name", "age"])
-      var house = knit.engine.memory.createRelation("house", ["houseId", "address", "cityId"])
-      var city = knit.engine.memory.createRelation("city", ["cityId", "name"])
+      var person = knit.engine.memory.createRelation("person", [["id", knit.attributeType.Integer], 
+                                                                ["houseId", knit.attributeType.Integer], 
+                                                                ["name", knit.attributeType.String], 
+                                                                ["age", knit.attributeType.String]])
+      var house = knit.engine.memory.createRelation("house", [["houseId", knit.attributeType.Integer], 
+                                                              ["address", knit.attributeType.String],
+                                                              ["cityId", knit.attributeType.String]])
+      var city = knit.engine.memory.createRelation("city", [["cityId", knit.attributeType.Integer], 
+                                                            ["name", knit.attributeType.String]])
       
       person.merge([
         [1, 101, "Jane", 5],

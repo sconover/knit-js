@@ -1,6 +1,5 @@
 require("../test_helper.js")
-require("knit/namespace")
-require("knit/core/reference")
+require("knit/core")
 require("knit/algebra/rename")
 require("../test_relation.js")
 
@@ -9,7 +8,7 @@ regarding("references allow late-binding of core relations and attributes. " +
           " - creation of nested attributes in nest, creating of new relations in normalize, etc.", function() {
     
   beforeEach(function() {
-    this.person = new TestRelation(["id", "houseId", "name", "age"])
+    setupPersonHouseCity(this)
     this.environment = new knit.ReferenceEnvironment()
   })
 
@@ -107,18 +106,14 @@ regarding("references allow late-binding of core relations and attributes. " +
   
   regarding("nested attribute reference", function() {
     
-    beforeEach(function() {
-      this.person = new TestRelation(["id", "name", "age"])
-      this.house = new TestRelation(["id"])
-      
-
+    beforeEach(function(){ 
+      setupPersonHouseCity(this) 
       this.environment = new knit.ReferenceEnvironment()
     })
     
-    
     test("you can refer to nested attributes as strings and then resolve to real attributes at perform time. " +
          "the same thing happens to the attributes that are nested", function(){
-      var peopleRef = this.environment.attr("people", this.environment.attr("person.id", "person.age"))
+      var peopleRef = this.environment.attr("people", this.environment.attr("person.personId", "person.age"))
       
       assert.equal(peopleRef.name(), "people")
       assert.equal(knit.NullRelation, peopleRef.sourceRelation())
@@ -129,7 +124,7 @@ regarding("references allow late-binding of core relations and attributes. " +
       
       assert.equal(peopleRef.name(), "people")
       assert.same(this.house, peopleRef.sourceRelation())
-      assert.arraySame(peopleRef.nestedRelation().attributes(), [this.person.attr("id"), this.person.attr("age")])
+      assert.arraySame(peopleRef.nestedRelation().attributes(), [this.person.attr("personId"), this.person.attr("age")])
     })
 
     //what about nested attrs post-resolve?
@@ -137,26 +132,26 @@ regarding("references allow late-binding of core relations and attributes. " +
       //or rather, the attribute becomes real and then the parent attribute stops pointing at the unresolved reference
 
     test("inspect", function(){
-      assert.equal("*people", this.environment.attr("people", this.environment.attr("person.id", "person.age")).inspect())
+      assert.equal("*people", this.environment.attr("people", this.environment.attr("person.personId", "person.age")).inspect())
     })
     
       
     regarding("sameness and equivalence", function() {
     
       test("two unresolved references naming the same attribute are the same", function(){
-        assert.same(this.environment.attr("people", this.environment.attr("person.id", "person.age")), 
-                    this.environment.attr("people", this.environment.attr("person.id", "person.age")))
-        assert.notSame(this.environment.attr("peopleZZ", this.environment.attr("person.id", "person.age")), 
-                       this.environment.attr("people", this.environment.attr("person.id", "person.age")))
+        assert.same(this.environment.attr("people", this.environment.attr("person.personId", "person.age")), 
+                    this.environment.attr("people", this.environment.attr("person.personId", "person.age")))
+        assert.notSame(this.environment.attr("peopleZZ", this.environment.attr("person.personId", "person.age")), 
+                       this.environment.attr("people", this.environment.attr("person.personId", "person.age")))
       })
       
       test("...in fact, it's the same object", function(){
-        assert.equal(true, this.environment.attr("people", this.environment.attr("person.id", "person.age")) === 
+        assert.equal(true, this.environment.attr("people", this.environment.attr("person.personId", "person.age")) === 
                            this.environment.attr("people"))
       })
     
       test("two resolved references to the same attribute are the same(both ways)", function(){
-        var peopleRef = this.environment.attr("people", this.environment.attr("person.id", "person.age"))
+        var peopleRef = this.environment.attr("people", this.environment.attr("person.personId", "person.age"))
         peopleRef.setSourceRelation(this.environment.relation("house"))
         this.environment.resolve({person:this.person, house:this.house})
         
@@ -165,10 +160,10 @@ regarding("references allow late-binding of core relations and attributes. " +
       })
       
       test("equivalent is like same", function(){
-        assert.equivalent(this.environment.attr("people", this.environment.attr("person.id", "person.age")), 
-                          this.environment.attr("people", this.environment.attr("person.id", "person.age")))
-        assert.notEquivalent(this.environment.attr("people", this.environment.attr("person.id", "person.age")), 
-                             this.environment.attr("peopleZZ", this.environment.attr("person.id", "person.age")))
+        assert.equivalent(this.environment.attr("people", this.environment.attr("person.personId", "person.age")), 
+                          this.environment.attr("people", this.environment.attr("person.personId", "person.age")))
+        assert.notEquivalent(this.environment.attr("people", this.environment.attr("person.personId", "person.age")), 
+                             this.environment.attr("peopleZZ", this.environment.attr("person.personId", "person.age")))
       })
         
     })

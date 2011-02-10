@@ -32,7 +32,10 @@ regarding("In Memory Engine", function() {
     })
     
     test("primary key - replace rows a row if it's a dup", function (){
-      var person2 = this.createRelation("person", ["personId", "houseId", "name", "age"], ["personId"])
+      var person2 = this.createRelation("person", [["personId", knit.attributeType.Integer], 
+                                                   ["houseId", knit.attributeType.Integer], 
+                                                   ["name", knit.attributeType.String], 
+                                                   ["age", knit.attributeType.String]], ["personId"])
 
       person2.merge([
         [1, 101, "Jane", 5],

@@ -19,17 +19,17 @@ regarding("table", function() {
     })
     
     test("attributes", function(){
-      this.db.execute({sql:"create table foo(id int primary key, color string, age integer)"})
+      this.db.execute({sql:"create table foo(id int primary key, color string, age int)"})
       this.db.execute({sql:"create table bar(id int primary key, color string)"})
 
       var foo = sqlite.Table.load(this.db, "foo")
-      // assert.equal([
-      //     ["id", type.Integer], 
-      //     ["color", type.String], 
-      //     ["age", type.Integer]
-      //   ],
-      //   foo.attributes().namesAndTypes()
-      // )
+      assert.equal([
+          ["id", type.Integer], 
+          ["color", type.String], 
+          ["age", type.Integer]
+        ],
+        foo.attributes().namesAndTypes()
+      )
       
       var bar = sqlite.Table.load(this.db, "bar")
       assert.same(foo.attr("color"), foo.attr("color"))

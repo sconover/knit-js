@@ -11,7 +11,7 @@ xregarding("memory", function() {
     }})
   })
   
-  relationProof("SqliteRelation", function(attributeNames){ return new knit.engine.Sqlite().this.createRelation("x", attributeNames) } )
+  // relationProof("SqliteRelation", function(attributeNamesAndTypes){ return new knit.engine.Sqlite().this.createRelation("x", attributeNamesAndTypes) } )
   
   xregarding("MemoryRelation inspect", function() {
     test("inspect", function(){

@@ -4,17 +4,11 @@ require("./../test_relation.js")
 
 regarding("join", function() {
     
-  beforeEach(function() {
-    this.$R = knit.createBuilderFunction({bindings:{
-      person:new TestRelation(["id", "houseId", "name", "age"]),
-      house:new TestRelation(["houseId", "address", "cityId"]),
-      city:new TestRelation(["cityId", "name"])
-    }})
-  })
+  beforeEach(function(){ setupPersonHouseCity(this) })
   
   test("combines the attributes of the two relations", function (){
     var join = this.$R(function(){return join(relation("person"), relation("house"))})
-    assert.equal(["id", "houseId", "name", "age", "houseId", "address", "cityId"], join.attributes().names())
+    assert.equal(["personId", "houseId", "name", "age", "houseId", "address", "cityId"], join.attributes().names())
   })
   
   test("inspect", function(){this.$R(function(){

@@ -7,10 +7,13 @@ require("./../test_relation.js")
 regarding("attributes", function() {
     
   beforeEach(function() {
-    var person = new TestRelation(["personId", "houseId", "name", "age"])
+    setupPersonHouseCity(this)
+    this.house = new TestRelation([["houseId", knit.attributeType.Integer], 
+                                   ["address", knit.attributeType.String], 
+                                   {"people":this.person}])
     this.$R = knit.createBuilderFunction({bindings:{
-      person:person,
-      house:new TestRelation(["houseId", "address", {"people":person}])
+      person:this.person,
+      house:this.house
     }})
   })
 
@@ -40,6 +43,16 @@ regarding("attributes", function() {
                  new knit.Attributes([attr("house.people"), attr("person.name")]).names())
   })})
 
+  test("types", function(){
+    assert.equal([knit.attributeType.Integer, knit.attributeType.String], 
+                 new knit.Attributes([this.house.attr("houseId"), this.person.attr("name")]).types())
+  })
+
+  test("namesAndTypes", function(){
+    assert.equal([["houseId",knit.attributeType.Integer], ["name",knit.attributeType.String]], 
+                 new knit.Attributes([this.house.attr("houseId"), this.person.attr("name")]).namesAndTypes())
+  })
+
   test("get single", function(){this.$R(function(){
     var attributes = new knit.Attributes([attr("house.people"), attr("person.name")])
     assert.equal(attr("house.people"), attributes.get("people"))
@@ -52,12 +65,9 @@ regarding("attributes", function() {
 
   test("splice nested attribute - puts the nested attribute in the first place one " +
        "of the consitutent attributes is found, then removes the constituent attributes from the top level", function(){
-    var original = this.$R(function(){
-      return new knit.Attributes(attr("house.houseId", "person.personId", "person.name", "house.address", "person.age"))
-    })
-    var house = this.$R(function(){return relation("house")})
-
-    var splicedIn = original.spliceInNestedAttribute(house.attr("people"))
+    var original = new knit.Attributes([this.house.attr("houseId"), this.person.attr("personId"), this.person.attr("name"), 
+                                        this.house.attr("address"), this.person.attr("age")])
+    var splicedIn = original.spliceInNestedAttribute(this.house.attr("people"))
     assert.equal(["houseId", "people", "address"], splicedIn.names())
   })
 

@@ -6,24 +6,27 @@ TestRelation = function() {
   
   var _id = 0
   
-  var F = function(attributeNames) {
+  var F = function(attributeNamesAndTypes) {
     _id += 1
     this._id = "test_" + _id
     var self = this
     
-    if (attributeNames.constructor == knit.Attributes) {
-      this._attributes = attributeNames
+    if (attributeNamesAndTypes.constructor == knit.Attributes) {
+      this._attributes = attributeNamesAndTypes
     } else {
       this._attributes = new knit.Attributes(
-        _A.map(attributeNames, function(attr){
-          if (attr.name) {
-            return attr
-          } else if (typeof attr == "string") {
-            var attributeName = attr
-            return new TestAttribute(attributeName, self)
+        _A.map(attributeNamesAndTypes, function(nameAndType){
+          // if (typeof nameAndType == "string") console.log(nameAndType)
+          
+          if (nameAndType.name) {
+            return nameAndType
+          } else if (nameAndType.length && nameAndType.length==2) {
+            var attributeName = nameAndType[0]
+            var attributeType = nameAndType[1]
+            return new TestAttribute(attributeName, attributeType, self)
           } else {
-            var attributeName = _.keys(attr)[0]
-            var nestedRelation = _.values(attr)[0]
+            var attributeName = _.keys(nameAndType)[0]
+            var nestedRelation = _.values(nameAndType)[0]
             return new TestNestedAttribute(attributeName, nestedRelation, self)
           }      
         })
@@ -57,12 +60,14 @@ TestRelation = function() {
 }()
 
 TestAttribute = function() {
-  var F = function(name, sourceRelation) {
+  var F = function(name, type, sourceRelation) {
     this._name = name
+    this._type = type
     this._sourceRelation = sourceRelation
   }; var p = F.prototype
 
   p.name = function() { return this._name }
+  p.type = function() { return this._type }
   p.sourceRelation = function() { return this._sourceRelation }
   p.isSame = p.isEquivalent = function(other) {
     return knit.quacksLike(other, knit.signature.attribute) &&
@@ -83,6 +88,7 @@ TestNestedAttribute = function() {
   }; var p = F.prototype
   
   p.name = function() { return this._name }
+  p.type = function() { return knit.attributeType.Nested }
   p.sourceRelation = function() { return this._sourceRelation }
   p.nestedRelation = function() { return this._nestedRelation }
   p.isSame = p.isEquivalent = function(other) {

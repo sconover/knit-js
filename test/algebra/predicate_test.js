@@ -5,16 +5,7 @@ require("./../test_relation.js")
 
 regarding("predicates", function() {
 
-  beforeEach(function() {
-    var person = new TestRelation(["id", "houseId", "name", "age"])
-    this.person = person
-    this.$R = knit.createBuilderFunction({bindings:{
-      person:person,
-      house:new TestRelation(["houseId", "address", "cityId"]),
-      city:new TestRelation(["cityId", "name"])
-    }})
-  })
-
+  beforeEach(function(){ setupPersonHouseCity(this) })
   
   test("sameness", function(){this.$R(function(){
     assert.same(TRUE, TRUE)

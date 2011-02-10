@@ -6,7 +6,7 @@ relationProof("TestRelation", function(attributeNames){ return new TestRelation(
 
 regarding("TestRelation inspect", function() {
   test("inspect", function (){
-    var r = new TestRelation(["a", "b"])
+    var r = new TestRelation([["a", knit.attributeType.Integer], ["b", knit.attributeType.Integer]])
 
     assert.equal("r[a,b]", r.inspect())
   })

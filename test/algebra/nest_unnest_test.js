@@ -6,9 +6,13 @@ require("./../test_relation.js")
 regarding("unnest", function() {
     
   beforeEach(function() {
+    setupPersonHouseCity(this)
+    this.house = new TestRelation([["houseId", knit.attributeType.Integer], 
+                                   ["address", knit.attributeType.String], 
+                                   {"people":this.person}])
     this.$R = knit.createBuilderFunction({bindings:{
-      person:new TestRelation(["personId", "houseId", "name", "age"]),
-      house:new TestRelation(["houseId", "address", {"people":new TestRelation(["personId", "houseId", "name", "age"])}])
+      person:this.person,
+      house:this.house
     }})
   })
 
@@ -35,12 +39,7 @@ regarding("unnest", function() {
 
 regarding("nest", function() {
     
-  beforeEach(function() {
-    this.$R = knit.createBuilderFunction({bindings:{
-      person:new TestRelation(["personId", "name", "age"]),
-      house:new TestRelation(["houseId", "address"])
-    }})
-  })
+  beforeEach(function() { setupPersonHouseCity(this) })
 
   test("inspect", function(){this.$R(function(){
     var houseAndPerson = join(relation("house"), relation("person"))

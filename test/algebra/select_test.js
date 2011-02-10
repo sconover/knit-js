@@ -5,14 +5,7 @@ require("./../test_relation.js")
 
 regarding("select", function() {
     
-  beforeEach(function() {
-    this.$R = knit.createBuilderFunction({bindings:{
-      person:new TestRelation(["id", "houseId", "name", "age"]),
-      house:new TestRelation(["houseId", "address", "cityId"]),
-      city:new TestRelation(["cityId", "name"])
-    }})
-  })
-  
+  beforeEach(function(){ setupPersonHouseCity(this) })
   
   test("inspect", function(){this.$R(function(){
     assert.equal("select(*person,eq(1,1))", select(relation("person"), TRUE).inspect())

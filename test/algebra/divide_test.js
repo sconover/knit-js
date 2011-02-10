@@ -5,13 +5,7 @@ require("./../test_relation.js")
 
 regarding("divide", function() {
     
-  beforeEach(function() {
-    this.$R = knit.createBuilderFunction({bindings:{
-      person:new TestRelation(["id", "houseId", "name", "age"]),
-      house:new TestRelation(["houseId", "address", "cityId"]),
-      city:new TestRelation(["cityId", "name"])
-    }})
-  })
+  beforeEach(function(){ setupPersonHouseCity(this) })
   
   test("the resulting relation has a-b attributes", function (){
     var join = this.$R(function(){return divide(join(relation("person"), relation("house")), relation("person"))})

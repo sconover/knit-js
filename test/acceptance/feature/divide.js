@@ -1,12 +1,5 @@
-require("../helper")
-require("knit/engine/memory")
-
-regarding("In Memory Engine", function() {
-    
-  beforeEach(function() {
-    knit._util.bind(setupAcceptanceFixtures, this)(knit.engine.memory.createRelation)
-  })
-
+feature.divide = function(){
+  
   regarding("Divide - relational divsion (think: opposite of cartesian join)", function() {
 
    test("divide cartesian product by a relation", function (){
@@ -80,5 +73,4 @@ regarding("In Memory Engine", function() {
     
   })
     
-})
-
+}

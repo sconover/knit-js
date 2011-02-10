@@ -1,12 +1,5 @@
-require("../helper")
-require("knit/engine/memory")
-
-describe("In Memory Engine", function() {
-    
-  beforeEach(function() {
-    knit._util.bind(setupAcceptanceFixtures, this)(knit.engine.memory.createRelation)
-  })
-
+feature.nest = function(){
+  
   describe("nest.  matching on duplicate/ordered parent rows, and take the other columns and group them into 'subrows'.", function() {
 
     test("simple.  works with intermingled nested/non-nested columns.", function (){
@@ -156,7 +149,6 @@ describe("In Memory Engine", function() {
     }, relationContents(housePeopleNested))
     
   })
-  
-
-})
+ 
+}
 

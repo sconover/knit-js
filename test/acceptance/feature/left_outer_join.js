@@ -1,19 +1,13 @@
-require("../helper")
-require("knit/engine/memory")
+feature.leftOuterJoin = function(){
 
-describe("In Memory Engine", function() {
+  regarding("left outer join", function() {
+
+    beforeEach(function() {
+      this.person.merge([
+        [5, 104, "Felix", 10]
+      ])
+    })
     
-  beforeEach(function() {
-    knit._util.bind(setupAcceptanceFixtures, this)(knit.engine.memory.createRelation)
-    
-    this.person.merge([
-      [5, 104, "Felix", 10]
-    ])
-
-  })
-
-  describe("left outer join", function() {
-
     test("create joined rows where the predicate matches, " +
          "or if there's no predicate match for to a row on the right, " +
          "return a joined row that consists of the row on the left with nulls on the right", function (){
@@ -37,6 +31,5 @@ describe("In Memory Engine", function() {
     })
   })
   
-  
-})
+}
 

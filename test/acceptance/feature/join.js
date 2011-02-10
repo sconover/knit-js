@@ -1,12 +1,5 @@
-require("../helper")
-require("knit/engine/memory")
-
-regarding("In Memory Engine", function() {
-    
-  beforeEach(function() {
-    knit._util.bind(setupAcceptanceFixtures, this)(knit.engine.memory.createRelation)
-  })
-
+feature.join = function(){
+  
   regarding("Join (cartesian)", function() {
 
     test("combine each row on the left with each row on the right (cartesian product)", function (){
@@ -95,6 +88,4 @@ regarding("In Memory Engine", function() {
     })
   })
   
-  
-})
-
+}

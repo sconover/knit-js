@@ -1,12 +1,5 @@
-require("../helper")
-require("knit/engine/memory")
-
-describe("In Memory Engine", function() {
-    
-  beforeEach(function() {
-    knit._util.bind(setupAcceptanceFixtures, this)(knit.engine.memory.createRelation)
-  })
-
+feature.unnest = function(){
+  
   describe("unnest.  take grouped up 'subrows' and flatten them into the parent structure.", function() {
 
     beforeEach(function() {
@@ -110,6 +103,5 @@ describe("In Memory Engine", function() {
     
   })
   
-  
-})
+}
 

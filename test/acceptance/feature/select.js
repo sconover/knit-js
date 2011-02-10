@@ -1,11 +1,4 @@
-require("../helper")
-require("knit/engine/memory")
-
-describe("In Memory Engine", function() {
-    
-  beforeEach(function() {
-    knit._util.bind(setupAcceptanceFixtures, this)(knit.engine.memory.createRelation)
-  })
+feature.select = function(){    
 
   describe("Selection", function() {
     
@@ -29,5 +22,6 @@ describe("In Memory Engine", function() {
     })
           
   })
-})
+  
+}
 

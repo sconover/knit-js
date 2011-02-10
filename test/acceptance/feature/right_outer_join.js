@@ -1,18 +1,12 @@
-require("../helper")
-require("knit/engine/memory")
-
-describe("In Memory Engine", function() {
+feature.rightOuterJoin = function(){
     
-  beforeEach(function() {
-    knit._util.bind(setupAcceptanceFixtures, this)(knit.engine.memory.createRelation)
-    
-    this.house.merge([
-      [104, "Ashbury", 1001]
-    ])
-
-  })
-
   describe("right outer join", function() {
+
+    beforeEach(function() {
+      this.house.merge([
+        [104, "Ashbury", 1001]
+      ])
+    })
 
     test("create joined rows where the predicate matches, " +
          "or if there's no predicate match for to a row on the left, " +
@@ -37,6 +31,5 @@ describe("In Memory Engine", function() {
     })
   })
   
-  
-})
+}
 

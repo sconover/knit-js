@@ -1,12 +1,5 @@
-require("../helper")
-require("knit/engine/memory")
-
-describe("In Memory Engine", function() {
-    
-  beforeEach(function() {
-    knit._util.bind(setupAcceptanceFixtures, this)(knit.engine.memory.createRelation)
-  })
-
+feature.selectionPushing = function(){
+  
   describe("Selection pushing and cost", function() {
     test("pushing in a select is less costly than leaving it outside, unnecessarily", function (){
       
@@ -55,7 +48,7 @@ describe("In Memory Engine", function() {
       assert.equal(true, expression.perform().cost > expression.push().perform().cost)
     })
     
-
   })
-})
+  
+}
 

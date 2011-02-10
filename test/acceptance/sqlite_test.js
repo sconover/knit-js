@@ -1,6 +1,6 @@
 require("./helper")
+
 require("knit/engine/sqlite")
-require("acceptance/feature/basics")
 
 regarding("Sqlite Engine", function() {
     
@@ -12,5 +12,24 @@ regarding("Sqlite Engine", function() {
   
   afterEach(function(){ this.db.close() })
 
-  feature.basics()
+  with(feature) {
+  
+    basics()
+
+    // select()
+    // selectionPushing()
+    // project()
+    // order()
+    // 
+    // join()
+    // leftOuterJoin()
+    // rightOuterJoin()
+    // naturalJoin()
+    // divide()
+    // 
+    // nest()
+    // unnest()  
+    
+  }
+
 })

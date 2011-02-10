@@ -2,6 +2,22 @@ require("../test_helper.js")
 
 feature = {}
 
+require("acceptance/feature/basics")
+
+require("acceptance/feature/select")
+require("acceptance/feature/selection_pushing")
+require("acceptance/feature/project")
+require("acceptance/feature/order")
+
+require("acceptance/feature/join")
+require("acceptance/feature/left_outer_join")
+require("acceptance/feature/right_outer_join")
+require("acceptance/feature/natural_join")
+require("acceptance/feature/divide")
+
+require("acceptance/feature/nest")
+require("acceptance/feature/unnest")
+
 setupAcceptanceFixtures = function(createRelation) {
   setupPersonHouseCity(this, createRelation)
 

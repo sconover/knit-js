@@ -1,12 +1,5 @@
-require("../helper")
-require("knit/engine/memory")
-
-describe("In Memory Engine", function() {
-    
-  beforeEach(function() {
-    knit._util.bind(setupAcceptanceFixtures, this)(knit.engine.memory.createRelation)
-  })
-
+feature.project = function(){
+  
   describe("Projection", function() {
 
     test("project a subset of attributes over the relation", function (){
@@ -28,5 +21,5 @@ describe("In Memory Engine", function() {
           
   })
   
-})
+}
 

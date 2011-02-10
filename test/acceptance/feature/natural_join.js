@@ -1,13 +1,6 @@
-require("../helper")
-require("knit/engine/memory")
+feature.naturalJoin = function(){
 
-describe("In Memory Engine", function() {
-    
-  beforeEach(function() {
-    knit._util.bind(setupAcceptanceFixtures, this)(knit.engine.memory.createRelation)
-  })
-
-  describe("natural join", function() {
+  regarding("natural join", function() {
 
     test("natural join automatically creates a join predicate based on like-named columns from both tables. " +
          "in a departure from 'purity', only columns ending in Id are considered. We'll see how this goes.", function (){
@@ -30,6 +23,5 @@ describe("In Memory Engine", function() {
     })
   })
   
-  
-})
+}
 

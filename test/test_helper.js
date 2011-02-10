@@ -101,6 +101,7 @@ assert.setsEqual = function(expectedArray, actualArray) {
     "is Set-Equal")
 }
 
+
 assert._equivalent = function(expected, actual, orientation, term) {
   assert._func(function(expected, actual){return expected.isEquivalent(actual)}, expected, actual, orientation, term)
 }

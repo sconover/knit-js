@@ -47,3 +47,10 @@ getAttributes = function(relation) {
   })
 }
 
+assert.relationEqual = function(expected, relation) {
+  assert.equal(expected.name, relation.name())
+  assert.equal(expected.attributes, getAttributes(relation))
+  assert.setsEqual(expected.rows, relation.rows())
+}
+
+

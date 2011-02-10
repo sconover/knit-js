@@ -35,7 +35,7 @@ regarding("table", function() {
       assert.notSame(foo.attr("color"), bar.attr("color"))
     })
     
-    test("objects", function(){
+    test("objects and rows", function(){
       this.db.execute({sql:"create table foo(id int primary key, color string)"})
       this.db.execute({sql:"insert into foo values(1, 'blue')"})
       this.db.execute({sql:"insert into foo values(2, 'red')"})
@@ -48,6 +48,14 @@ regarding("table", function() {
           {id:3, color:'green'}
         ],
         foo.objects()
+      )
+      
+      assert.equal([
+          [1, 'blue'],
+          [2, 'red'],
+          [3, 'green']
+        ],
+        foo.rows()
       )
       
     })

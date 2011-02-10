@@ -27,7 +27,7 @@ require("vendor/jshashtable")
  * Website: http://www.timdown.co.uk/jshashtable
  */
 
-var Hashtable = (function() {
+Hashtable = (function() {
 	var FUNCTION = "function";
 
 	var arrayRemoveAt = (typeof Array.prototype.splice == FUNCTION) ?

@@ -1,7 +1,7 @@
 require("./helper")
 require("knit/engine/sqlite")
 
-xregarding("Sqlite Engine", function() {
+regarding("Sqlite Engine", function() {
     
   beforeEach(function() {
     this.db = new knit.engine.sqlite.Database(":memory:")
@@ -36,10 +36,10 @@ xregarding("Sqlite Engine", function() {
     })
     
     test("primary key - replace rows a row if it's a dup", function (){
-      var person2 = this.createTable("person", [["personId", knit.attributeType.Integer], 
-                                                ["houseId", knit.attributeType.Integer], 
-                                                ["name", knit.attributeType.String], 
-                                                ["age", knit.attributeType.String]], ["personId"])
+      var person2 = this.createRelation("person2", [["personId", knit.attributeType.Integer], 
+                                                    ["houseId", knit.attributeType.Integer], 
+                                                    ["name", knit.attributeType.String], 
+                                                    ["age", knit.attributeType.String]], ["personId"])
 
       person2.merge([
         [1, 101, "Jane", 5],
@@ -47,7 +47,7 @@ xregarding("Sqlite Engine", function() {
         [3, 102, "Fanny", 30]
       ])
       
-      assert.equal([
+      assert.setsEqual([
         [1, 101, "Jane", 5],
         [2, 101, "Puck", 12],
         [3, 102, "Fanny", 30]
@@ -57,7 +57,7 @@ xregarding("Sqlite Engine", function() {
         [1, 101, "Jeanne", 6]
       ])
 
-      assert.equal([
+      assert.setsEqual([
         [1, 101, "Jeanne", 6],
         [2, 101, "Puck", 12],
         [3, 102, "Fanny", 30]

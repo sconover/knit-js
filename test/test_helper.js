@@ -3,6 +3,8 @@ require.paths.push("lib")
 require.paths.push("../node-sqlite")
 
 require("../../jasmine-node/lib/jasmine")
+require("./vendor/jshashtable")
+require("./vendor/jshashset")
 
 jasmine.Env.prototype.regarding = jasmine.Env.prototype.describe
 jasmine.Env.prototype.xregarding = jasmine.Env.prototype.xdescribe
@@ -64,12 +66,39 @@ assert._func = function(func, expected, actual, orientation, term) {
     }
   }
   
+  function doInspect(obj) {
+    if (obj.inspect) {
+      return obj.inspect()
+    } else if (obj.push && obj.length) {
+      return CollectionFunctions.Array.functions.inspect(obj)
+    } else {
+      simpleInspect(obj)
+    }
+  }
+  
   var result = func(expected, actual)==orientation
   assert.ok(result, 
             !result &&
             term + " failure: " + 
-            "\n    expected: " + (expected.inspect ? expected.inspect() : simpleInspect(expected)) + 
-            "\n    actual:   " + (actual.inspect ? actual.inspect() : simpleInspect(actual)))
+            "\n    expected: " + doInspect(expected) + 
+            "\n    actual:   " + doInspect(actual))
+}
+
+assert.setsEqual = function(expectedArray, actualArray) {
+  var equalityFunction = CollectionFunctions.Array.functions.equals
+  
+  var expectedSet = new HashSet(undefined, equalityFunction)
+  expectedSet.addAll(expectedArray)  
+  
+  var actualSet = new HashSet(undefined, equalityFunction)
+  actualSet.addAll(actualArray)
+  
+  assert._func(
+    function(expected, actual){return expectedSet.intersection(actualSet).size()==actualSet.size()}, 
+    expectedArray, 
+    actualArray, 
+    true, 
+    "is Set-Equal")
 }
 
 assert._equivalent = function(expected, actual, orientation, term) {

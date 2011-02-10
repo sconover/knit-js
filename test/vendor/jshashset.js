@@ -27,7 +27,7 @@
  * Website: http://www.timdown.co.uk/jshashtable/
  */
 
-function HashSet(hashingFunction, equalityFunction) {
+HashSet = function(hashingFunction, equalityFunction) {
     var hashTable = new Hashtable(hashingFunction, equalityFunction);
 
     this.add = function(o) {

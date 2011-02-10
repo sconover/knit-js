@@ -7,8 +7,8 @@ FakeTable = function() {
       _ = knit._util
 
   
-  var F = function(name, attributeNames) {
-    this._testRelation = new TestRelation(attributeNames)
+  var F = function(name, attributeNamesAndTypes) {
+    this._testRelation = new TestRelation(attributeNamesAndTypes)
     this._testRelation.name = function(){return name}
     
     var self = this

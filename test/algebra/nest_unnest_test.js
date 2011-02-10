@@ -29,10 +29,6 @@ regarding("unnest", function() {
       assert.notSame(unnest(relation("house"), attr("house.people")), unnest(relation("house"), attr("house.address")))
     })})    
   
-    test("equivalence and sameness are the same thing", function(){this.$R(function(){
-      assert.equivalent(unnest(relation("house"), attr("house.people")), unnest(relation("house"), attr("house.people")))
-      assert.notEquivalent(unnest(relation("house"), attr("house.people")), unnest(relation("house"), attr("house.address")))
-    })})    
   })
   
 })

@@ -20,12 +20,6 @@ regarding("project lets you cut down the columns in a relation", function() {
       assert.notSame(project(relation("person"), [attr("person.personId")]), project(relation("house"), [attr("house.houseId")]))
     })})
         
-    test("equivalent is like same", function(){this.$R(function(){
-      assert.equivalent(project(relation("person"), attr("person.name", "person.age")), project(relation("person"), attr("person.name", "person.age")))
-      assert.notEquivalent(project(relation("person"), attr("person.name", "person.age")), project(relation("person"), [attr("person.name")]))
-      assert.notEquivalent(project(relation("person"), [attr("person.personId")]), project(relation("house"), [attr("house.houseId")]))
-    })})
-        
   })
   
 })

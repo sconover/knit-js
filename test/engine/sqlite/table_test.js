@@ -1,6 +1,5 @@
 require("../../test_helper")
-require("knit/engine/sqlite/db")
-require("knit/engine/sqlite/table")
+require("knit/engine/sqlite")
 
 regarding("table", function() {
   
@@ -36,6 +35,15 @@ regarding("table", function() {
       assert.notSame(foo.attr("color"), bar.attr("color"))
     })
     
+  })
+  
+  test("same", function(){
+    assert.same(new sqlite.Table("foo", [{name:"color", type:"string", pk:"0"}], this.db),
+                new sqlite.Table("foo", [{name:"color", type:"string", pk:"0"}], this.db))
+    assert.notSame(new sqlite.Table("foo", [{name:"color", type:"string", pk:"0"}], this.db),
+                   new sqlite.Table("bar", [{name:"color", type:"string", pk:"0"}], this.db))
+    assert.notSame(new sqlite.Table("foo", [{name:"color", type:"string", pk:"0"}], this.db),
+                   new sqlite.Table("foo", [{name:"zzz", type:"string", pk:"0"}], this.db))
   })
   
 })

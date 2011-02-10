@@ -37,12 +37,6 @@ regarding("rename", function() {
       assert.notSame(rename(relation("person"), "martian"), rename(relation("horse"), "martian"))
     })})
         
-    test("equivalent is like same", function(){this.$R(function(){
-      assert.equivalent(rename(relation("person"), "martian"), rename(relation("person"), "martian"))
-      assert.notEquivalent(rename(relation("person"), "martian"), rename(relation("person"), "zoozoo"))
-      assert.notEquivalent(rename(relation("person"), "martian"), rename(relation("horse"), "martian"))
-    })})
-        
   })
   
   regarding("rename attribute: sameness and equivalence", function() {
@@ -51,12 +45,6 @@ regarding("rename", function() {
       assert.same(rename(attr("person.age"), "oldness"), rename(attr("person.age"), "oldness"))
       assert.notSame(rename(attr("person.age"), "oldness"), rename(attr("person.age"), "grumpiness"))
       assert.notSame(rename(attr("person.age"), "oldness"), rename(attr("person.name"), "oldness"))
-    })})
-        
-    test("equivalent is like same", function(){this.$R(function(){
-      assert.equivalent(rename(attr("person.age"), "oldness"), rename(attr("person.age"), "oldness"))
-      assert.notEquivalent(rename(attr("person.age"), "oldness"), rename(attr("person.age"), "grumpiness"))
-      assert.notEquivalent(rename(attr("person.age"), "oldness"), rename(attr("person.name"), "oldness"))
     })})
         
   })

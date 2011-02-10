@@ -29,13 +29,6 @@ regarding("attributes", function() {
       assert.notSame(new knit.Attributes([attr("house.people"), attr("person.age")]), 
                      new knit.Attributes([attr("house.people"), attr("person.name")]))
     })})    
-  
-    test("equivalence and sameness are the same thing", function(){this.$R(function(){
-      assert.equivalent(new knit.Attributes([attr("house.people"), attr("person.name")]), 
-                        new knit.Attributes([attr("house.people"), attr("person.name")]))
-      assert.notEquivalent(new knit.Attributes([attr("house.people"), attr("person.age")]), 
-                           new knit.Attributes([attr("house.people"), attr("person.name")]))
-    })})    
   })
 
   test("names", function(){this.$R(function(){

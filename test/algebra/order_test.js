@@ -21,12 +21,6 @@ regarding("order", function() {
       assert.notSame(order.asc(relation("person"), attr("person.name")), order.asc(relation("person"), attr("person.age")))
     })})
         
-    test("equivalent is like same", function(){this.$R(function(){
-      assert.equivalent(order.asc(relation("person"), attr("person.name")), order.asc(relation("person"), attr("person.name")))
-      assert.notEquivalent(order.asc(relation("person"), attr("person.name")), order.desc(relation("person"), attr("person.name")))
-      assert.notEquivalent(order.asc(relation("person"), attr("person.name")), order.asc(relation("person"), attr("person.age")))
-    })})
-        
   })
   
 })

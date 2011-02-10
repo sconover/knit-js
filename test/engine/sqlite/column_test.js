@@ -26,21 +26,9 @@ regarding("column", function() {
                 new sqlite.Column({name:"color", type:"string"}, fooTable))
 
     assert.notSame(new sqlite.Column({name:"color", type:"string"}, fooTable), 
-                   new sqlite.Column({name:"color", type:"int"}, fooTable))
-    assert.notSame(new sqlite.Column({name:"color", type:"string"}, fooTable), 
                    new sqlite.Column({name:"name", type:"string"}, fooTable))
     assert.notSame(new sqlite.Column({name:"color", type:"string"}, fooTable), 
                    new sqlite.Column({name:"color", type:"string"}, barTable))
-
-    assert.equivalent(new sqlite.Column({name:"color", type:"string"}, fooTable), 
-                      new sqlite.Column({name:"color", type:"string"}, fooTable))
-
-    assert.notEquivalent(new sqlite.Column({name:"color", type:"string"}, fooTable), 
-                         new sqlite.Column({name:"color", type:"int"}, fooTable))
-    assert.notEquivalent(new sqlite.Column({name:"color", type:"string"}, fooTable), 
-                         new sqlite.Column({name:"name", type:"string"}, fooTable))
-    assert.notEquivalent(new sqlite.Column({name:"color", type:"string"}, fooTable), 
-                         new sqlite.Column({name:"color", type:"string"}, barTable))
   })    
   
 })

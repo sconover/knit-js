@@ -27,12 +27,6 @@ regarding("divide", function() {
       assert.notSame(divide(relation("person"), relation("person")), divide(relation("house"), relation("person")))
     })})    
 
-    test("same implies equivalent", function(){this.$R(function(){
-      assert.equivalent(divide(relation("person"), relation("person")), divide(relation("person"), relation("person")))
-
-      assert.notEquivalent(divide(relation("person"), relation("person")), divide(relation("person"), relation("house")))
-      assert.notEquivalent(divide(relation("person"), relation("person")), divide(relation("house"), relation("person")))
-    })})
   })
   
 })

@@ -35,13 +35,6 @@ regarding("references allow late-binding of core relations and attributes. " +
         assert.same(this.environment.relation("person"), this.environment.relation("person"))
       })
       
-      test("equivalent is like same", function(){
-        assert.equivalent(this.environment.relation("person"), this.environment.relation("person"))
-        this.environment.resolve({person:this.person})
-        assert.equivalent(this.environment.relation("person"), this.environment.relation("person"))
-        assert.notEquivalent(this.environment.relation("personX"), this.environment.relation("personZZZ"))
-      })
-      
     })
     
     regarding("resolving a reference to a real relation", function() {
@@ -96,11 +89,6 @@ regarding("references allow late-binding of core relations and attributes. " +
         assert.same(this.environment.attr("person.age"), this.environment.attr("person.age"))
       })
       
-      test("equivalent is like same", function(){
-        assert.equivalent(this.environment.attr("person.age"), this.environment.attr("person.age"))
-        assert.notEquivalent(this.environment.attr("person.age"), this.environment.attr("personZZZ.age"))
-      })
-        
     })
   })
   
@@ -159,13 +147,6 @@ regarding("references allow late-binding of core relations and attributes. " +
         assert.same(this.person.attr("age"), this.environment.attr("people").nestedRelation().attributes()[1])
       })
       
-      test("equivalent is like same", function(){
-        assert.equivalent(this.environment.attr("people", this.environment.attr("person.personId", "person.age")), 
-                          this.environment.attr("people", this.environment.attr("person.personId", "person.age")))
-        assert.notEquivalent(this.environment.attr("people", this.environment.attr("person.personId", "person.age")), 
-                             this.environment.attr("peopleZZ", this.environment.attr("person.personId", "person.age")))
-      })
-        
     })
   })
   

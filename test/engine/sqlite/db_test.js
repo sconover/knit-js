@@ -36,25 +36,10 @@ regarding("sqlite db", function() {
     }) 
            
     xtest("a table object quacks like a relation",function(){
-      var table = this.db.createTable("foo", [["id",type.Integer], ["color",type.String]], ["id"])
+      var table = this.db.createTable("foo", [["id",type.Integer],["color",type.String]], ["id"])
       assert.quacksLike(table, knit.signature.relation)
     }) 
     
-       
   })
-  
-  // xtest("table definition", function(){
-  //   db.executeSync(new knit.engine.sql.statement.CreateTable("foo", [["color", knit.engine.sql.StringType]]))    
-  //   db.executeSync(new knit.engine.sql.statement.CreateTable("bar", [["age", knit.engine.sql.IntegerType]]))    
-  //   
-  //   assert.equal(new knit.engine.sql.statement.CreateTable("foo", [["color", knit.engine.sql.StringType]]), 
-  //                db.tableDefinition("foo"))
-  //                
-  //   assert.equal(new knit.engine.sql.statement.CreateTable("bar", [["age", knit.engine.sql.IntegerType]]), 
-  //                db.tableDefinition("bar"))
-  // 
-  // })
-  
-
   
 })

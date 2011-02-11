@@ -1,4 +1,4 @@
-require("../helper")
+require("./helper")
 
 acceptanceTest("nested object style", engine.memory, function(){
 

@@ -1,4 +1,4 @@
-require("../helper")
+require("./helper")
 
 acceptanceTest("right outer join", engine.memory, function(){
     

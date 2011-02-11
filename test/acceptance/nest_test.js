@@ -1,4 +1,4 @@
-require("../helper")
+require("./helper")
 
 acceptanceTest("nest.  matching on duplicate/ordered parent rows, and take " +
                  "the other columns and group them into 'subrows'.", engine.memory, function(){

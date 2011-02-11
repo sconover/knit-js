@@ -1,4 +1,4 @@
-require("../helper")
+require("./helper")
 
 acceptanceTest("order", engine.memory, function(){
 

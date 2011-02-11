@@ -1,4 +1,4 @@
-require("../helper")
+require("./helper")
 
 acceptanceTest("selection pushing and cost", engine.memory, function(){
   

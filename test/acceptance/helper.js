@@ -1,7 +1,5 @@
 require("../test_helper.js")
 
-feature = {}
-
 require("knit/engine/memory")
 require("knit/engine/sqlite")
 

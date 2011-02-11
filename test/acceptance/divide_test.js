@@ -1,4 +1,4 @@
-require("../helper")
+require("./helper")
 
 acceptanceTest("divide - relational divsion (think: opposite of cartesian join)", 
                engine.memory, function(){

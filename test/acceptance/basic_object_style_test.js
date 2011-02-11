@@ -1,4 +1,4 @@
-require("../helper")
+require("./helper")
 
 acceptanceTest("basic object style", engine.memory, engine.sqlite, function(){
 

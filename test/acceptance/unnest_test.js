@@ -1,4 +1,4 @@
-require("../helper")
+require("./helper")
 
 acceptanceTest("unnest.  take grouped up 'subrows' and flatten them into the parent structure.", 
                  engine.memory, function(){

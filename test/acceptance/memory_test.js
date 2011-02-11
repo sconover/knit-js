@@ -2,7 +2,7 @@ require("./helper")
 
 require("knit/engine/memory")
 
-regarding("In Memory Engine", function() {
+xregarding("In Memory Engine", function() {
     
   beforeEach(function() { knit._util.bind(setupAcceptanceFixtures, this)(knit.engine.memory.createRelation) })
   

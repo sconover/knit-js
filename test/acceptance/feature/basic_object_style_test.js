@@ -1,8 +1,10 @@
-feature.basicObjectStyle = function(){
+require("../helper")
+
+acceptanceTest("basic object style", engine.memory, engine.sqlite, function(){
 
   test("return results in js object / associative array style", function (){
     
-    assert.equal([
+    assert.setsEqual([
       {personId:1, houseId:101, name:"Jane", age:5},
       {personId:2, houseId:101, name:"Puck", age:12},
       {personId:3, houseId:102, name:"Fanny", age:30},
@@ -11,5 +13,5 @@ feature.basicObjectStyle = function(){
     
   })
 
-}
+})
 

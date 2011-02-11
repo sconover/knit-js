@@ -2,21 +2,49 @@ require("../test_helper.js")
 
 feature = {}
 
-require("acceptance/feature/basics")
+require("knit/engine/memory")
+require("knit/engine/sqlite")
 
-require("acceptance/feature/select")
-require("acceptance/feature/selection_pushing")
-require("acceptance/feature/project")
-require("acceptance/feature/order")
+engine = {
+  
+  memory: {
+    name:"memory",
+    setup: function(target) {
+      knit._util.bind(setupAcceptanceFixtures, target)(knit.engine.memory.createRelation)
+    }
+  },
+  
+  sqlite: {
+    name:"sqlite",
+    setup: function(target) {
+      target.db = new knit.engine.sqlite.Database(":memory:")
+      target.db.open()
+      knit._util.bind(setupAcceptanceFixtures, target)(knit._util.bind(target.db.createTable,target.db))
+    },
+    tearDown: function(target) {
+      target.db.close()
+    }
+  }
+  
+}
 
-require("acceptance/feature/join")
-require("acceptance/feature/left_outer_join")
-require("acceptance/feature/right_outer_join")
-require("acceptance/feature/natural_join")
-require("acceptance/feature/divide")
-
-require("acceptance/feature/nest")
-require("acceptance/feature/unnest")
+acceptanceTest = function() {
+  var _A = CollectionFunctions.Array.functions
+  
+  var args = _A.toArray(arguments)
+  var name = args.shift()
+  var jasmineFunction = args.pop()
+  var engines = args
+  
+  _A.each(engines, function(engine){
+    describe("engine=" + engine.name + " " + name, function(){
+      beforeEach(function(){ engine.setup(this) })
+      afterEach(function(){ if (engine.tearDown) engine.tearDown(this) })
+      
+      jasmineFunction()
+    })
+  })
+}
 
 setupAcceptanceFixtures = function(createRelation) {
   setupPersonHouseCity(this, createRelation)

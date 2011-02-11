@@ -2,7 +2,7 @@ require("./helper")
 
 require("knit/engine/sqlite")
 
-regarding("Sqlite Engine", function() {
+xregarding("Sqlite Engine", function() {
     
   beforeEach(function() {
     this.db = new knit.engine.sqlite.Database(":memory:")

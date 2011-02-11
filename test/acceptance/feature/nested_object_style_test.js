@@ -1,4 +1,6 @@
-feature.nestedObjectStyle = function(){
+require("../helper")
+
+acceptanceTest("nested object style", engine.memory, function(){
 
   test(".objects should cause nested stuff to be object-style too", function (){
     
@@ -59,5 +61,5 @@ feature.nestedObjectStyle = function(){
     
   })
 
-}
+})
 

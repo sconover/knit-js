@@ -5,6 +5,7 @@ require.paths.push("../node-sqlite")
 require("../../jasmine-node/lib/jasmine")
 require("./vendor/jshashtable")
 require("./vendor/jshashset")
+require("./vendor/deep_equal")
 
 jasmine.Env.prototype.regarding = jasmine.Env.prototype.describe
 jasmine.Env.prototype.xregarding = jasmine.Env.prototype.xdescribe
@@ -85,14 +86,13 @@ assert._func = function(func, expected, actual, orientation, term) {
 }
 
 assert.setsEqual = function(expectedArray, actualArray) {
-  var equalityFunction = CollectionFunctions.Array.functions.equals
+  var equalityFunction = function(a,b){return deepEqual(a,b)}
   
   var expectedSet = new HashSet(undefined, equalityFunction)
   expectedSet.addAll(expectedArray)  
   
   var actualSet = new HashSet(undefined, equalityFunction)
   actualSet.addAll(actualArray)
-  
   assert._func(
     function(expected, actual){return expectedSet.intersection(actualSet).size()==actualSet.size()}, 
     expectedArray, 

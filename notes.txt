@@ -1,3 +1,24 @@
+getting perform* methods out of relation.js...
+  on the sql side, we'll be building a relation that holds a sql object (a query?)
+  later, if we want memory to behave the same way, build a separate memory relation with a function (delayed execution?)
+    ...and think stream...
+  distinction between these relations and "base" relations (e.g. table)
+
+relation defaults?  copy some other prototype?
+  "it's like this relation but different"
+  relation interface is inconsistently implemented
+    make sure there are quackslike tests for all relations
+  
+test for better quacksLike failures
+  extract this?
+    ...plus assertions / jasmine matchers
+    
+consider putting the notSame variations on the left side
+  
+query (vs table)
+  both are relations
+  join a query with a table => new query
+  
 attribute signature should include type
 
 ok now get the *sqlite* engine working

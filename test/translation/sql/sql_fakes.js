@@ -21,6 +21,7 @@ FakeTable = function() {
               return this._testRelation[methodName].apply(this._testRelation, _A.toArray(arguments))
             }
           })
+  p.columns = p.attributes
   
   p.inspect = function() { return this.name() + "[" + this.attributes().inspect() + "]" }
   

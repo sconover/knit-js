@@ -70,7 +70,7 @@ assert._func = function(func, expected, actual, orientation, term) {
     if (obj.inspect) {
       return obj.inspect()
     } else if (obj.push && obj.length) {
-      return CollectionFunctions.Array.functions.inspect(obj)
+      return knit._util.inspect(obj)
     } else {
       simpleInspect(obj)
     }
@@ -128,7 +128,7 @@ assert.notSame = function(expected, actual) {
 
 
 assert.arraySame = function(expected, actual) {
-  CollectionFunctions.Array.functions.each(expected, function(item, i){
+  knit._util.each(expected, function(item, i){
     assert.same(item, actual[i])
   })
 }

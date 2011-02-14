@@ -3,7 +3,6 @@ require("knit/engine/sqlite/db")
 
 regarding("sqlite db", function() {
   
-  var _A = CollectionFunctions.Array.functions
   var type = knit.attributeType
   
   beforeEach(function(){ this.db = new knit.engine.sqlite.Database(":memory:"); this.db.open() })

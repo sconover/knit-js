@@ -27,14 +27,13 @@ engine = {
 }
 
 acceptanceTest = function() {
-  var _A = CollectionFunctions.Array.functions
+  var _ = knit._util,
+      args = _.toArray(arguments),
+      name = args.shift(),
+      jasmineFunction = args.pop(),
+      engines = args
   
-  var args = _A.toArray(arguments)
-  var name = args.shift()
-  var jasmineFunction = args.pop()
-  var engines = args
-  
-  _A.each(engines, function(engine){
+  _.each(engines, function(engine){
     describe("engine=" + engine.name + " " + name, function(){
       beforeEach(function(){ engine.setup(this) })
       afterEach(function(){ if (engine.tearDown) engine.tearDown(this) })

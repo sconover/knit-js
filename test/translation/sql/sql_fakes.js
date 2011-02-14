@@ -3,22 +3,20 @@ require("knit/core")
 require("test_relation")
 
 FakeTable = function() {
-  var _A = CollectionFunctions.Array.functions,
-      _ = knit._util
-
-  
-  var F = function(name, attributeNamesAndTypes) {
-    this._testRelation = new TestRelation(attributeNamesAndTypes)
-    this._testRelation.name = function(){return name}
+  var _ = knit._util,
+      F = function(name, attributeNamesAndTypes) {
+            this._testRelation = new TestRelation(attributeNamesAndTypes)
+            this._testRelation.name = function(){return name}
     
-    var self = this
-    this.name = function(){return self._testRelation.name()}
-  }; var p = F.prototype
+            var self = this
+            this.name = function(){return self._testRelation.name()}
+          },
+      p = F.prototype
   
-  _A.each(["id", "attributes", "attr", "isSame", "isEquivalent", "split", "merge", "newNestedAttribute"], 
+  _.each(["id", "attributes", "attr", "isSame", "isEquivalent", "split", "merge", "newNestedAttribute"], 
           function(methodName){
             p[methodName] = function() {
-              return this._testRelation[methodName].apply(this._testRelation, _A.toArray(arguments))
+              return this._testRelation[methodName].apply(this._testRelation, _.toArray(arguments))
             }
           })
   p.columns = p.attributes

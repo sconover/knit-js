@@ -4,6 +4,8 @@ getting perform* methods out of relation.js...
     ...and think stream...
   distinction between these relations and "base" relations (e.g. table)
 
+introduce hashset into main vendor dir and use to back the in-memory rowstore
+
 relation defaults?  copy some other prototype?
   "it's like this relation but different"
   relation interface is inconsistently implemented

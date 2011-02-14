@@ -6,8 +6,7 @@ require("knit/engine/sqlite/column")
 
 regarding("column", function() {
 
-  var _A = CollectionFunctions.Array.functions,
-      type = knit.attributeType,
+  var type = knit.attributeType,
       sqlite = knit.engine.sqlite,
       fooTable = new sqlite.Table("foo", []),
       barTable = new sqlite.Table("bar", [])

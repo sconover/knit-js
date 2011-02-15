@@ -1,3 +1,9 @@
+"compile" metaphor
+  transform high-level algebra into lower-level "executable" form
+    (algebra => sql object)
+  compiler.compile(expression
+
+
 cross-language AT's
   since knit expressions are now late-binding, assume a canonical json format of an expression and state the expression directly in json?
   
@@ -18,23 +24,8 @@ do relations have names, or not?
   they ought not have early-bound names.
 
 toSql => toSqlObject?
-
-the word perform is problematic
-  is it just a language problem or evidence of something awry / something emerging?
   
-  there's base relations
-    table, memory
   
-  then there's the output of a relational algebra expression applied to base relations
-    in sql-land, this means constructing a query
-      RA expression + tables + sql translation = query
-      the query is a relation
-      you can keep modifying it
-      
-      promote the notion of query up out of sql-land?
-        RA expression + base relations/transformation => query
-        query.rows(), query.objects()
-
 something is overgeneralized.  maybe.
   some distinction between resultset and relation?
   or is it valid to add something on to a query as if it's a relation?

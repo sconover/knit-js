@@ -16,7 +16,7 @@ xregarding("sql select is a relation", function() {
     assert.equal(
       new sql.Select().
         what(new sql.Column("person.name"), new sql.Column("person.age")).
-        from({"person":this.person}),
+        from(this.person),
       project.toSql()
     )
   })

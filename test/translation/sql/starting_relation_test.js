@@ -11,24 +11,24 @@ regarding("starting relation", function() {
     
     test("attributes/columns", function(){
       assert.equal(this.person.attributes(),
-                   new sql.Select().from({"person":this.person}).columns())
+                   new sql.Select().from(this.person).columns())
       
       assert.equal(this.person.attributes(),
-                   new sql.Select().from({"person":this.person}).attributes())
+                   new sql.Select().from(this.person).attributes())
       
       assert.equal(this.person.attributes().concat(this.house.attributes()),
-                   new sql.Select().from({"person":this.person}, {"house":this.house}).attributes())
+                   new sql.Select().from(this.person, this.house).attributes())
     })
 
     test("sql select quacksLike a relation", function(){
-      assert.quacksLike(new sql.Select().from({"person":this.person}), knit.signature.relation)
+      assert.quacksLike(new sql.Select().from(this.person), knit.signature.relation)
     })
         
     test("simple same (from-only)", function(){
-      assert.same(new sql.Select().from({"person":this.person}), new sql.Select().from({"person":this.person}))
-      assert.same(new sql.Select().from({"person":this.person}, {"house":this.house}), new sql.Select().from({"person":this.person}, {"house":this.house}))
-      assert.notSame(new sql.Select().from({"person":this.person}), new sql.Select().from({"person":this.person}, {"house":this.house}))
-      assert.notSame(new sql.Select().from({"person":this.person}, {"city":this.city}), new sql.Select().from({"person":this.person}, {"house":this.house}))
+      assert.same(new sql.Select().from(this.person), new sql.Select().from(this.person))
+      assert.same(new sql.Select().from(this.person, this.house), new sql.Select().from(this.person, this.house))
+      assert.notSame(new sql.Select().from(this.person), new sql.Select().from(this.person, this.house))
+      assert.notSame(new sql.Select().from(this.person, this.city), new sql.Select().from(this.person, this.house))
     })
     
     test("same (whats are different)", function(){
@@ -51,7 +51,7 @@ regarding("starting relation", function() {
       assert.same(
         new sql.Select().
           what(this.person.columns().map(function(col){return new sql.Column("person." + col.name())})).
-          from({"person":this.person}),
+          from(this.person),
         relation.toSql()
       )
     })
@@ -63,7 +63,7 @@ regarding("starting relation", function() {
     test("simple select statement.  what defaults to star.", function(){
       assert.equal(
         "select * from person",
-        new sql.Select().from({"person":this.person}).toStatement().sql
+        new sql.Select().from(this.person).toStatement().sql
       )
     })
     
@@ -73,14 +73,14 @@ regarding("starting relation", function() {
         new sql.Select().
           what(new sql.Column("person.name"), 
                new sql.Column("person.age")).
-          from({"person":this.person}).toStatement().sql
+          from(this.person).toStatement().sql
       )
     })
     
     test("multiple froms", function(){
       assert.equal(
         "select * from person, house",
-        new sql.Select().from({"person":this.person}, {"house":this.house}).toStatement().sql
+        new sql.Select().from(this.person, this.house).toStatement().sql
       )
     })
     

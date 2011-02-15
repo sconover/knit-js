@@ -16,7 +16,7 @@ regarding("project(proh-JEKT)", function() {
       assert.same(
         new sql.Select().
           what(new sql.Column("person.name"), new sql.Column("person.age")).
-          from({"person":this.person}),
+          from(this.person),
         project.toSql()
       )
     })
@@ -30,7 +30,7 @@ regarding("project(proh-JEKT)", function() {
         "select person.name, person.age from person",
         new sql.Select().
           what(new sql.Column("person.name"), new sql.Column("person.age")).
-          from({"person":this.person}).toStatement().sql
+          from(this.person).toStatement().sql
       )
     })
     

@@ -1,4 +1,5 @@
 require("../../test_helper")
+require("knit/core")
 require("knit/engine/sqlite/db")
 
 regarding("sqlite db", function() {

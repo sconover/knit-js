@@ -31,17 +31,26 @@ regarding("starting relation", function() {
       assert.notSame(new sql.Select().from({"person":this.person}, {"city":this.city}), new sql.Select().from({"person":this.person}, {"house":this.house}))
     })
     
+    test("same (whats are different)", function(){
+      assert.same(new sql.Select().what(new sql.Column("foo.name")), new sql.Select().what(new sql.Column("foo.name")))
+      assert.notSame(new sql.Select().what(new sql.Column("BAR.name")), 
+                     new sql.Select().what(new sql.Column("foo.name")))
+      assert.notSame(new sql.Select().what(new sql.Column("foo.name"), new sql.Column("foo.age")), 
+                     new sql.Select().what(new sql.Column("foo.name")))
+    })
+    
   })
   
-  xregarding("translate expression to sql object", function(){
+  regarding("translate expression to sql object", function(){
     
     test("convert a straight relation reference to sql", function(){
       var relation = this.$R(function(){
         return relation("person")
       })
-      assert.equal(
+
+      assert.same(
         new sql.Select().
-          what(this.person.columns()).
+          what(this.person.columns().map(function(col){return new sql.Column("person." + col.name())})).
           from({"person":this.person}),
         relation.toSql()
       )
@@ -49,19 +58,29 @@ regarding("starting relation", function() {
     
   })
   
-  xregarding("sql object to statement", function(){
+  regarding("sql object to statement", function(){
 
     test("simple select statement.  what defaults to star.", function(){
       assert.equal(
-        "select person. from person",
-        new sql.Select().from("person").toStatement().sql
+        "select * from person",
+        new sql.Select().from({"person":this.person}).toStatement().sql
+      )
+    })
+    
+    test("whats are not equal to the attributes", function(){
+      assert.equal(
+        "select person.name, person.age from person",
+        new sql.Select().
+          what(new sql.Column("person.name"), 
+               new sql.Column("person.age")).
+          from({"person":this.person}).toStatement().sql
       )
     })
     
     test("multiple froms", function(){
       assert.equal(
         "select * from person, house",
-        new sql.Select().from("person", "house").toStatement().sql
+        new sql.Select().from({"person":this.person}, {"house":this.house}).toStatement().sql
       )
     })
     

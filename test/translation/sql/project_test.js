@@ -13,10 +13,10 @@ regarding("project(proh-JEKT)", function() {
       var project = this.$R(function(){
         return project(relation("person"), attr("person.name", "person.age"))
       })
-      assert.equal(
+      assert.same(
         new sql.Select().
           what(new sql.Column("person.name"), new sql.Column("person.age")).
-          from("person"),
+          from({"person":this.person}),
         project.toSql()
       )
     })
@@ -30,7 +30,7 @@ regarding("project(proh-JEKT)", function() {
         "select person.name, person.age from person",
         new sql.Select().
           what(new sql.Column("person.name"), new sql.Column("person.age")).
-          from("person").toStatement().sql
+          from({"person":this.person}).toStatement().sql
       )
     })
     

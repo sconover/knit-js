@@ -1,3 +1,8 @@
+[sql] lazyresultset
+        is a relation
+        delegates to sql object
+        .rows() toString's the sql object and executes against the engine...
+
 getting perform* methods out of relation.js...
   on the sql side, we'll be building a relation that holds a sql object (a query?)
   later, if we want memory to behave the same way, build a separate memory relation with a function (delayed execution?)
@@ -15,11 +20,16 @@ test for better quacksLike failures
   extract this?
     ...plus assertions / jasmine matchers
     
-consider putting the notSame variations on the left side
+[style] consider putting the notSame variations on the left side
+  align the expected and actual vertically?  (chop down)
   
 query (vs table)
   both are relations
   join a query with a table => new query
+  
+http://jscc.jmksf.com/
+  consider a string form
+  ...hrm...do not like...
   
 attribute signature should include type
 

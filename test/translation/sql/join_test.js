@@ -13,9 +13,9 @@ regarding("join to sql", function() {
       var join = this.$R(function(){
         return join(relation("person"), relation("house"))
       })
-      assert.equal(
+      assert.same(
         new sql.Select().
-          join(new sql.Join("person", "house", null)),
+          join(new sql.Join(this.person, this.house, null)),
         join.toSql()
       )
     })
@@ -24,9 +24,9 @@ regarding("join to sql", function() {
       var join = this.$R(function(){
         return join(relation("person"), relation("house"), eq(attr("house.houseId"), attr("person.houseId")))
       })
-      assert.equal(
+      assert.same(
         new sql.Select().
-          join(new sql.Join("person", "house", new sql.predicate.Equals(new sql.Column("house.houseId"), new sql.Column("person.houseId")))),
+          join(new sql.Join(this.person, this.house, new sql.predicate.Equals(new sql.Column("house.houseId"), new sql.Column("person.houseId")))),
         join.toSql()
       )
     })
@@ -39,7 +39,7 @@ regarding("join to sql", function() {
       assert.equal(
         "select * from person join house",
         new sql.Select().
-          join(new sql.Join("person", "house", null)).toStatement().sql
+          join(new sql.Join(this.person, this.house, null)).toStatement().sql
       )
     })
 
@@ -47,7 +47,7 @@ regarding("join to sql", function() {
       assert.equal(
         "select * from person join house on house.houseId = person.houseId",
         new sql.Select().
-          join(new sql.Join("person", "house", new sql.predicate.Equals(new sql.Column("house.houseId"), new sql.Column("person.houseId")))).
+          join(new sql.Join(this.person, this.house, new sql.predicate.Equals(new sql.Column("house.houseId"), new sql.Column("person.houseId")))).
           toStatement().sql
       )
     })    
@@ -56,7 +56,7 @@ regarding("join to sql", function() {
       assert.equal(
         {sql:"select * from person join house on house.houseId = ?", values:[101]},
         new sql.Select().
-          join(new sql.Join("person", "house", new sql.predicate.Equals(new sql.Column("house.houseId"), 101))).
+          join(new sql.Join(this.person, this.house, new sql.predicate.Equals(new sql.Column("house.houseId"), 101))).
           toStatement()
       )
     })    

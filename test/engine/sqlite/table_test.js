@@ -34,6 +34,11 @@ regarding("table", function() {
       assert.notSame(foo.attr("color"), bar.attr("color"))
     })
     
+    test("inspect", function(){
+      this.db.execute({sql:"create table bar(id int primary key, color string)"})
+      assert.equal("bar[id,color]", sqlite.Table.load(this.db, "bar").inspect())
+    })
+    
     test("objects and rows", function(){
       this.db.execute({sql:"create table foo(id int primary key, color string)"})
       this.db.execute({sql:"insert into foo values(1, 'blue')"})
@@ -91,6 +96,13 @@ regarding("table", function() {
                    new sqlite.Table("bar", [{name:"color", type:"string", pk:"0"}], this.db))
     assert.notSame(new sqlite.Table("foo", [{name:"color", type:"string", pk:"0"}], this.db),
                    new sqlite.Table("foo", [{name:"zzz", type:"string", pk:"0"}], this.db))
+  })
+  
+  test("a table is the same as a resolved table reference", function(){
+    var fooRef = new knit.RelationReference("foo")
+    var foo = new sqlite.Table("foo", [{name:"color", type:"string", pk:"0"}], this.db)
+    fooRef.resolve({foo:foo})
+    assert.same(fooRef, foo)
   })
   
   test("quacks like relation", function(){

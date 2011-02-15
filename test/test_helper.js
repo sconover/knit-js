@@ -52,6 +52,30 @@ setupPersonHouseCity = function(target, createRelation) {
 
 assert = require('assert')
 
+var formatFunction = require("./vendor/format_from_node_console")
+assert.AssertionError.prototype.originalToString = assert.AssertionError.prototype.toString
+assert.AssertionError.prototype.toString = function() {
+  try {
+    return this.originalToString()
+  } catch(e) {
+    console.log("Error in AssertionError#toString()")
+    console.log("\nEXPECTED:\n")
+    console.log(this.expected)
+    console.log("\nACTUAL:\n")
+    console.log(this.actual)
+    return ""
+  }
+  
+  // var str = this.originalToString()
+  // if (str.indexOf("Converting circular structure to JSON")>=0) {
+  //   console.log("error detected, expected inspect: ", this.expected)
+  //   console.log("error detected, actual inspect: ", this.actual)
+  // }
+  // 
+  
+  return this.originalToString() + "\nEXPECTED:\n" + formatFunction.format(this.expected) + "\n\nACTUAL:\n" + formatFunction.format(this.actual)
+}
+
 assert.doubleEqual = assert.equal
 assert.equal = assert.deepEqual
 
@@ -81,7 +105,8 @@ assert._func = function(func, expected, actual, orientation, term) {
             !result &&
             term + " failure: " + 
             "\n    expected: " + doInspect(expected) + 
-            "\n    actual:   " + doInspect(actual))
+            "\n    actual:   " + doInspect(actual))    
+  
 }
 
 assert.setsEqual = function(expectedArray, actualArray) {

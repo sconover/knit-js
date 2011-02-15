@@ -13,9 +13,9 @@ regarding("order to sql", function() {
       var order = this.$R(function(){
         return order.asc(relation("person"), attr("person.name"))
       })
-      assert.equal(
+      assert.same(
         new sql.Select().
-          from("person").
+          from({"person":this.person}).
           order(new sql.Order(new sql.Column("person.name"), sql.Order.ASC)),
         order.toSql()
       )
@@ -25,9 +25,9 @@ regarding("order to sql", function() {
       var order = this.$R(function(){
         return order.desc(relation("person"), attr("person.name"))
       })
-      assert.equal(
+      assert.same(
         new sql.Select().
-          from("person").
+          from({"person":this.person}).
           order(new sql.Order(new sql.Column("person.name"), sql.Order.DESC)),
         order.toSql()
       )
@@ -37,9 +37,9 @@ regarding("order to sql", function() {
       var order = this.$R(function(){
         return order.asc(order.desc(relation("person"), attr("person.age")), attr("person.name"))
       })
-      assert.equal(
+      assert.same(
         new sql.Select().
-          from("person").
+          from({"person":this.person}).
           order(new sql.Order(new sql.Column("person.age"), sql.Order.DESC), 
                 new sql.Order(new sql.Column("person.name"), sql.Order.ASC)),
         order.toSql()
@@ -55,7 +55,7 @@ regarding("order to sql", function() {
       assert.equal(
         "select * from person order by person.name",
         new sql.Select().
-          from("person").
+          from({"person":this.person}).
           order(new sql.Order(new sql.Column("person.name"), sql.Order.ASC)).toStatement().sql
       )
     })
@@ -64,7 +64,7 @@ regarding("order to sql", function() {
       assert.equal(
         "select * from person order by person.name desc",
         new sql.Select().
-          from("person").
+          from({"person":this.person}).
           order(new sql.Order(new sql.Column("person.name"), sql.Order.DESC)).toStatement().sql
       )
     })
@@ -73,7 +73,7 @@ regarding("order to sql", function() {
       assert.equal(
         "select * from person order by person.age desc, person.name",
         new sql.Select().
-          from("person").
+          from({"person":this.person}).
           order(new sql.Order(new sql.Column("person.age"), sql.Order.DESC), 
                 new sql.Order(new sql.Column("person.name"), sql.Order.ASC)).toStatement().sql
       )

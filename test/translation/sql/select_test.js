@@ -8,16 +8,25 @@ regarding("select", function() {
   var sql = knit.translation.sql
   
   regarding("translate expression to sql object", function(){  
+
+    test("same (wheres are different)", function(){
+      assert.same(new sql.Select().where(new sql.predicate.Equals(new sql.Column("person.name"), "Jane")), 
+                  new sql.Select().where(new sql.predicate.Equals(new sql.Column("person.name"), "Jane")))
+      assert.notSame(new sql.Select().where(new sql.predicate.Equals(new sql.Column("person.name"), "ZZZZZZZZZ")), 
+                     new sql.Select().where(new sql.predicate.Equals(new sql.Column("person.name"), "Jane")))
+    })
     
     test("convert a select to sql", function(){
-      var project = this.$R(function(){
+      var select = this.$R(function(){
         return select(relation("person"), eq(attr("person.name"), "Jane"))
       })
-      assert.equal(
+      
+      assert.same(
         new sql.Select().
-          from("person").
+          what(this.person.columns().map(function(col){return new sql.Column("person." + col.name())})).
+          from({"person":this.person}).
           where(new sql.predicate.Equals(new sql.Column("person.name"), "Jane")),
-        project.toSql()
+        select.toSql()
       )
     })
     
@@ -29,7 +38,7 @@ regarding("select", function() {
       assert.equal(
         {sql:"select * from person where person.name = ?", values:["Jane"]},
         new sql.Select().
-          from("person").
+          from({"person":this.person}).
           where(new sql.predicate.Equals(new sql.Column("person.name"), "Jane")).toStatement()
       )
     })
@@ -38,7 +47,7 @@ regarding("select", function() {
       assert.equal(
         {sql:"select * from person where person.name = ? and person.age = ? and ? = ?", values:["Jane", 5, 7, 7]},
         new sql.Select().
-          from("person").
+          from({"person":this.person}).
           where(new sql.predicate.Equals(new sql.Column("person.name"), "Jane")).
           where(new sql.predicate.Equals(new sql.Column("person.age"), 5)).
           where(new sql.predicate.Equals(7, 7)).toStatement()
@@ -49,7 +58,7 @@ regarding("select", function() {
       assert.equal(
         {sql:"select * from person where person.name = ? and person.age = ?", values:["Jane", 5]},
         new sql.Select().
-          from("person").
+          from({"person":this.person}).
           where(
             new sql.predicate.And(
               new sql.predicate.Equals(new sql.Column("person.name"), "Jane"),

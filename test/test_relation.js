@@ -54,7 +54,7 @@ TestRelation = function() {
   }
   
   p.inspect = function() { return "r[" + this.attributes().inspect() + "]" }
-  
+
   return F
 }()
 

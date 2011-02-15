@@ -90,7 +90,7 @@ regarding("table", function() {
         {id:1, color:'blue'},
         {id:2, color:'red'},
         {id:3, color:'green'}],
-        foo.defaultCompiler()(foo).objects()
+        foo.compile().objects()
       )
     })
 

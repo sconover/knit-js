@@ -1,3 +1,9 @@
+something is overgeneralized.  maybe.
+  some distinction between resultset and relation?
+  or is it valid to add something on to a query as if it's a relation?
+  why not?
+    hmmm
+
 [sql] lazyresultset
         is a relation
         delegates to sql object

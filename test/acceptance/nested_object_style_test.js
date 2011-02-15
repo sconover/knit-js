@@ -29,10 +29,10 @@ acceptanceTest("nested object style", engine.memory, function(){
          ),
          attr("city.cityId")
        )
-    }).perform()
+    })
     
     
-    var objects = nested.objects()
+    var objects = nested.perform().objects()
     
     assert.equal([
     

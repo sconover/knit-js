@@ -14,7 +14,7 @@ acceptanceTest("left outer join", engine.memory, function(){
     
     allPeopleCombinedWithAllHouses = this.$R(function(){
       return leftOuterJoin(relation("person"), relation("house"), equality(attr("person.houseId"), attr("house.houseId")))
-    }).perform()
+    })
     
     assert.relationEqual({
       name:"person__house",

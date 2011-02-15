@@ -9,7 +9,7 @@ acceptanceTest("nest.  matching on duplicate/ordered parent rows, and take " +
                join(relation("house"), relation("person"), eq(attr("house.houseId"), attr("person.houseId"))), 
                attr("house.houseId", "person.personId", "person.name", "house.address", "person.age")
              )
-    }).perform()
+    })
 
     assert.relationEqual({
       name:"house__person",
@@ -29,7 +29,7 @@ acceptanceTest("nest.  matching on duplicate/ordered parent rows, and take " +
         nest(this.housePersonUnnested, attr("people", attr("person.personId", "person.name", "person.age"))),
         attr("house.houseId")
       )
-    }, {housePersonUnnested:housePersonUnnested}).perform()
+    }, {housePersonUnnested:housePersonUnnested})
 
     assert.relationEqual({
       name:"house__person",
@@ -59,7 +59,7 @@ acceptanceTest("nest.  matching on duplicate/ordered parent rows, and take " +
                ), 
                attr("city.cityId", "city.name", "house.houseId", "person.personId", "person.name", "house.address", "person.age")
              )
-    }).perform()
+    })
 
     assert.relationEqual({
       name:"city__house__person",
@@ -84,7 +84,7 @@ acceptanceTest("nest.  matching on duplicate/ordered parent rows, and take " +
         ),
         attr("city.cityId")
       )
-    }, {cityHousePersonUnnested:cityHousePersonUnnested}).perform()
+    }, {cityHousePersonUnnested:cityHousePersonUnnested})
 
     assert.relationEqual({
       name:"city__house__person",
@@ -113,7 +113,7 @@ acceptanceTest("nest.  matching on duplicate/ordered parent rows, and take " +
                leftOuterJoin(relation("house"), relation("person"), eq(attr("house.houseId"), attr("person.houseId"))), 
                attr("house.houseId", "person.personId", "person.name", "house.address", "person.age")
              )
-    }).perform()
+    })
 
     assert.relationEqual({
       name:"house__person",
@@ -134,7 +134,7 @@ acceptanceTest("nest.  matching on duplicate/ordered parent rows, and take " +
         nest(this.housePersonUnnested, attr("people", attr("person.personId", "person.name", "person.age"))),
         attr("house.houseId")
       )
-    }, {housePersonUnnested:housePersonUnnested}).perform()
+    }, {housePersonUnnested:housePersonUnnested})
 
     assert.relationEqual({
       name:"house__person",

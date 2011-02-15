@@ -5,9 +5,9 @@ acceptanceTest("project", engine.memory, engine.sqlite, function(){
   test("project a subset of attributes over the relation", function (){
     var narrowerRelation = this.$R(function(){
       return project(relation("person"), attr("person.name", "person.age"))
-    }).perform()
+    })
     
-    assert.equal({
+    assert.relationEqual({
       name:"person",
       attributes:["name", "age"],
       rows:[
@@ -16,7 +16,7 @@ acceptanceTest("project", engine.memory, engine.sqlite, function(){
         ["Fanny", 30],
         ["Amy", 6]
       ]
-    }, relationContents(narrowerRelation))
+    }, narrowerRelation)
   })
   
 })

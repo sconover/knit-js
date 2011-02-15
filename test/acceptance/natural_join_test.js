@@ -7,7 +7,7 @@ acceptanceTest("natural join", engine.memory, function(){
     
     allPeopleCombinedWithAllHouses = this.$R(function(){
       return naturalJoin(relation("person"), relation("house"))
-    }).perform()
+    })
     
     assert.relationEqual({
       name:"person__house",

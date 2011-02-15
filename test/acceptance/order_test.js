@@ -6,7 +6,7 @@ acceptanceTest("order", engine.memory, engine.sqlite, function(){
     var peopleInNameOrderAscending = 
       this.$R(function(){
         return order.asc(relation("person"), attr("person.name"))
-      }).perform()
+      })
       
     assert.relationEqual({
       name:"person",
@@ -24,7 +24,7 @@ acceptanceTest("order", engine.memory, engine.sqlite, function(){
     var peopleInNameOrderDescending = 
       this.$R(function(){
         return order.desc(relation("person"), attr("person.name"))
-      }).perform()
+      })
       
     assert.relationEqual({
       name:"person",

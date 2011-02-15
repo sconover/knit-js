@@ -29,7 +29,7 @@ acceptanceTest("unnest.  take grouped up 'subrows' and flatten them into the par
         return unnest(this.housePeople, this.housePeople.attr("people"))
       }, {housePeople:housePeopleNested}).perform()
             
-    assert.equal({
+    assert.relationEqual({
       name:"housePeople",
       attributes:["houseId", "personId", "name", "age", "address"],
       rows:[
@@ -37,7 +37,7 @@ acceptanceTest("unnest.  take grouped up 'subrows' and flatten them into the par
         [101, 2, "Puck", 12, "Chimney Hill"],
         [102, 3, "Fanny", 30, "Parnassus"]
       ]
-    }, relationContents(housePeopleUnnested))
+    }, housePeopleUnnested)
     
   })
   
@@ -71,7 +71,7 @@ acceptanceTest("unnest.  take grouped up 'subrows' and flatten them into the par
       return unnest(this.cityHousesPeople, this.cityHousesPeople.attr("houses"))
     }, {cityHousesPeople:cityHousesPeopleNested}).perform()
                     
-    assert.equal({
+    assert.relationEqual({
       name:"cityHousesPeople",
       attributes:["cityId", "name", "houseId", "address", {"people":["personId", "name", "age"]}],
       rows:[
@@ -80,7 +80,7 @@ acceptanceTest("unnest.  take grouped up 'subrows' and flatten them into the par
         [1001, "San Francisco", 102, "Parnassus", [[3, "Fanny", 30]] ],
         [1002, "New Orleans", 103, "Canal", [[4, "Amy", 6]] ]
       ]
-    }, relationContents(unnestHousesOnly))
+    }, unnestHousesOnly)
     
     
     var unnestHousesAndPeople = this.$R(function(){
@@ -90,7 +90,7 @@ acceptanceTest("unnest.  take grouped up 'subrows' and flatten them into the par
              )
     }, {housePeople:housePeople, cityHousesPeople:cityHousesPeopleNested}).perform()
     
-    assert.equal({
+    assert.relationEqual({
       name:"cityHousesPeople",
       attributes:["cityId", "name", "houseId", "address", "personId", "name", "age"],
       rows:[
@@ -99,7 +99,7 @@ acceptanceTest("unnest.  take grouped up 'subrows' and flatten them into the par
         [1001, "San Francisco", 102, "Parnassus", 3, "Fanny", 30],
         [1002, "New Orleans", 103, "Canal", 4, "Amy", 6]
       ]
-    }, relationContents(unnestHousesAndPeople))        
+    }, unnestHousesAndPeople)
   })
   
 })

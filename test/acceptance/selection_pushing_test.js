@@ -19,8 +19,8 @@ acceptanceTest("selection pushing and cost", engine.memory, function(){
       ]
     }
 
-    assert.equal(expected, relationContents(expression.perform()))
-    assert.equal(expected, relationContents(expression.push().perform()))
+    assert.relationEqual(expected, expression)
+    assert.relationEqual(expected, expression.push())
 
     assert.equal(true, expression.perform().cost > expression.push().perform().cost)
   })
@@ -43,8 +43,8 @@ acceptanceTest("selection pushing and cost", engine.memory, function(){
       ]
     }
 
-    assert.equal(expected, relationContents(expression.perform()))
-    assert.equal(expected, relationContents(expression.push().perform()))
+    assert.relationEqual(expected, expression)
+    assert.relationEqual(expected, expression.push())
 
     assert.equal(true, expression.perform().cost > expression.push().perform().cost)
   })

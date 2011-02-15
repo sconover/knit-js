@@ -6,7 +6,7 @@ acceptanceTest("join", engine.memory, function(){
     
     allPeopleCombinedWithAllHouses = this.$R(function(){
       return join(relation("person"), relation("house"))
-    }).perform()
+    })
     
     assert.relationEqual({
       name:"person__house",
@@ -33,7 +33,7 @@ acceptanceTest("join", engine.memory, function(){
 
     allPeopleCombinedWithAllHousesCombinedWithAllCities = this.$R(function(){
       return join(join(relation("person"), relation("house")), relation("city"))
-    }).perform()
+    })
 
     assert.relationEqual({
       name:"person__house__city",
@@ -72,7 +72,7 @@ acceptanceTest("join", engine.memory, function(){
     
     allPeopleCombinedWithAllHouses = this.$R(function(){
       return join(relation("person"), relation("house"), equality(attr("person.houseId"), attr("house.houseId")))
-    }).perform()
+    })
     
     assert.relationEqual({
       name:"person__house",

@@ -1,3 +1,17 @@
+cross-language AT's
+  since knit expressions are now late-binding, assume a canonical json format of an expression and state the expression directly in json?
+  
+  select(relation("person"), and(eq(attr("person.houseId"), 101), eq(attr("person.age"), 5)))
+
+  ["select", 
+    ["relation","person"], 
+    ["and", 
+      ["eq", ["attr","person.houseId"], 101],
+      ["eq", ["attr","person.age"], 5]
+    ]
+  ]
+
+
 do relations have names, or not?
   memory relations ought not have names, right?
   you need to be able to refer to them...

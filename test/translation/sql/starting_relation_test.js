@@ -18,6 +18,10 @@ regarding("starting relation", function() {
       
       assert.equal(this.person.attributes().concat(this.house.attributes()),
                    new sql.Select().from(this.person, this.house).attributes())
+                   
+      assert.equal(new knit.Attributes([this.person.attr("age")]),
+                   new sql.Select().from(this.person).what(new sql.Column("person.age")).columns())
+      
     })
 
     test("sql select quacksLike a relation", function(){

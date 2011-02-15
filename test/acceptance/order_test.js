@@ -1,6 +1,6 @@
 require("./helper")
 
-acceptanceTest("order", engine.memory, function(){
+acceptanceTest("order", engine.memory, engine.sqlite, function(){
 
   test("rows are in ascending order", function (){
     var peopleInNameOrderAscending = 

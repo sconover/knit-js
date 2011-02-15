@@ -1,6 +1,6 @@
 require("./helper")
 
-acceptanceTest("select", engine.memory, function(){
+acceptanceTest("select", engine.memory, engine.sqlite, function(){
 
   describe("Predicates", function() {
   

@@ -58,6 +58,28 @@ regarding("starting relation", function() {
     
   })
   
+  test("clone a sql object", function(){
+    var original = new sql.Select().from(this.person)
+    var clone = original.clone()
+    
+    original.what(new sql.Column("person.name"))
+    clone.what(new sql.Column("person.age"))
+    
+    assert.same(
+      new sql.Select().
+        what(new sql.Column("person.name")).
+        from(this.person),
+      original
+    )
+
+    assert.same(
+      new sql.Select().
+        what(new sql.Column("person.age")).
+        from(this.person),
+      clone
+    )
+  })
+  
   regarding("sql object to statement", function(){
 
     test("simple select statement.  what defaults to star.", function(){

@@ -30,7 +30,11 @@ regarding("join to sql", function() {
         join.toSql()
       )
     })
-      
+    
+    test("columns/attributes", function(){
+      assert.equal(this.person.attributes().concat(this.house.attributes()),
+                   new sql.Select().join(new sql.Join(this.person, this.house, null)).columns())
+    })
   })
   
   regarding("sql object to sql statement", function() {

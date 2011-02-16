@@ -53,29 +53,29 @@ regarding("order to sql", function() {
   
     test("asc", function(){
       assert.equal(
-        "select * from person order by person.name",
+        " order by person.name",
         new sql.Select().
           from(this.person).
-          order(new sql.Order(new sql.Column("person.name"), sql.Order.ASC)).toStatement().sql
+          order(new sql.Order(new sql.Column("person.name"), sql.Order.ASC)).toStatement().sql.split("from person")[1]
       )
     })
 
     test("desc", function(){
       assert.equal(
-        "select * from person order by person.name desc",
+        " order by person.name desc",
         new sql.Select().
           from(this.person).
-          order(new sql.Order(new sql.Column("person.name"), sql.Order.DESC)).toStatement().sql
+          order(new sql.Order(new sql.Column("person.name"), sql.Order.DESC)).toStatement().sql.split("from person")[1]
       )
     })
 
     test("nested orders - inner are leftmost", function(){
       assert.equal(
-        "select * from person order by person.age desc, person.name",
+        " order by person.age desc, person.name",
         new sql.Select().
           from(this.person).
           order(new sql.Order(new sql.Column("person.age"), sql.Order.DESC), 
-                new sql.Order(new sql.Column("person.name"), sql.Order.ASC)).toStatement().sql
+                new sql.Order(new sql.Column("person.name"), sql.Order.ASC)).toStatement().sql.split("from person")[1]
       )
     })
     

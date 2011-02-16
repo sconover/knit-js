@@ -3,6 +3,7 @@
     (algebra => sql object)
   compiler.compile(expression
 
+sqlite db ==> connection / conn
 
 cross-language AT's
   since knit expressions are now late-binding, assume a canonical json format of an expression and state the expression directly in json?

@@ -41,7 +41,10 @@ regarding("join to sql", function() {
   
     test("cartesian", function(){
       assert.equal(
-        "select * from person join house",
+        "select person.personId as person$$personId, person.houseId as person$$houseId, " +
+        "person.name as person$$name, person.age as person$$age, " + 
+        "house.houseId as house$$houseId, house.address as house$$address, house.cityId as house$$cityId " +
+        "from person join house",
         new sql.Select().
           join(new sql.Join(this.person, this.house, null)).toStatement().sql
       )
@@ -49,7 +52,10 @@ regarding("join to sql", function() {
 
     test("with predicate", function(){
       assert.equal(
-        "select * from person join house on house.houseId = person.houseId",
+        "select person.personId as person$$personId, person.houseId as person$$houseId, " +
+        "person.name as person$$name, person.age as person$$age, " +
+        "house.houseId as house$$houseId, house.address as house$$address, house.cityId as house$$cityId " +
+        "from person join house on house.houseId = person.houseId",
         new sql.Select().
           join(new sql.Join(this.person, this.house, new sql.predicate.Equals(new sql.Column("house.houseId"), new sql.Column("person.houseId")))).
           toStatement().sql
@@ -58,7 +64,10 @@ regarding("join to sql", function() {
     
     test("and values", function(){
       assert.equal(
-        {sql:"select * from person join house on house.houseId = ?", values:[101]},
+        {sql:"select person.personId as person$$personId, person.houseId as person$$houseId, " +
+             "person.name as person$$name, person.age as person$$age, " +
+             "house.houseId as house$$houseId, house.address as house$$address, house.cityId as house$$cityId " +
+             "from person join house on house.houseId = ?", values:[101]},
         new sql.Select().
           join(new sql.Join(this.person, this.house, new sql.predicate.Equals(new sql.Column("house.houseId"), 101))).
           toStatement()

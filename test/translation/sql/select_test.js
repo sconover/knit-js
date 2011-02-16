@@ -33,10 +33,12 @@ regarding("select", function() {
   })
   
   regarding("sql object (involving where) to statement", function(){
-
+    var select_person_beginning = 
+      "select person.personId as person$$personId, person.houseId as person$$houseId, person.name as person$$name, " +
+      "person.age as person$$age from person "
     test("where clause - simple", function(){
       assert.equal(
-        {sql:"select * from person where person.name = ?", values:["Jane"]},
+        {sql:select_person_beginning + "where person.name = ?", values:["Jane"]},
         new sql.Select().
           from(this.person).
           where(new sql.predicate.Equals(new sql.Column("person.name"), "Jane")).toStatement()
@@ -45,7 +47,7 @@ regarding("select", function() {
     
     test("'and' is implied between wheres", function(){
       assert.equal(
-        {sql:"select * from person where person.name = ? and person.age = ? and ? = ?", values:["Jane", 5, 7, 7]},
+        {sql:select_person_beginning + "where person.name = ? and person.age = ? and ? = ?", values:["Jane", 5, 7, 7]},
         new sql.Select().
           from(this.person).
           where(new sql.predicate.Equals(new sql.Column("person.name"), "Jane")).
@@ -56,7 +58,7 @@ regarding("select", function() {
     
     test("where clause - conjunction", function(){
       assert.equal(
-        {sql:"select * from person where person.name = ? and person.age = ?", values:["Jane", 5]},
+        {sql:select_person_beginning + "where person.name = ? and person.age = ?", values:["Jane", 5]},
         new sql.Select().
           from(this.person).
           where(

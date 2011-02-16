@@ -79,7 +79,7 @@ assert.AssertionError.prototype.toString = function() {
 assert.doubleEqual = assert.equal
 assert.equal = assert.deepEqual
 
-assert._func = function(func, expected, actual, orientation, term) {
+assert._func = function(func, expected, actual, orientation, term, additionalMessageFunction) {
   var _ = knit._util
   
   function simpleInspect(obj) {
@@ -100,12 +100,14 @@ assert._func = function(func, expected, actual, orientation, term) {
     }
   }
   
+  additionalMessageFunction = additionalMessageFunction || function(){return ""}
   var result = func(expected, actual)==orientation
   assert.ok(result, 
             !result &&
             term + " failure: " + 
             "\n    expected: " + doInspect(expected) + 
-            "\n    actual:   " + doInspect(actual))    
+            "\n    actual:   " + doInspect(actual) + 
+            additionalMessageFunction(expected, actual))    
   
 }
 
@@ -122,7 +124,12 @@ assert.setsEqual = function(expectedArray, actualArray) {
     expectedArray, 
     actualArray, 
     true, 
-    "is Set-Equal")
+    "is Set-Equal",
+    function(){
+      var intersection = expectedSet.intersection(actualSet)
+      return "\nexpected-actual=" + knit._util.inspect(knit._util.differ(expectedArray, intersection.values())) +
+             "\nactual-expected=" + knit._util.inspect(knit._util.differ(actualArray, intersection.values()))
+    })
 }
 
 

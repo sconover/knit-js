@@ -86,16 +86,18 @@ regarding("starting relation", function() {
   
   regarding("sql object to statement", function(){
 
-    test("simple select statement.  what defaults to star.", function(){
+    test("simple select statement", function(){
       assert.equal(
-        "select * from person",
+        "select person.personId as person$$personId, person.houseId as person$$houseId, " +
+        "person.name as person$$name, person.age as person$$age from person",
         new sql.Select().from(this.person).toStatement().sql
       )
     })
     
-    test("whats are not equal to the attributes", function(){
+    test("whats are not equal to the attributes.  all columns are aliased because "+
+         "of the same-name-column stomping problem in the sqlite driver", function(){
       assert.equal(
-        "select person.name, person.age from person",
+        "select person.name as person$$name, person.age as person$$age from person",
         new sql.Select().
           what(new sql.Column("person.name"), 
                new sql.Column("person.age")).
@@ -105,7 +107,10 @@ regarding("starting relation", function() {
     
     test("multiple froms", function(){
       assert.equal(
-        "select * from person, house",
+        "select person.personId as person$$personId, person.houseId as person$$houseId, " +
+        "person.name as person$$name, person.age as person$$age, " +
+        "house.houseId as house$$houseId, house.address as house$$address, house.cityId as house$$cityId " +
+        "from person, house",
         new sql.Select().from(this.person, this.house).toStatement().sql
       )
     })

@@ -27,7 +27,7 @@ regarding("project(proh-JEKT)", function() {
 
     test("select clause", function(){
       assert.equal(
-        "select person.name, person.age from person",
+        "select person.name as person$$name, person.age as person$$age from person",
         new sql.Select().
           what(new sql.Column("person.name"), new sql.Column("person.age")).
           from(this.person).toStatement().sql

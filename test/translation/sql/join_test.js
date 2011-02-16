@@ -42,6 +42,17 @@ regarding("join to sql", function() {
           join(new sql.Join(this.house, this.city)),
         join.toSql()
       )
+      
+      // join = this.$R(function(){
+      //   return join(relation("person"), join(relation("house"), relation("city")))
+      // })
+      // 
+      // assert.same(
+      //   new sql.Select().
+      //     join(new sql.Join(this.person, this.house)).
+      //     join(new sql.Join(this.house, this.city)),
+      //   join.toSql()
+      // )
     })
     
     test("columns/attributes", function(){

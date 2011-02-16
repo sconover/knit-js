@@ -31,7 +31,7 @@ acceptanceTest("divide - relational divsion (think: opposite of cartesian join)"
 
     allPeopleCombinedWithAllHousesBackToPeople = this.$R(function(){
       return divide(join(relation("person"), relation("house")), relation("house"))
-    }).perform()
+    })
 
     assert.relationEqual({
       name:"person__house$$house",
@@ -56,7 +56,7 @@ acceptanceTest("divide - relational divsion (think: opposite of cartesian join)"
                naturalJoin(relation("person"), relation("house")), 
                select(relation("house"), eq(attr("house.address"), "Chimney Hill"))
              )
-    }).perform()
+    })
      
     assert.relationEqual({
       name:"person__house$$house",

@@ -31,6 +31,19 @@ regarding("join to sql", function() {
       )
     })
     
+    test("multiple joins", function(){
+      var join = this.$R(function(){
+        return join(join(relation("person"), relation("house")), relation("city"))
+      })
+      
+      assert.same(
+        new sql.Select().
+          join(new sql.Join(this.person, this.house)).
+          join(new sql.Join(this.house, this.city)),
+        join.toSql()
+      )
+    })
+    
     test("columns/attributes", function(){
       assert.equal(this.person.attributes().concat(this.house.attributes()),
                    new sql.Select().join(new sql.Join(this.person, this.house, null)).columns())
@@ -38,7 +51,7 @@ regarding("join to sql", function() {
   })
   
   regarding("sql object to sql statement", function() {
-  
+    
     test("cartesian", function(){
       assert.equal(
         "select person.personId as person$$personId, person.houseId as person$$houseId, " +
@@ -49,13 +62,15 @@ regarding("join to sql", function() {
           join(new sql.Join(this.person, this.house, null)).toStatement().sql
       )
     })
-
+    
+    var select_star = 
+      "select person.personId as person$$personId, person.houseId as person$$houseId, " +
+      "person.name as person$$name, person.age as person$$age, " +
+      "house.houseId as house$$houseId, house.address as house$$address, house.cityId as house$$cityId"
+    
     test("with predicate", function(){
       assert.equal(
-        "select person.personId as person$$personId, person.houseId as person$$houseId, " +
-        "person.name as person$$name, person.age as person$$age, " +
-        "house.houseId as house$$houseId, house.address as house$$address, house.cityId as house$$cityId " +
-        "from person join house on house.houseId = person.houseId",
+        select_star + " from person join house on house.houseId = person.houseId",
         new sql.Select().
           join(new sql.Join(this.person, this.house, new sql.predicate.Equals(new sql.Column("house.houseId"), new sql.Column("person.houseId")))).
           toStatement().sql
@@ -64,13 +79,27 @@ regarding("join to sql", function() {
     
     test("and values", function(){
       assert.equal(
-        {sql:"select person.personId as person$$personId, person.houseId as person$$houseId, " +
-             "person.name as person$$name, person.age as person$$age, " +
-             "house.houseId as house$$houseId, house.address as house$$address, house.cityId as house$$cityId " +
-             "from person join house on house.houseId = ?", values:[101]},
+        {sql:select_star + " from person join house on house.houseId = ?", values:[101]},
         new sql.Select().
           join(new sql.Join(this.person, this.house, new sql.predicate.Equals(new sql.Column("house.houseId"), 101))).
           toStatement()
+      )
+    })    
+    
+    test("several joins", function(){
+      assert.equal(
+        select_star + ", city.cityId as city$$cityId, city.name as city$$name " +
+          "from person join house on house.houseId = person.houseId join city on house.cityId = city.cityId",
+        new sql.Select().
+          join(
+            new sql.Join(this.person, this.house, 
+                         new sql.predicate.Equals(new sql.Column("house.houseId"), new sql.Column("person.houseId")))
+          ).
+          join(
+            new sql.Join(this.house, this.city, 
+                         new sql.predicate.Equals(new sql.Column("house.cityId"), new sql.Column("city.cityId")))
+          ).
+          toStatement().sql
       )
     })    
     

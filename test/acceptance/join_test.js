@@ -29,7 +29,7 @@ acceptanceTest("join", engine.memory, engine.sqlite, function(){
       
   })
   
-  xtest("two joins", function (){
+  test("two joins", function (){
 
     allPeopleCombinedWithAllHousesCombinedWithAllCities = this.$R(function(){
       return join(join(relation("person"), relation("house")), relation("city"))

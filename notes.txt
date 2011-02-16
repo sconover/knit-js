@@ -1,3 +1,11 @@
+convert memory to complier style
+
+async / iterator resultset style?
+
+sqlite left/right outer join
+
+more exotic join + other scenarios...
+
 "compile" metaphor
   transform high-level algebra into lower-level "executable" form
     (algebra => sql object)
@@ -26,18 +34,6 @@ do relations have names, or not?
 
 toSql => toSqlObject?
   
-  
-something is overgeneralized.  maybe.
-  some distinction between resultset and relation?
-  or is it valid to add something on to a query as if it's a relation?
-  why not?
-    hmmm
-
-[sql] lazyresultset
-        is a relation
-        delegates to sql object
-        .rows() toString's the sql object and executes against the engine...
-
 getting perform* methods out of relation.js...
   on the sql side, we'll be building a relation that holds a sql object (a query?)
   later, if we want memory to behave the same way, build a separate memory relation with a function (delayed execution?)

@@ -1,6 +1,6 @@
 require("../../test_helper")
 require("knit/core")
-require("knit/engine/sqlite/db")
+require("knit/engine/sqlite")
 
 regarding("sqlite db", function() {
   
@@ -14,6 +14,19 @@ regarding("sqlite db", function() {
     this.db.execute({sql:"insert into foo values('red')"})
     
     assert.equal([{"color":"red"}], this.db.query({sql:"select * from foo"}))
+  })
+  
+  test("execute, query async", function(){
+    this.db.execute({sql:"create table foo(color string)"})
+    this.db.execute({sql:"insert into foo values('red')"})
+    var objects = []
+    this.db.query({sql:"select * from foo"}, function(next){
+      if (next == null) {
+        assert.equal([{"color":"red"}], objects)
+      } else {
+        objects.push(next)
+      }
+    })
   })
   
   test("list tables", function(){

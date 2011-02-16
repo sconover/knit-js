@@ -9,7 +9,43 @@ regarding("query", function() {
   
   beforeEach(function(){ this.db = new knit.engine.sqlite.Database(":memory:"); this.db.open() })
   afterEach(function(){ this.db.close() })
-
+  
+  
+  test("async/stream-oriented row+object access", function(){
+    this.db.execute({sql:"create table foo(id int primary key, color string)"})
+    this.db.execute({sql:"insert into foo values(1, 'blue')"})
+    this.db.execute({sql:"insert into foo values(2, 'red')"})
+    
+    var foo = sqlite.Table.load(this.db, "foo"),
+        query = new sqlite.Query(new sql.Select().from(foo), this.db),
+        results = []
+        
+    query.rows(function(row){
+      if (row==null) {
+        assert.equal([
+          [1, 'blue'],
+          [2, 'red']
+        ], results)
+      } else {
+        results.push(row)
+      }
+    })
+    
+    results = []
+    query.objects(function(object){
+      if (object==null) {
+        assert.equal([
+          {id:1, color:'blue'},
+          {id:2, color:'red'}
+        ], results)
+      } else {
+        results.push(object)
+      }
+    })
+    
+    //talk to davis et al about proving async
+  })
+  
   test("[wasabug] rows are not incorrect because columns from different tables have the same name", function(){
     this.db.execute({sql:"create table foo(id int primary key, color string)"})
     this.db.execute({sql:"create table bar(id int primary key, color string)"})
@@ -32,6 +68,7 @@ regarding("query", function() {
       query.objects()
     )
   })
+  
 
 })
 

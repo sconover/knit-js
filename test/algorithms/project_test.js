@@ -7,16 +7,16 @@ regarding("project (proh-JEKT)", function() {
       f = knit.algorithms
   
   test("cut down to only the specified attributes / columns", function(){
-    var relation = compiledRelation(["id", "color", "age"], [[1, "red", 5],[2, "blue", 15]])
+    var relation = {attributes:["id", "color", "age"], rows:[[1, "red", 5],[2, "blue", 15]]}
 
     assert.deepSame(
-      {attributes:relation.attributes().get("id", "color"), rows:[[1, "red"], [2, "blue"]]},
-      f.project(relation, relation.attributes().get("id", "color"))
+      {attributes:["id", "color"], rows:[[1, "red"], [2, "blue"]]},
+      f.project(relation, ["id", "color"])
     )
     
     assert.deepSame(
-      {attributes:new knit.Attributes([]), rows:[[], []]},
-      f.project(relation, new knit.Attributes([]))
+      {attributes:[], rows:[[], []]},
+      f.project(relation, [])
     )
   })
   

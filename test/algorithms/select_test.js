@@ -7,21 +7,21 @@ regarding("select", function() {
       f = knit.algorithms
   
   test("filter rows based on a predicate", function(){
-    var relation = compiledRelation(["id", "color"], [[1, "red"],[2, "blue"],[3, "blue"]])
+    var relation = {attributes:["id", "color"], rows:[[1, "red"],[2, "blue"],[3, "blue"]]}
 
     assert.deepSame(
-      {attributes:relation.attributes().get("id", "color"), rows:[[2, "blue"],[3, "blue"]]},
-      f.select(relation, new knit.algebra.predicate.Equality(relation.attr("color"), "blue"))
+      {attributes:["id", "color"], rows:[[2, "blue"],[3, "blue"]]},
+      f.select(relation, function(attributes, row){return row[1]=="blue"})
     )
     
     assert.deepSame(
-      {attributes:relation.attributes().get("id", "color"), rows:[[1, "red"]]},
-      f.select(relation, new knit.algebra.predicate.Equality(relation.attr("color"), "red"))
+      {attributes:["id", "color"], rows:[[1, "red"]]},
+      f.select(relation, function(attributes, row){return row[1]=="red"})
     )
-
+    
     assert.deepSame(
-      {attributes:relation.attributes().get("id", "color"), rows:[]},
-      f.select(relation, new knit.algebra.predicate.Equality(relation.attr("color"), "PURPLE"))
+      {attributes:["id", "color"], rows:[]},
+      f.select(relation, function(attributes, row){return row[1]=="PURPLE"})
     )
   })
   

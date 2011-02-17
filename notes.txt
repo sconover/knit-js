@@ -1,5 +1,7 @@
 convert memory to complier style
 
+quacksLike Executable relation
+
 async / iterator resultset style?
 
 sqlite left/right outer join

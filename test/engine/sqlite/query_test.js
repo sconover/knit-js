@@ -20,7 +20,7 @@ regarding("query", function() {
         query = new sqlite.Query(new sql.Select().from(foo), this.db),
         results = []
         
-    query.rows(function(row){
+    query.rowsAsync(function(row){
       if (row==null) {
         assert.equal([
           [1, 'blue'],
@@ -28,18 +28,6 @@ regarding("query", function() {
         ], results)
       } else {
         results.push(row)
-      }
-    })
-    
-    results = []
-    query.objects(function(object){
-      if (object==null) {
-        assert.equal([
-          {id:1, color:'blue'},
-          {id:2, color:'red'}
-        ], results)
-      } else {
-        results.push(object)
       }
     })
     
@@ -58,14 +46,14 @@ regarding("query", function() {
 
     assert.equal([
       [1, 'blue', 2, 'red']],
-      query.rows()
+      query.rowsSync()
     )
     
     //the last id+color columns 'win'
     //this is messed up but it's just how it has to be.
     assert.equal([
       {id:2, color:'red'}],
-      query.objects()
+      new knit.ExecutableRelation(query).objects()
     )
   })
   

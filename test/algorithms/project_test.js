@@ -8,12 +8,12 @@ regarding("project (proh-JEKT)", function() {
   test("cut down to only the specified attributes / columns", function(){
     var relation = {attributes:["id", "color", "age"], rows:[[1, "red", 5],[2, "blue", 15]]}
 
-    assert.deepSame(
+    assert.equal(
       {attributes:["id", "color"], rows:[[1, "red"], [2, "blue"]]},
       f.project(relation, ["id", "color"])
     )
     
-    assert.deepSame(
+    assert.equal(
       {attributes:[], rows:[[], []]},
       f.project(relation, [])
     )

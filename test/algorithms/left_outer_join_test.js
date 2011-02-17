@@ -19,24 +19,23 @@ regarding("join", function() {
          [2, "blue", "carrera"],
          [2, "blue", "mustang"]
        ]},
-      f.join(colors, cars)
+      f.leftOuterJoin(colors, cars)
     )
         
   })
   
-  test("only return combined rows that match the predicate", function(){
+  test("if a row on the left has no match on the right, return a null row on the right", function(){
 
     assert.equal(
       {attributes:["id", "color", "model"], 
        rows:[
-         [1, "red",  "accord"], 
+         [1, "red",  null], 
          [2, "blue", "accord"],
          [2, "blue", "carrera"],
          [2, "blue", "mustang"]
        ]},
-      f.join(colors, cars, function(combinedAttributes, candidateRow){
-        return candidateRow[_.indexOf(combinedAttributes, "color")]=="blue" || 
-               candidateRow[_.indexOf(combinedAttributes, "model")]=="accord"
+      f.leftOuterJoin(colors, cars, function(combinedAttributes, candidateRow){
+        return candidateRow[_.indexOf(combinedAttributes, "color")]=="blue"
       })
     )
         

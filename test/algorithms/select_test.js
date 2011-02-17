@@ -8,17 +8,17 @@ regarding("select", function() {
   test("filter rows based on a predicate", function(){
     var relation = {attributes:["id", "color"], rows:[[1, "red"],[2, "blue"],[3, "blue"]]}
 
-    assert.deepSame(
+    assert.equal(
       {attributes:["id", "color"], rows:[[2, "blue"],[3, "blue"]]},
       f.select(relation, function(attributes, row){return row[1]=="blue"})
     )
     
-    assert.deepSame(
+    assert.equal(
       {attributes:["id", "color"], rows:[[1, "red"]]},
       f.select(relation, function(attributes, row){return row[1]=="red"})
     )
     
-    assert.deepSame(
+    assert.equal(
       {attributes:["id", "color"], rows:[]},
       f.select(relation, function(attributes, row){return row[1]=="PURPLE"})
     )

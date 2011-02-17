@@ -34,6 +34,12 @@ regarding("query", function() {
     //talk to davis et al about proving async
   })
   
+  test("quacksLike execution strategy", function(){
+    this.db.execute({sql:"create table foo(id int primary key, color string)"})
+    var foo = sqlite.Table.load(this.db, "foo")
+    assert.quacksLike(new sqlite.Query(new sql.Select().from(foo), this.db), knit.signature.executionStrategy)
+  })
+  
   test("[wasabug] rows are not incorrect because columns from different tables have the same name", function(){
     this.db.execute({sql:"create table foo(id int primary key, color string)"})
     this.db.execute({sql:"create table bar(id int primary key, color string)"})

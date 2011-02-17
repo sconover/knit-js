@@ -34,8 +34,8 @@ regarding("right outer join", function() {
          [null, null, "carrera"],
          [null, null, "mustang"]
        ]},
-      f.rightOuterJoin(colors, cars, function(combinedAttributes, candidateRow){
-        return candidateRow[_.indexOf(combinedAttributes, "model")]=="accord"
+      f.rightOuterJoin(colors, cars, function(candidateRow){
+        return candidateRow[2]=="accord"
       })
     )
         

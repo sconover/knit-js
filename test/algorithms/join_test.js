@@ -34,9 +34,8 @@ regarding("join", function() {
          [2, "blue", "carrera"],
          [2, "blue", "mustang"]
        ]},
-      f.join(colors, cars, function(combinedAttributes, candidateRow){
-        return candidateRow[_.indexOf(combinedAttributes, "color")]=="blue" || 
-               candidateRow[_.indexOf(combinedAttributes, "model")]=="accord"
+      f.join(colors, cars, function(candidateRow){
+        return candidateRow[1]=="blue" || candidateRow[2]=="accord"
       })
     )
         

@@ -10,17 +10,17 @@ regarding("select", function() {
 
     assert.equal(
       {attributes:["id", "color"], rows:[[2, "blue"],[3, "blue"]]},
-      f.select(relation, function(attributes, row){return row[1]=="blue"})
+      f.select(relation, function(row){return row[1]=="blue"})
     )
     
     assert.equal(
       {attributes:["id", "color"], rows:[[1, "red"]]},
-      f.select(relation, function(attributes, row){return row[1]=="red"})
+      f.select(relation, function(row){return row[1]=="red"})
     )
     
     assert.equal(
       {attributes:["id", "color"], rows:[]},
-      f.select(relation, function(attributes, row){return row[1]=="PURPLE"})
+      f.select(relation, function(row){return row[1]=="PURPLE"})
     )
   })
   

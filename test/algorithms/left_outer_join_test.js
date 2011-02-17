@@ -34,8 +34,8 @@ regarding("left outer join", function() {
          [2, "blue", "carrera"],
          [2, "blue", "mustang"]
        ]},
-      f.leftOuterJoin(colors, cars, function(combinedAttributes, candidateRow){
-        return candidateRow[_.indexOf(combinedAttributes, "color")]=="blue"
+      f.leftOuterJoin(colors, cars, function(candidateRow){
+        return candidateRow[1]=="blue"
       })
     )
         

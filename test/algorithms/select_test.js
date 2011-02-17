@@ -1,6 +1,5 @@
-require("./helper")
+require("../helper")
 require("knit/algorithms")
-require("../test_relation.js")
 
 regarding("select", function() {
   var _ = knit._util,

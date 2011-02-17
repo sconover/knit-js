@@ -1,6 +1,5 @@
-require("./helper")
+require("../helper")
 require("knit/algorithms")
-require("../test_relation.js")
 
 regarding("project (proh-JEKT)", function() {
   var _ = knit._util,

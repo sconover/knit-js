@@ -2,8 +2,7 @@ require("../helper")
 require("knit/algorithms")
 
 regarding("unnest", function() {
-  var _ = knit._util,
-      f = knit.algorithms
+  var _ = knit._util
   
   test("take nested columns and flatten them", function(){
     var relation = {attributes:["model", {"individualCars": ["id", "color", "year"]}], 
@@ -21,7 +20,7 @@ regarding("unnest", function() {
          ["accord",  2, "blue", 1998],
          ["carrera", 3, "blue",  1970]
        ]},
-      f.unnest(relation, {"individualCars": ["id", "color", "year"]})
+      knit.algorithms.unnest(relation, {"individualCars": ["id", "color", "year"]})
     )
     
   })
@@ -42,12 +41,13 @@ regarding("unnest", function() {
          ["accord",  2, "blue", 1998, "Amy"],
          ["carrera", 3, "blue",  1970, "Jane"]
        ]},
-      f.unnest(f.unnest(
-                 relation,
-                 {"individualCars": ["id", "color", "year", {"owners":["owner"]}]}
-               ),
-               {"owners": ["owner"]}
-             )
+      knit.algorithms.unnest(
+        knit.algorithms.unnest(
+          relation,
+          {"individualCars": ["id", "color", "year", {"owners":["owner"]}]}
+        ),
+        {"owners": ["owner"]}
+      )
     )
     
   })

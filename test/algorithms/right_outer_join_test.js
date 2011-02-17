@@ -3,7 +3,6 @@ require("knit/algorithms")
 
 regarding("right outer join", function() {
   var _ = knit._util,
-      f = knit.algorithms,
       colors = {attributes:["id", "color"], rows:[[1, "red"],[2, "blue"]]},
       cars = {attributes:["model"], rows:[["accord"],["carrera"],["mustang"]]}
   
@@ -19,7 +18,7 @@ regarding("right outer join", function() {
          [1, "red",  "mustang"], 
          [2, "blue", "mustang"]
        ]},
-      f.rightOuterJoin(colors, cars)
+      knit.algorithms.rightOuterJoin(colors, cars)
     )
         
   })
@@ -34,7 +33,7 @@ regarding("right outer join", function() {
          [null, null, "carrera"],
          [null, null, "mustang"]
        ]},
-      f.rightOuterJoin(colors, cars, function(candidateRow){
+      knit.algorithms.rightOuterJoin(colors, cars, function(candidateRow){
         return candidateRow[2]=="accord"
       })
     )

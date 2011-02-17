@@ -2,8 +2,7 @@ require("../helper")
 require("knit/algorithms")
 
 regarding("nest", function() {
-  var _ = knit._util,
-      f = knit.algorithms
+  var _ = knit._util
   
   test("take flattened columns and group them up", function(){
     var relation = {attributes:["id", "color", "model", "year"], 
@@ -20,9 +19,9 @@ regarding("nest", function() {
                      [2, "blue", 1998]]],
          ["carrera", [[3, "blue", 1970]]]
        ]},
-      f.nest(relation, 
-             {"individualCars": ["id", "color", "year"]}, 
-             ["model", {"individualCars": ["id", "color", "year"]}])
+      knit.algorithms.nest(relation, 
+                           {"individualCars": ["id", "color", "year"]}, 
+                           ["model", {"individualCars": ["id", "color", "year"]}])
     )
     
   })
@@ -43,13 +42,15 @@ regarding("nest", function() {
                      [2, "blue", 1998, [["Amy"]] ] ]],
          ["carrera", [[3, "blue", 1970, [["Jane"]] ]] ]
        ]},
-      f.nest(f.nest(
-               relation,
-               {"owners": ["owner"]},
-               ["id", "color", "model", "year", {"owners":["owner"]}]
-             ), 
-             {"individualCars": ["id", "color", "year", {"owners":["owner"]}]}, 
-             ["model", {"individualCars": ["id", "color", "year", {"owners":["owner"]}]}])
+      knit.algorithms.nest(
+        knit.algorithms.nest(
+          relation,
+          {"owners": ["owner"]},
+          ["id", "color", "model", "year", {"owners":["owner"]}]
+        ), 
+        {"individualCars": ["id", "color", "year", {"owners":["owner"]}]}, 
+        ["model", {"individualCars": ["id", "color", "year", {"owners":["owner"]}]}]
+      )
     )
     
   })

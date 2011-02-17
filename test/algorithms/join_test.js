@@ -3,7 +3,6 @@ require("knit/algorithms")
 
 regarding("join", function() {
   var _ = knit._util,
-      f = knit.algorithms,
       colors = {attributes:["id", "color"], rows:[[1, "red"],[2, "blue"]]},
       cars = {attributes:["model"], rows:[["accord"],["carrera"],["mustang"]]}
   
@@ -19,7 +18,7 @@ regarding("join", function() {
          [2, "blue", "carrera"],
          [2, "blue", "mustang"]
        ]},
-      f.join(colors, cars)
+      knit.algorithms.join(colors, cars)
     )
         
   })
@@ -34,7 +33,7 @@ regarding("join", function() {
          [2, "blue", "carrera"],
          [2, "blue", "mustang"]
        ]},
-      f.join(colors, cars, function(candidateRow){
+      knit.algorithms.join(colors, cars, function(candidateRow){
         return candidateRow[1]=="blue" || candidateRow[2]=="accord"
       })
     )

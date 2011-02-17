@@ -112,7 +112,7 @@ regarding("references allow late-binding of core relations and attributes. " +
       
       assert.equal(peopleRef.name(), "people")
       assert.same(this.house, peopleRef.sourceRelation())
-      assert.arraySame(peopleRef.nestedRelation().attributes(), [this.person.attr("personId"), this.person.attr("age")])
+      assert.deepSame(peopleRef.nestedRelation().attributes(), [this.person.attr("personId"), this.person.attr("age")])
     })
 
     //what about nested attrs post-resolve?

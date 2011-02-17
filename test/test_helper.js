@@ -158,11 +158,8 @@ assert.notSame = function(expected, actual) {
   assert._same(expected, actual, false, "is Not Same")
 }
 
-
-assert.arraySame = function(expected, actual) {
-  knit._util.each(expected, function(item, i){
-    assert.same(item, actual[i])
-  })
+assert.deepSame = function(expected, actual) {
+  assert._func(function(expected, actual){return knit._util.deepSame(expected, actual)}, expected, actual, true, "is Deep Same")
 }
 
 assert.quacksLike = function(actualObject, expectedSignature) {

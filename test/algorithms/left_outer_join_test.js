@@ -3,7 +3,7 @@ require("knit/algorithms")
 
 regarding("left outer join", function() {
   var _ = knit._util,
-      f = knit.algorithms
+      f = knit.algorithms,
       colors = {attributes:["id", "color"], rows:[[1, "red"],[2, "blue"]]},
       cars = {attributes:["model"], rows:[["accord"],["carrera"],["mustang"]]}
   

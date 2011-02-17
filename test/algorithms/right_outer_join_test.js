@@ -1,7 +1,7 @@
 require("../helper")
 require("knit/algorithms")
 
-regarding("left outer join", function() {
+regarding("right outer join", function() {
   var _ = knit._util,
       f = knit.algorithms
       colors = {attributes:["id", "color"], rows:[[1, "red"],[2, "blue"]]},
@@ -13,29 +13,29 @@ regarding("left outer join", function() {
       {attributes:["id", "color", "model"], 
        rows:[
          [1, "red",  "accord"], 
-         [1, "red",  "carrera"], 
-         [1, "red",  "mustang"], 
          [2, "blue", "accord"],
+         [1, "red",  "carrera"], 
          [2, "blue", "carrera"],
+         [1, "red",  "mustang"], 
          [2, "blue", "mustang"]
        ]},
-      f.leftOuterJoin(colors, cars)
+      f.rightOuterJoin(colors, cars)
     )
         
   })
   
-  test("if a row on the left has no match on the right, return a null row on the right", function(){
+  test("if a row on the right has no match on the left, return a null row on the left", function(){
 
     assert.equal(
       {attributes:["id", "color", "model"], 
        rows:[
-         [1, "red",  null], 
+         [1, "red", "accord"],
          [2, "blue", "accord"],
-         [2, "blue", "carrera"],
-         [2, "blue", "mustang"]
+         [null, null, "carrera"],
+         [null, null, "mustang"]
        ]},
-      f.leftOuterJoin(colors, cars, function(combinedAttributes, candidateRow){
-        return candidateRow[_.indexOf(combinedAttributes, "color")]=="blue"
+      f.rightOuterJoin(colors, cars, function(combinedAttributes, candidateRow){
+        return candidateRow[_.indexOf(combinedAttributes, "model")]=="accord"
       })
     )
         

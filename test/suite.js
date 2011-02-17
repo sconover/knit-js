@@ -1,4 +1,4 @@
-require("./test_helper")
+require("./helper")
 
 
 var subdir = process.argv.length==3 ? "/" + process.argv[2] : ""

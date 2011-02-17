@@ -1,4 +1,4 @@
-require("../test_helper")
+require("../helper")
 require("knit/engine/memory")
 require("../relation_proof")
 

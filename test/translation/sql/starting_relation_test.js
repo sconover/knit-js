@@ -1,4 +1,4 @@
-require("../../test_helper")
+require("../../helper")
 require("./sql_fakes.js")
 require("knit/translation/sql")
 

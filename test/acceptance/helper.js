@@ -1,4 +1,4 @@
-require("../test_helper.js")
+require("../helper")
 
 require("knit/engine/memory")
 require("knit/engine/sqlite")

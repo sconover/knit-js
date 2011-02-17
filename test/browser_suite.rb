@@ -18,7 +18,7 @@ source_files = %w{
   lib/knit/attributes/string.js
 }
 
-test_files = ["test/test_helper.js"] + Dir["test/**/*_test.js"].to_a.sort
+test_files = ["test/helper"] + Dir["test/**/*_test.js"].to_a.sort
 
 
 html = File.read("test/browser_suite.html.in")

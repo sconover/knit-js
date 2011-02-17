@@ -1,4 +1,4 @@
-require("../test_helper.js")
+require("../helper")
 require("knit/algebra/rename")
 require("./../test_relation.js")
 

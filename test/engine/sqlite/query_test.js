@@ -1,4 +1,4 @@
-require("../../test_helper")
+require("../../helper")
 require("knit/engine/sqlite")
 
 regarding("query", function() {

@@ -1,4 +1,4 @@
-require("./test_helper")
+require("./helper")
 require("./test_relation")
 require("./relation_proof")
 

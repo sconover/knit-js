@@ -1,4 +1,4 @@
-require("../test_helper.js")
+require("../helper")
 require("knit/namespace")
 require("knit/core/quacks_like")
 require("../test_relation.js")

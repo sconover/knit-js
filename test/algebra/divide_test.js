@@ -1,4 +1,4 @@
-require("../test_helper.js")
+require("../helper")
 require("knit/algebra/join")
 require("knit/algebra/divide")
 require("./../test_relation.js")

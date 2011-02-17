@@ -1,4 +1,4 @@
-require("../../test_helper")
+require("../../helper")
 require("knit/core")
 require("knit/engine/sqlite/type_mapping")
 require("knit/engine/sqlite/table")

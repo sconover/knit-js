@@ -1,15 +1,14 @@
 require("../helper")
 require("knit/algorithms")
 
-regarding("join", function() {
+regarding("unnest", function() {
   var _ = knit._util,
       f = knit.algorithms,
       colors = {attributes:["id", "color"], rows:[[1, "red"],[2, "blue"]]},
       cars = {attributes:["model"], rows:[["accord"],["carrera"],["mustang"]]}
-  
-  test("combine all the rows on the left with all the rows on the right (cartesian)", function(){
-    
-    assert.equal(
+
+  test("divide cartesian product by a relation", function (){
+    var joined = 
       {attributes:["id", "color", "model"], 
        rows:[
          [1, "red",  "accord"], 
@@ -18,28 +17,27 @@ regarding("join", function() {
          [2, "blue", "accord"],
          [2, "blue", "carrera"],
          [2, "blue", "mustang"]
-       ]},
-      f.join(colors, cars)
-    )
-        
+       ]}
+    
+    assert.equal(colors, f.divide(joined, cars))
   })
-  
-  test("only return combined rows that match the predicate", function(){
 
-    assert.equal(
+  test("only populate quotient rows based on rows present in the dividend and in the divisor", function (){
+    var joined = 
       {attributes:["id", "color", "model"], 
        rows:[
          [1, "red",  "accord"], 
+         [1, "red",  "carrera"], 
+         [1, "red",  "mustang"], 
          [2, "blue", "accord"],
          [2, "blue", "carrera"],
-         [2, "blue", "mustang"]
-       ]},
-      f.join(colors, cars, function(candidateRow){
-        return candidateRow[1]=="blue" || candidateRow[2]=="accord"
-      })
-    )
-        
+         [2, "blue", "mustang"],
+         [2, "green", "pinto"]
+       ]}
+    
+    assert.equal(colors, f.divide(joined, cars))
   })
+  
   
 })
 

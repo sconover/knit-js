@@ -46,15 +46,36 @@ regarding("attributes", function() {
                  new knit.Attributes([this.house.attr("houseId"), this.person.attr("name")]).namesAndTypes())
   })
 
-  test("get single", function(){this.$R(function(){
-    var attributes = new knit.Attributes([attr("house.people"), attr("person.name")])
-    assert.equal(attr("house.people"), attributes.get("people"))
-  })})
+  regarding("get", function() {
+    test("single", function(){this.$R(function(){
+      var attributes = new knit.Attributes([attr("house.people"), attr("person.name")])
+      assert.equal(attr("house.people"), attributes.get("people"))
+    })})
 
-  test("get multiple", function(){this.$R(function(){
-    var attributes = new knit.Attributes([attr("house.people"), attr("person.name")])
-    assert.same(new knit.Attributes([attr("house.people"), attr("person.name")]), attributes.get("people", "name"))
-  })})
+    test("multiple", function(){this.$R(function(){
+      var attributes = new knit.Attributes([attr("house.people"), attr("person.name")])
+      assert.same(new knit.Attributes([attr("house.people"), attr("person.name")]), attributes.get("people", "name"))
+    })})
+  })
+  
+  regarding("from primitives", function() {
+
+    test("simple name", function(){
+      assert.same(this.person.attributes().get("name", "age"), 
+                  this.person.attributes().fromPrimitives(["name", "age"]))
+    })
+    
+    test("fully qualified", function(){
+      assert.same(this.person.attributes().get("name", "age"), 
+                  this.person.attributes().fromPrimitives([this.person.id() + ".name", this.person.id() + ".age"]))
+    })
+    
+    test("nested form", function(){
+      assert.same(this.person.attributes().get("name", "age"), 
+                  this.person.attributes().fromPrimitives([{"name":[]}, {"age":[]}]))
+    })
+    
+  })
 
   test("splice nested attribute - puts the nested attribute in the first place one " +
        "of the consitutent attributes is found, then removes the constituent attributes from the top level", function(){

@@ -54,9 +54,9 @@ regarding("memory", function() {
     })
   })
   
-  regarding("the 'cost' of a perform using the memory engine is the sum of all the rows of all relations created", function() {
+  regarding("the cost of doing an in-memory operation is all the iterations that happened in the course of calculating the result", function() {
     
-    test("just performing a relation and doing nothing else is zero cost", function(){this.$R(function(){
+    test("just compiling a relation and doing nothing else is zero cost", function(){this.$R(function(){
       resolve()
       assert.equal(0, relation("r").compile().cost())
     })})

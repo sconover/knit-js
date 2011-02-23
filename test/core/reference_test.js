@@ -55,7 +55,7 @@ regarding("references allow late-binding of core relations and attributes. " +
   
   regarding("attribute reference", function() {
   
-    test("you can refer to attributes as strings and then resolve to real attributes at perform time", function(){
+    test("you can refer to attributes as strings and then resolve to real attributes at compile time", function(){
       var ageRef = this.environment.attr("personZ.age")
       assert.notSame(ageRef, this.person.attr("age")) //attr method naming collision coming...
       
@@ -99,7 +99,7 @@ regarding("references allow late-binding of core relations and attributes. " +
       this.environment = new knit.ReferenceEnvironment()
     })
     
-    test("you can refer to nested attributes as strings and then resolve to real attributes at perform time. " +
+    test("you can refer to nested attributes as strings and then resolve to real attributes at compile time. " +
          "the same thing happens to the attributes that are nested", function(){
       var peopleRef = this.environment.attr("people", this.environment.attr("person.personId", "person.age"))
       

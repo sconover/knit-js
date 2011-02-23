@@ -69,8 +69,7 @@ setupAcceptanceFixtures = function(createRelation) {
 }
 
 relationContents = function(relation) {
-  //transitional
-  var compiled = relation.defaultCompiler() ? relation.defaultCompiler()(relation) : relation.perform()
+  var compiled = relation.compile()
   return {
    name:compiled.name(),
    attributes:getAttributes(compiled),
@@ -92,7 +91,7 @@ getAttributes = function(relation) {
 
 assert.relationEqual = function(expected, relation) {
   //transitional
-  var compiled = relation.defaultCompiler() ? relation.defaultCompiler()(relation) : relation.perform()
+  var compiled = relation.compile()
   assert.equal(expected.name, compiled.name())
   assert.equal(expected.attributes, getAttributes(compiled))
   assert.setsEqual(expected.rows, compiled.rows())

@@ -6,7 +6,7 @@ acceptanceTest("selection pushing and cost", engine.memory, function(){
     return relation.defaultCompiler()(relation)
   }
   
-  xtest("pushing in a select is less costly than leaving it outside, unnecessarily", function (){
+  test("pushing in a select is less costly than leaving it outside, unnecessarily", function (){
     
     var expression = this.$R(function(){
       return select(join(relation("person"), relation("house")), equality(attr("house.address"), "Chimney Hill"))
@@ -26,10 +26,10 @@ acceptanceTest("selection pushing and cost", engine.memory, function(){
     assert.relationEqual(expected, expression)
     assert.relationEqual(expected, expression.push())
 
-    assert.equal(true, compile(expression).cost > compile(expression.push()).cost)
+    assert.equal(true, compile(expression).cost() > compile(expression.push()).cost())
   })
 
-  xtest("pushing in a select and making it into a join predicate is less costly than just leaving the select outside", function (){
+  test("pushing in a select and making it into a join predicate is less costly than just leaving the select outside", function (){
 
     var expression = this.$R(function(){
       return select(join(relation("person"), relation("house")), equality(attr("house.houseId"), attr("person.houseId")))
@@ -50,7 +50,7 @@ acceptanceTest("selection pushing and cost", engine.memory, function(){
     assert.relationEqual(expected, expression)
     assert.relationEqual(expected, expression.push())
 
-    assert.equal(true, compile(expression).cost > compile(expression.push()).cost)
+    assert.equal(true, compile(expression).cost() > compile(expression.push()).cost())
   })
   
 })

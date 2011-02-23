@@ -1,5 +1,7 @@
 die:  also rows and objects...
 
+delegate signatures
+
 remove rows and objects methods from algebra classes
   this is only available upon compilation
   ...or change them to default compile..?

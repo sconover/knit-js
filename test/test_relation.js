@@ -35,7 +35,6 @@ TestRelation = function() {
 
   p.id = function(){ return this._id }
   p.attributes = function(){ return this._attributes }
-  
   p.attr = function(attributeName) { return this.attributes().get(attributeName) }
   p.isSame = function(other) { return other.id && this.id() == other.id() }
   

@@ -1,3 +1,6 @@
+perform can die
+  also rows and objects...
+
 remove rows and objects methods from algebra classes
   this is only available upon compilation
   ...or change them to default compile..?

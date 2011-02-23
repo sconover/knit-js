@@ -54,12 +54,11 @@ regarding("memory", function() {
     })
   })
   
-  
-  xregarding("the 'cost' of a perform using the memory engine is the sum of all the rows of all relations created", function() {
-
+  regarding("the 'cost' of a perform using the memory engine is the sum of all the rows of all relations created", function() {
+    
     test("just performing a relation and doing nothing else is zero cost", function(){this.$R(function(){
       resolve()
-      assert.equal(0, relation("r").perform().cost)
+      assert.equal(0, relation("r").compile().cost())
     })})
     
     test("the size of the select result is the cost", function(){this.$R(function(){
@@ -70,10 +69,10 @@ regarding("memory", function() {
         [3, 99]
       ])
       
-      assert.equal(1, select(relation("r"), equality(attr("r.a"), 1)).perform().cost)
-      assert.equal(2, select(relation("r"), equality(attr("r.b"), 98)).perform().cost)
-      assert.equal(3, select(relation("r"), TRUE).perform().cost)
-      assert.equal(6, select(select(relation("r"), TRUE), TRUE).perform().cost)
+      assert.equal(6, select(relation("r"), equality(attr("r.a"), 1)).compile().cost())
+      assert.equal(9, select(relation("r"), equality(attr("r.b"), 98)).compile().cost())
+      assert.equal(3, select(relation("r"), TRUE).compile().cost())
+      assert.equal(6, select(select(relation("r"), TRUE), TRUE).compile().cost())
     })})
     
     test("join cost usually depends greatly on whether a good join predicate is available", function(){this.$R(function(){
@@ -103,15 +102,15 @@ regarding("memory", function() {
         [1002, "New Orleans"]
       ])
       
-      assert.equal(6, join(person, house).perform().cost)
-      assert.equal(6 + 12, join(join(person, house), city).perform().cost)
+      assert.equal(9, join(person, house).compile().cost())
+      assert.equal(9 + 18, join(join(person, house), city).compile().cost())
       
-      assert.equal(3, join(person, house, equality(person.attr("houseId"), house.attr("houseId"))).perform().cost)
-      assert.equal(3 + 3, join(join(person, house, equality(person.attr("houseId"), house.attr("houseId"))),
-                               city, equality(house.attr("cityId"), city.attr("cityId"))).perform().cost)
+      assert.equal(51, join(person, house, equality(person.attr("houseId"), house.attr("houseId"))).compile().cost())
+      assert.equal(150,   join(join(person, house, equality(person.attr("houseId"), house.attr("houseId"))),
+                               city, equality(house.attr("cityId"), city.attr("cityId"))).compile().cost())
     })})
     
-    test("the numbers of rows involved in an order is the cost", function(){this.$R(function(){
+    test("the cost is proportional to the number of rows", function(){this.$R(function(){
       resolve()
       
       relation("r").merge([
@@ -120,10 +119,10 @@ regarding("memory", function() {
         [3, 99]
       ])
       
-      assert.equal(3, order.asc(relation("r"), attr("r.a")).perform().cost)
-      assert.equal(3, order.desc(relation("r"), attr("r.a")).perform().cost)
+      assert.equal(8, order.asc(relation("r"), attr("r.a")).compile().cost())
+      assert.equal(8, order.desc(relation("r"), attr("r.a")).compile().cost())
 
-      assert.equal(6, order.asc(order.asc(relation("r"), attr("r.a")), attr("r.b")).perform().cost)
+      assert.equal(16, order.asc(order.asc(relation("r"), attr("r.a")), attr("r.b")).compile().cost())
     })})
   })
 })

@@ -19,23 +19,6 @@ regarding("memory", function() {
     })
   })
 
-  regarding(".rows / .objects", function() {
-    test("they cause the relation to be applied", function(){this.$R(function(){
-      resolve()
-      
-      relation("r").merge([
-        [1, 98],
-        [2, 98],
-        [3, 99]
-      ])
-      
-      assert.equal([
-        [1, 98],
-        [2, 98]
-      ], select(relation("r"), equality(attr("r.b"), 98)).rows())
-    })
-  })})
-
   regarding("memory predicate - match", function() {
   
     test("true false match", function(){this.$R(function(){
@@ -72,7 +55,7 @@ regarding("memory", function() {
   })
   
   
-  regarding("the 'cost' of a perform using the memory engine is the sum of all the rows of all relations created", function() {
+  xregarding("the 'cost' of a perform using the memory engine is the sum of all the rows of all relations created", function() {
 
     test("just performing a relation and doing nothing else is zero cost", function(){this.$R(function(){
       resolve()

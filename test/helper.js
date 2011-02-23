@@ -120,7 +120,10 @@ assert.setsEqual = function(expectedArray, actualArray) {
   var actualSet = new HashSet(undefined, equalityFunction)
   actualSet.addAll(actualArray)
   assert._func(
-    function(expected, actual){return expectedSet.intersection(actualSet).size()==actualSet.size()}, 
+    function(expected, actual){
+      var intersectionSize = expectedSet.intersection(actualSet).size()
+      return intersectionSize==actualSet.size() && intersectionSize==expectedSet.size()
+    }, 
     expectedArray, 
     actualArray, 
     true, 

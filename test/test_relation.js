@@ -66,7 +66,8 @@ TestAttribute = function() {
       },
       p = F.prototype
 
-  p.name = function() { return this._name }
+  p.name = 
+    p.structuredName = function() { return this._name }
   p.fullyQualifiedName = function() { return this.sourceRelation().id() + "." + this.name() }
   p.type = function() { return this._type }
   p.sourceRelation = function() { return this._sourceRelation }
@@ -90,7 +91,8 @@ TestNestedAttribute = function() {
       },
       p = F.prototype
   
-  p.name = function() { return this._name }
+  p.name = 
+    p.structuredName = function() { return this._name }
   p.fullyQualifiedName = function() { return this.sourceRelation().id() + "." + this.name() }
   p.type = function() { return knit.attributeType.Nested }
   p.sourceRelation = function() { return this._sourceRelation }

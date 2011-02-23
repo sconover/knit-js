@@ -32,7 +32,7 @@ acceptanceTest("nested object style", engine.memory, function(){
     })
     
     
-    var objects = nested.perform().objects()
+    var objects = nested.defaultCompiler()(nested).objects()
     
     assert.equal([
     

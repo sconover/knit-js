@@ -1,6 +1,45 @@
+remove rows and objects methods from algebra classes
+  this is only available upon compilation
+  ...or change them to default compile..?
+
+how should I auto-compile the inner relations to get rows and proper attributes?
+
+relations shouldn't need names.  yet names are convenient.
+  are they so practically convenient that we should require them?
+  or is that limiting?  and/or offensive, from an elegance POV?
+
 convert memory to complier style
 
 quacksLike Executable relation
+
+algebra to algorithm depends into memory relation
+  make another relation?
+  or, extract memory relation?
+    should i reconsider the concept of memory engine?
+    that's a good name though
+      is it more about sets?
+      or algorithms?
+      ...storage vs execution strategy
+      ...ideally engines are about storage.
+      rename engine => storage?
+        storage.sqlite
+        storage.set
+          ...but it's not simply storage.
+          ...engine implies the ability to do interesting things with the storage...
+            ...there's an execution capability.
+
+more predicate match out of engine/memory?
+  does it belong with algorithm?
+  
+...executing an expression
+     collaboration between storage and strategy
+     algorithmic execution is a general strategy
+     sql execution is specific to things that understand sql...
+       sqlite supports algorithmic, sql strategies
+       memory/set supports algorithmic
+       ...hybrid strategies? (sql + algorithmic) (e.g. to allow sql for most things but then also nest/unnest algorithmically)
+
+"name" is out of control
 
 async / iterator resultset style?
 

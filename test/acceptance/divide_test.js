@@ -7,7 +7,7 @@ acceptanceTest("divide - relational divsion (think: opposite of cartesian join)"
     
     allPeopleCombinedWithAllHouses = this.$R(function(){
       return join(relation("person"), relation("house"))
-    }).perform()
+    })
     
     assert.relationEqual({
       name:"person__house",

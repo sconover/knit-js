@@ -1,4 +1,4 @@
-require("../helper")
+require("./helper")
 require("knit/algorithms")
 
 regarding("natural join - join on common column names", function() {
@@ -8,7 +8,7 @@ regarding("natural join - join on common column names", function() {
     var colors = {attributes:["colorId", "color"], rows:[[1, "red"],[2, "blue"],[3,"green"]]},
         cars = {attributes:["model", "colorId"], rows:[["accord", 1],["carrera", 999],["mustang", 2]]}
     
-    assert.equal(
+    assert.rawRelationEqual(
       {attributes:["colorId", "color", "model", "colorId"], 
        rows:[
          [1, "red",  "accord", 1], 
@@ -24,7 +24,7 @@ regarding("natural join - join on common column names", function() {
     var colors = {attributes:["colorId", "color"], rows:[[1, "red"],[2, "blue"],[3,"green"]]},
         cars = {attributes:["model", "colorId", "color"], rows:[["accord", 1, "red"],["carrera", 999, "red"],["mustang", 2, "red"]]}
     
-    assert.equal(
+    assert.rawRelationEqual(
       {attributes:["colorId", "color", "model", "colorId", "color"], 
        rows:[
          [1, "red",  "accord", 1, "red"], 

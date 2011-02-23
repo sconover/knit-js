@@ -1,4 +1,4 @@
-require("../helper")
+require("./helper")
 require("knit/algorithms")
 
 regarding("right outer join", function() {
@@ -8,7 +8,7 @@ regarding("right outer join", function() {
   
   test("combine all the rows on the left with all the rows on the right (cartesian)", function(){
 
-    assert.equal(
+    assert.rawRelationEqual(
       {attributes:["id", "color", "model"], 
        rows:[
          [1, "red",  "accord"], 
@@ -25,7 +25,7 @@ regarding("right outer join", function() {
   
   test("if a row on the right has no match on the left, return a null row on the left", function(){
 
-    assert.equal(
+    assert.rawRelationEqual(
       {attributes:["id", "color", "model"], 
        rows:[
          [1, "red", "accord"],

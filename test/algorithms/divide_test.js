@@ -1,4 +1,4 @@
-require("../helper")
+require("./helper")
 require("knit/algorithms")
 
 regarding("unnest", function() {
@@ -18,7 +18,7 @@ regarding("unnest", function() {
          [2, "blue", "mustang"]
        ]}
     
-    assert.equal(colors, knit.algorithms.divide(joined, cars))
+    assert.rawRelationEqual(colors, knit.algorithms.divide(joined, cars))
   })
 
   test("only populate quotient rows based on rows present in the dividend and in the divisor", function (){
@@ -34,7 +34,7 @@ regarding("unnest", function() {
          [2, "green", "pinto"]
        ]}
     
-    assert.equal(colors, knit.algorithms.divide(joined, cars))
+    assert.rawRelationEqual(colors, knit.algorithms.divide(joined, cars))
   })
   
   

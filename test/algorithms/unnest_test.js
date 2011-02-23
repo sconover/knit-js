@@ -1,4 +1,4 @@
-require("../helper")
+require("./helper")
 require("knit/algorithms")
 
 regarding("unnest", function() {
@@ -13,7 +13,7 @@ regarding("unnest", function() {
                     ]}
     
     
-    assert.equal(
+    assert.rawRelationEqual(
       {attributes:["model", "id", "color", "year"], 
        rows:[
          ["accord",  1, "red",  1984],
@@ -33,7 +33,7 @@ regarding("unnest", function() {
                       ["carrera", [[3, "blue", 1970, [["Jane"]] ]] ]
                     ]}
     
-    assert.equal(
+    assert.rawRelationEqual(
       {attributes:["model", "id", "color", "year", "owner"], 
        rows:[
          ["accord",  1, "red",  1984, "Joe"],

@@ -1,7 +1,7 @@
 audit
   baserelation.rows, .objects...
   .attr?
-  F => C ?
+  C => C ?
   
 fill-out backlog...
   aggregate

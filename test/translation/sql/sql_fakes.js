@@ -4,14 +4,14 @@ require("test_relation")
 
 FakeTable = function() {
   var _ = knit._util,
-      F = function(name, attributeNamesAndTypes) {
+      C = function(name, attributeNamesAndTypes) {
             this._testRelation = new TestRelation(attributeNamesAndTypes)
             this._testRelation.name = function(){return name}
     
             var self = this
             this.name = function(){return self._testRelation.name()}
           },
-      p = F.prototype
+      p = C.prototype
   
   _.each(["id", "attributes", "attr", "isSame", "isEquivalent", "split", "merge", "newNestedAttribute"], 
           function(methodName){
@@ -23,5 +23,5 @@ FakeTable = function() {
   
   p.inspect = function() { return this.name() + "[" + this.attributes().inspect() + "]" }
   
-  return F
+  return C
 }()

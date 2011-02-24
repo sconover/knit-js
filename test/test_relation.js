@@ -3,7 +3,7 @@ require("knit/core")
 TestRelation = function() {
   var _ = knit._util,
       _id = 0,
-      F = function(attributeNamesAndTypes) {
+      C = function(attributeNamesAndTypes) {
             _id += 1
             this._id = "test_" + _id
             var self = this
@@ -31,7 +31,7 @@ TestRelation = function() {
             }
     
           },
-      p = F.prototype
+      p = C.prototype
   
   knit.mixin.relationDefaults(p)
   
@@ -53,16 +53,16 @@ TestRelation = function() {
   
   p.inspect = function() { return "r[" + this.attributes().inspect() + "]" }
 
-  return F
+  return C
 }()
 
 TestAttribute = function() {
-  var F = function(name, type, sourceRelation) {
+  var C = function(name, type, sourceRelation) {
         this._name = name
         this._type = type
         this._sourceRelation = sourceRelation
       },
-      p = F.prototype
+      p = C.prototype
 
   p.name = 
     p.structuredName = function() { return this._name }
@@ -78,16 +78,16 @@ TestAttribute = function() {
   
   p.inspect = function() { return this.name() }
   
-  return F
+  return C
 }()
 
 TestNestedAttribute = function() {
-  var F = function(name, nestedRelation, sourceRelation) {
+  var C = function(name, nestedRelation, sourceRelation) {
         this._name = name
         this._nestedRelation = nestedRelation
         this._sourceRelation = sourceRelation
       },
-      p = F.prototype
+      p = C.prototype
   
   p.name = 
     p.structuredName = function() { return this._name }
@@ -105,5 +105,5 @@ TestNestedAttribute = function() {
 
   p.inspect = function() { return this.name() + ":" + this.nestedRelation().inspect() }
   
-  return F
+  return C
 }()

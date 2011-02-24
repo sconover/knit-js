@@ -1,12 +1,13 @@
 audit
+  constructor creation functions need to be anonymous style
   baserelation.rows, .objects...
   .attr?
-  vendor hashset, hashtble.
-    require these in memory engine,
-    drop rowstore and just use a hash
     
     
 fill-out backlog...
+  tests run in a browser
+    knit works in a browser
+    sqlite stuff works with html5 storage
   aggregate
   pivot
   complete predicates: or, gt, gte, grouping, etc...

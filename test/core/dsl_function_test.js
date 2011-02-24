@@ -5,7 +5,7 @@ require("knit/core/dsl_function")
 regarding("a dsl function presents a set of objects to a user-defined function as locals", function() {
 
   test("set what you want available in the user-defined function on 'locals'", function (){
-    var dsl = new DSLFunction()
+    var dsl = new knit._DSLFunction()
     dsl.dslLocals.x = 123
     dsl.dslLocals.hello = function(){return "world"}
     
@@ -16,7 +16,7 @@ regarding("a dsl function presents a set of objects to a user-defined function a
   })
     
   test("returns the return value of the user function to the caller", function (){
-    var dsl = new DSLFunction()
+    var dsl = new knit._DSLFunction()
     
     var returnValue = dsl(function(){
       return "foo"
@@ -26,7 +26,7 @@ regarding("a dsl function presents a set of objects to a user-defined function a
   })
     
   test("it's fine to do nothing / return nothing", function (){
-    var dsl = new DSLFunction()
+    var dsl = new knit._DSLFunction()
     
     var returnValue = dsl(function(){
       //nothing
@@ -36,7 +36,7 @@ regarding("a dsl function presents a set of objects to a user-defined function a
   })
 
   test("if a second argument is passed, make it 'this'", function(){
-    var dsl = new DSLFunction()
+    var dsl = new knit._DSLFunction()
     
     var returnValue = dsl(function(){
       return this.a
@@ -52,7 +52,7 @@ regarding("you can specialize a dsl function. " +
           "that is, you can take some existing dsl function and add your own locals", function (){
 
   test("specialize a dsl function without affecting the original", function(){
-    var dslParent = new DSLFunction()
+    var dslParent = new knit._DSLFunction()
     dslParent.dslLocals.x = 123
     dslParent.dslLocals.hello = function(){return "world"}
 

@@ -1,18 +1,33 @@
 audit
-  constructor creation functions need to be anonymous style
   baserelation.rows, .objects...
   .attr?
-    
-    
-fill-out backlog...
+        
+fill out backlog...
   tests run in a browser
     knit works in a browser
     sqlite stuff works with html5 storage
   aggregate
+    straight aggregation, group by
   pivot
   complete predicates: or, gt, gte, grouping, etc...
   using
   union
+  RA expressions as json...
+    then x-language AT's.
+  x-engine joins
+    is it even possible to implement "join" async?
+      stream vs async...
+      go stream?  assume (synchronous) iterators...
+  
+  ...so far this is an exploration of what a RA library might look like.
+    it actually works too
+      but it's inefficient in many places
+      also incomplete (ex: predicate are and, eq)
+    assumes arrays where it maybe ought to assume streams
+      and what about async?
+      and x-engine joins?
+  
+  
   
 
 aggregate(relation, avg(attr("person.age")))

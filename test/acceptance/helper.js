@@ -106,8 +106,6 @@ assert.relationEqual = function(expected, relation) {
         rowsAsync.push(row)
       }
     })    
-  } else {
-    console.log("D")
   }
   
 }

@@ -41,7 +41,7 @@ TestRelation = function() {
   p.isSame = function(other) { return other.id && this.id() == other.id() }
   
   p.isEquivalent = function(other) {
-    return knit.quacksLike(other, knit.signature.relation) &&
+    return knit._util.quacksLike(other, knit.signature.relation) &&
            this.attributes().isSame(other.attributes())
   }
   
@@ -71,7 +71,7 @@ TestAttribute = function() {
   p.sourceRelation = function() { return this._sourceRelation }
   p.isSame = 
     p.isEquivalent = function(other) {
-      return knit.quacksLike(other, knit.signature.attribute) &&
+      return knit._util.quacksLike(other, knit.signature.attribute) &&
              this.name() == other.name() &&
              this.sourceRelation().id() == other.sourceRelation().id()
     }
@@ -97,7 +97,7 @@ TestNestedAttribute = function() {
   p.nestedRelation = function() { return this._nestedRelation }
   p.isSame = 
     p.isEquivalent = function(other) {
-      return knit.quacksLike(other, knit.signature.nestedAttribute) &&
+      return knit._util.quacksLike(other, knit.signature.nestedAttribute) &&
              this.name() == other.name() &&
              this.sourceRelation().id() == other.sourceRelation().id() &&
              this.sourceRelation().id() == other.sourceRelation().id()

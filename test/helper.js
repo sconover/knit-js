@@ -166,7 +166,7 @@ assert.deepSame = function(expected, actual) {
 }
 
 assert.quacksLike = function(actualObject, expectedSignature) {
-  assert._func(function(expectedSignature, actualObject){return knit.quacksLike(actualObject, expectedSignature)}, 
+  assert._func(function(expectedSignature, actualObject){return knit._util.quacksLike(actualObject, expectedSignature)}, 
                expectedSignature, 
                actualObject, 
                true, 
@@ -174,7 +174,7 @@ assert.quacksLike = function(actualObject, expectedSignature) {
 }
 
 assert.doesntQuackLike = function(actualObject, expectedSignature) {
-  assert._func(function(expectedSignature, actualObject){return knit.quacksLike(actualObject, expectedSignature)}, 
+  assert._func(function(expectedSignature, actualObject){return knit._util.quacksLike(actualObject, expectedSignature)}, 
                expectedSignature, 
                actualObject, 
                false, 

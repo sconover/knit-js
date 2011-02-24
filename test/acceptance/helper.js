@@ -95,6 +95,21 @@ assert.relationEqual = function(expected, relation) {
   assert.equal(expected.name, compiled.name())
   assert.equal(expected.attributes, getAttributes(compiled))
   assert.setsEqual(expected.rows, compiled.rows())
+  
+  if (compiled._executionStrategy.rowsAsync) {
+    //talk to davis and xian about async
+    var rowsAsync = []
+    compiled.rows(function(row) {
+      if (row==null) {
+        assert.setsEqual(expected.rows, rowsAsync)
+      } else {
+        rowsAsync.push(row)
+      }
+    })    
+  } else {
+    console.log("D")
+  }
+  
 }
 
 

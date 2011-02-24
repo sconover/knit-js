@@ -1,3 +1,49 @@
+aggregate(relation, avg(attr("person.age")))
+
+aggregate(relation, [attr("person.name"), attr("person.foo")], [avg(attr("person.age")), max(attr("person.age"))])
+  ...assumes a projection down to avg(age)
+
+aggregate(relation, [attr("person.name"), avg(attr("person.age"))])
+  ...assumes a projection down to person.name, avg(age) - group by person.name
+
+
+readme
+    
+  Motivation
+    
+  The relational paradigm is .... efficient data organization and manipulation.  While SQL/RDBs are successful outgrowths of relational theory, expressions of relational algebra in its pure form are rare in the programming world.
+  
+  Knit follows Arel (or, Arel as originally envisioned *) as an attempt to bring the power of relational algebra to programmers.
+    
+  
+  Examples
+  
+  
+  
+  examples  
+  
+  state of the union
+  
+  algebra
+  "compilation"
+  acceptance tests
+    vision
+      - tests are json?
+  future directions...
+    there's a lot to do, based on demand
+    - x-engine
+    - streaming / async
+    - json wire format
+    
+
+group by, aggregates
+  group(relation, [name, age])
+  is group like nest?
+    nest, then apply aggrgates?
+      collapse a nesting...
+
+complete predicates.
+
 die:  also rows and objects...
 
 delegate signatures

@@ -1,3 +1,16 @@
+audit
+  baserelation.rows, .objects...
+  .attr?
+  F => C ?
+  
+fill-out backlog...
+  aggregate
+  pivot
+  complete predicates: or, gt, gte, grouping, etc...
+  using
+  union
+  
+
 aggregate(relation, avg(attr("person.age")))
 
 aggregate(relation, [attr("person.name"), attr("person.foo")], [avg(attr("person.age")), max(attr("person.age"))])

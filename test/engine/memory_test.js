@@ -4,14 +4,14 @@ require("../relation_proof")
 
 regarding("memory", function() {
   beforeEach(function(){
-    var r = knit.engine.memory.createRelation("foo", [["a",knit.attributeType.Integer], ["b",knit.attributeType.String]])
+    var r = new knit.engine.memory.MutableBaseRelation("foo", [["a",knit.attributeType.Integer], ["b",knit.attributeType.String]])
     this.r = r
     this.$R = knit.createBuilderFunction({bindings:{
       r:r
     }})
   })
   
-  relationProof("MemoryRelation", function(attributeNamesAndTypes){ return knit.engine.memory.createRelation("x", attributeNamesAndTypes) } )
+  relationProof("MemoryRelation", function(attributeNamesAndTypes){ return new knit.engine.memory.MutableBaseRelation("x", attributeNamesAndTypes) } )
   
   regarding("MemoryRelation inspect", function() {
     test("inspect", function(){
@@ -76,14 +76,14 @@ regarding("memory", function() {
     })})
     
     test("join cost usually depends greatly on whether a good join predicate is available", function(){this.$R(function(){
-      var person = knit.engine.memory.createRelation("person", [["id", knit.attributeType.Integer], 
+      var person = new knit.engine.memory.MutableBaseRelation("person", [["id", knit.attributeType.Integer], 
                                                                 ["houseId", knit.attributeType.Integer], 
                                                                 ["name", knit.attributeType.String], 
                                                                 ["age", knit.attributeType.String]])
-      var house = knit.engine.memory.createRelation("house", [["houseId", knit.attributeType.Integer], 
+      var house = new knit.engine.memory.MutableBaseRelation("house", [["houseId", knit.attributeType.Integer], 
                                                               ["address", knit.attributeType.String],
                                                               ["cityId", knit.attributeType.String]])
-      var city = knit.engine.memory.createRelation("city", [["cityId", knit.attributeType.Integer], 
+      var city = new knit.engine.memory.MutableBaseRelation("city", [["cityId", knit.attributeType.Integer], 
                                                             ["name", knit.attributeType.String]])
       
       person.merge([

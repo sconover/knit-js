@@ -32,7 +32,9 @@ TestRelation = function() {
     
           },
       p = F.prototype
-
+  
+  knit.mixin.relationDefaults(p)
+  
   p.id = function(){ return this._id }
   p.attributes = function(){ return this._attributes }
   p.attr = function(attributeName) { return this.attributes().get(attributeName) }
@@ -42,9 +44,6 @@ TestRelation = function() {
     return knit.quacksLike(other, knit.signature.relation) &&
            this.attributes().isSame(other.attributes())
   }
-  
-  p.split = 
-    p.merge = function(){return this}
   
   p.newNestedAttribute = function(attributeName, attributesToNest) {
     var nestedRelation = new TestRelation([]) 

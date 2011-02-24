@@ -105,6 +105,20 @@ regarding("table", function() {
     })
   })
   
+  regarding("create", function(){
+
+    test("requires attribute type information and information about the primary key",function(){
+      sqlite.Table.create(this.db, "foo", [["id",type.Integer], ["color",type.String]], ["id"])
+      
+      assert.equal(
+        [{name:"id", type:"int", pk:"1"},
+         {name:"color", type:"string", pk:"0"}],
+        this.db.columnInformation("foo")
+      )      
+    }) 
+    
+  })
+  
   test("same", function(){
     assert.same(new sqlite.Table("foo", [{name:"color", type:"string", pk:"0"}], this.db),
                 new sqlite.Table("foo", [{name:"color", type:"string", pk:"0"}], this.db))

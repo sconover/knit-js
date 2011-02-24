@@ -1,8 +1,11 @@
 audit
   baserelation.rows, .objects...
   .attr?
-  C => C ?
-  
+  vendor hashset, hashtble.
+    require these in memory engine,
+    drop rowstore and just use a hash
+    
+    
 fill-out backlog...
   aggregate
   pivot

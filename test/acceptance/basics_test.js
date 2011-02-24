@@ -42,12 +42,6 @@ acceptanceTest("basics", engine.memory, engine.sqlite, function(){
       [3, 102, "Fanny", 30]
     ], person2.rows())
     
-    // var h = new HashSet(function(){return 1}, function(a,b){console.log(a,b,a.a==b.a);return a.a==b.a})
-    // h.addAll([{a:1,b:"x"},{a:2,b:"y"},{a:3,b:"z"}])
-    // console.log(h.values())
-    // h.addAll([{a:1,b:"XXX"}])
-    // console.log(h.values())
-
     person2.merge([
       [1, 101, "Jeanne", 6]
     ])

@@ -3,8 +3,8 @@ require.paths.push("lib")
 require.paths.push("../node-sqlite")
 
 require("../../jasmine-node/lib/jasmine")
-require("./vendor/jshashtable")
-require("./vendor/jshashset")
+require("vendor/jshashtable")
+require("vendor/jshashset")
 require("./vendor/deep_equal")
 
 jasmine.Env.prototype.regarding = jasmine.Env.prototype.describe
@@ -35,12 +35,12 @@ setupPersonHouseCity = function(target, createRelation) {
   target.person = createRelation("person", [["personId", knit.attributeType.Integer], 
                                             ["houseId", knit.attributeType.Integer], 
                                             ["name", knit.attributeType.String], 
-                                            ["age", knit.attributeType.String]])
+                                            ["age", knit.attributeType.String]], ["personId"])
   target.house = createRelation("house", [["houseId", knit.attributeType.Integer], 
                                           ["address", knit.attributeType.String], 
-                                          ["cityId", knit.attributeType.Integer]])
+                                          ["cityId", knit.attributeType.Integer]], ["houseId"])
   target.city = createRelation("city", [["cityId", knit.attributeType.Integer], 
-                                        ["name", knit.attributeType.String]])  
+                                        ["name", knit.attributeType.String]], ["cityId"])  
   
   target.$R = knit.createBuilderFunction({bindings:{
     person:target.person,

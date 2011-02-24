@@ -1,7 +1,8 @@
 require("./helper")
 
 acceptanceTest("nested object style", engine.memory, function(){
-
+  var _ = knit._util
+  
   test(".objects should cause nested stuff to be object-style too", function (){
     
     var nested = this.$R(function(){
@@ -32,7 +33,7 @@ acceptanceTest("nested object style", engine.memory, function(){
     })
     
     
-    var objects = nested.defaultCompiler()(nested).objects()
+    var objects = _.sortBy(nested.defaultCompiler()(nested).objects(), function(obj){return obj.cityId})
     
     assert.equal([
     

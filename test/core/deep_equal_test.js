@@ -90,6 +90,10 @@ regarding("traverse down and compare equality", function() {
       assert.equal(false, deepEqualWithIsEqual([this.butterfly], undefined))
     })
     
+    test("two empty arrays are equal", function(){
+      assert.equal(true, deepEqualWithIsEqual([], []))
+    })
+    
     test("number of elements is different", function(){
       assert.equal(true, deepEqualWithIsEqual([this.butterfly], [this.butterflyAgain]))
       assert.equal(false, deepEqualWithIsEqual([this.butterfly], [this.butterflyAgain, this.butterflyAgain]))

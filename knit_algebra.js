@@ -1,14 +1,5 @@
 
 
-//knit/algebra ======================================================
-//hrm.  inelegant.
-
-
-//knit/core ======================================================
-if (!(typeof window === 'undefined')) global=window
-
-
-
 //vendor/collection_functions ======================================================
 CollectionFunctions = (function(){  
 
@@ -514,12 +505,13 @@ CollectionFunctions = (function(){
       }
       
       function layerOnCostTracking(functions) {
-        iteratorHolder._callsToNext = 0
+        iteratorHolder._callsToNextSession = 0
+        iteratorHolder._callsToNextTotal = 0
         var wrappedFunctions = {}
         
         function makeCostResettingWrapper(inner) {
           return function() {
-            iteratorHolder._callsToNext = 0
+            iteratorHolder._callsToNextSession = 0
             var args = arrayFunctions.map(arguments, function(arg){return arg}),
                 result = inner.apply(this, args)
             return result                      
@@ -534,13 +526,16 @@ CollectionFunctions = (function(){
 
           var realNext = realIterator.next
           realIterator.next = function() {
-            iteratorHolder._callsToNext += 1
+            iteratorHolder._callsToNextSession += 1
+            iteratorHolder._callsToNextTotal += 1
             return realNext()
           }
           return realIterator
         }
         
-        wrappedFunctions.lastCost = function() { return iteratorHolder._callsToNext }
+        wrappedFunctions.lastCost = function() { return iteratorHolder._callsToNextSession }
+        wrappedFunctions.totalCost = function() { return iteratorHolder._callsToNextTotal }
+        wrappedFunctions.resetTotalCost = function() { iteratorHolder._callsToNextTotal = 0 }
         
         return wrappedFunctions
       }
@@ -587,29 +582,92 @@ CollectionFunctions = (function(){
   return mainFunction
 })()
 
+
+//knit/core ======================================================
+
+
+
+//knit/namespace ======================================================
+if (!(typeof window === 'undefined')) global=window
+
 global.knit = {
   algebra: {predicate:{}},
   mixin:{},
-  engine:{  /*hrm.  begone.*/ sql:{statement:{}}  },
-  _:CollectionFunctions.Array.functions //handy underscore-like array functions...each, map, etc
+  translation:{sql:{}},
+  engine:{ memory:{}, sqlite:{} },
+  attributeType:{}
 }
 
 
-
-//knit/util ======================================================
+//knit/core/util ======================================================
 //internal utilities
 knit._util = {
 
+  //see http://fitzgeraldnick.com/weblog/39/
+  quacksLike: function(object, signature) {
+    if (typeof signature === "undefined") throw("no signature provided")
+    if (object == undefined) return false
+
+    var k, ctor;
+    for ( k in signature ) {
+      ctor = signature[k];
+      if ( ctor === Number ) {
+        if ( Object.prototype.toString.call(object[k]) !== "[object Number]"
+             || isNaN(object[k]) ) {
+          return false;
+        }
+      } else if ( ctor === String ) {
+        if ( Object.prototype.toString.call(object[k])
+             !== "[object String]" ) {
+          return false;
+        }
+      } else if ( ctor === Boolean ) {
+        var value = object[k]
+        if (!(value === true || value === false)) return false
+      } else if ( ! (object[k] instanceof ctor) ) {
+        return false;
+      }
+    }
+    return true;
+  },
+      
   bind: function(f, objectThatShouldBeThis) {
     return function() {
-      var args = CollectionFunctions.Array.functions.toArray(arguments)
+      var args = knit._util.toArray(arguments)
       return f.apply(objectThatShouldBeThis, args)
     }
   },
   
-  extend: function(mergee, toMerge) {
-    for(k in toMerge) mergee[k] = toMerge[k]
+  extend: function() {
+    
+    //chicken and egg
+    var args = []
+    for (var i=0; i<arguments.length; i++) {
+      args.push(arguments[i])
+    }
+    
+    var mergee = args.shift(),
+        toMerges = args
+    
+    for (var i=0; i<toMerges.length; i++) {
+      var toMerge = toMerges[i]
+      for(var k in toMerge) mergee[k] = toMerge[k]
+    }
+
     return mergee
+  },
+  
+  delegate: function(object, signature, delegateFunction) {
+    knit._util.each(knit._util.keys(signature), function(methodNameToDelegate) {
+      object[methodNameToDelegate] = function() {
+        var target = delegateFunction.apply(this, []),
+            targetFunction = target[methodNameToDelegate]
+        if (typeof targetFunction != "function") {
+          throw(methodNameToDelegate + " not an available function on delegate.")
+        }
+        return targetFunction.apply(target, arguments) 
+      }
+    })
   },
   
   keys: function(obj) {
@@ -625,381 +683,457 @@ knit._util = {
   },
   
   isArray: function(thing){ 
-    return typeof thing.length != "undefined" && typeof thing.push != "undefined" 
-  }
+    return Object.prototype.toString.apply(thing) == "[object Array]"
+  },
+  
+  deepEqual:function(a,b,equalsMethodName) {
+    function objectsEqual(objA, objB, equalsMethodName) {
+      for (var key in objA) if (!(key in objB) || !knit._util.deepEqual(objA[key], objB[key], equalsMethodName)) return false
+      return true
+    }
+    
+    if (a===b) return true
+    if (typeof a != typeof b) return false
+    if ((a===null || b===null) && a!=b) return false
+    if (this.isArray(a) && this.isArray(b)) {
+      if (a.length != b.length) return false
+
+      var i = a.length
+      while (i--) { if ( ! knit._util.deepEqual(a[i], b[i], equalsMethodName)) return false } //hrm
+    } else {      
+      if (a[equalsMethodName] && b[equalsMethodName]) {
+        if (!a[equalsMethodName](b)) return false
+      } else if (typeof a == "object" && typeof b == "object") {
+        if (!objectsEqual(a, b, equalsMethodName) || !objectsEqual(b, a, equalsMethodName)) return false //inefficient
+      } else {
+        if (a!=b) return false
+      }
+    }
+    return true
+  },
+  
+  deepSame:function(a,b) { return knit._util.deepEqual(a,b, "isSame") },
+  deepSameThisVsOther:function(other) { return knit._util.deepSame(this, other) }
   
 }
 
-
-//knit/quacks_like ======================================================
-
-//see http://fitzgeraldnick.com/weblog/39/
-
-knit.quacksLike = function(object, signature) {
-  if (typeof signature === "undefined") throw("no signature provided")
-  
-  var k, ctor;
-  for ( k in signature ) {
-    ctor = signature[k];
-    if ( ctor === Number ) {
-      if ( Object.prototype.toString.call(object[k]) !== "[object Number]"
-           || isNaN(object[k]) ) {
-        return false;
-      }
-    } else if ( ctor === String ) {
-      if ( Object.prototype.toString.call(object[k])
-           !== "[object String]" ) {
-        return false;
-      }
-    } else if ( ctor === Boolean ) {
-      var value = object[k]
-      if (!(value === true || value === false)) return false
-    } else if ( ! (object[k] instanceof ctor) ) {
-      return false;
-    }
-  }
-  return true;
-};
+knit._util.extend(knit._util, CollectionFunctions.Array.functions)
 
 
-//knit/reference ======================================================
-;(function(){
-
-  var _A = CollectionFunctions.Array.functions,
-      _ = knit._util
-  
-  knit.RelationReference = function(){
-    var F = function(relationName) {
-      this._relation = new knit.UnresolvedRelationReference(relationName)
-    }; var p = F.prototype
-  
-    p.resolve = function(bindings) { 
-      if (this._relation.resolve) this._relation = this._relation.resolve(bindings) 
-      return this
-    }
-  
-    _A.each(["id", "attributes", "attr", "inspect", "merge", "split", "newNestedAttribute", "perform"], function(methodNameToDelegate) {
-      p[methodNameToDelegate] = function() { 
-        return this._relation[methodNameToDelegate].apply(this._relation, arguments) 
-      }
-    })
-  
-    p.isSame = p.isEquivalent = function(other) { 
-      return this._relation.isSame(other) || !!(other._relation && this._relation.isSame(other._relation))
-    }
-  
-    return F
-  }()
-
-  knit.UnresolvedRelationReference = function(){
-    var _id = 0
-  
-    var F = function(relationName) {
-      this._relationName = relationName
-      _id += 1
-      this._id = "unresolvedRelation_" + _id
-    }; var p = F.prototype
-  
-    p.id = function(bindings) { return this._id }
-    p.resolve = function(bindings) { return bindings[this._relationName] }
-
-    _A.each(["attributes", "attr", "merge", "split", "newNestedAttribute", "perform"], function(methodNameToDelegate) {
-      p[methodNameToDelegate] = function() { 
-        throw(methodNameToDelegate + " not available until after resolve (and refs are bound to real relations)")
-      }
-    })
-  
-    p.isSame = p.isEquivalent = function(other) {
-      return other.constructor == F &&
-             this._relationName == other._relationName
-    }
-  
-    p.inspect = function(){return "*" + this._relationName }
-  
-    return F
-  }()
-
-  knit.NullRelation = function(){
-    var F = function() {}; var p = F.prototype
-    p.resolve = function(bindings) { return this }
-    p.id = function() { return "nullRelation_id" }
-    p.attributes = function() { return new knit.Attributes([]) }
-    p.attr = function() { throw("Null Relation has no attributes") }
-    p.inspect = function() { return "nullRelation" }
-    p.merge = function() { return this }
-    p.split = function() { return this }
-    p.newNestedAttribute = function() { throw("It doesn't make sense for Null Relation to create attributes") }
-    p.perform = function() { return this }
-    p.isSame = p.isEquivalent = function(other) { return this === other }
-    return new F()  
-  }()
-
-  knit.AttributeReference = function(){
-    var F = function(relationRef, attributeName) {
-      this._attribute = new knit.UnresolvedAttributeReference(relationRef, attributeName)
-    }; var p = F.prototype
-  
-    p.resolve = function(bindings) { 
-      if (this._attribute.resolve) this._attribute = this._attribute.resolve(bindings) 
-      return this
-    }
-  
-    p.name = function() { return this._attribute.name() }
-    p.sourceRelation = function() { return this._attribute.sourceRelation() }
-    p.isSame = p.isEquivalent = function(other) { return this._attribute.isSame(other) }
-    p.inspect = function(){return this._attribute.inspect()}
-  
-    return F
-  }()
-
-  knit.UnresolvedAttributeReference = function(){
-    var F = function(relationRef, attributeName) {
-      this._relationRef = relationRef
-      this._attributeName = attributeName
-    }; var p = F.prototype
-  
-    p.resolve = function(bindings) {
-      return this._relationRef.resolve(bindings).attr(this._attributeName)
-    }
-
-    p.name = function() { return this._attributeName }
-    p.sourceRelation = function() { return this._relationRef }
-  
-    p.isSame = p.isEquivalent = function(other) {
-      return knit.quacksLike(other, knit.signature.attribute) &&
-             this.sourceRelation().isSame(other.sourceRelation()) &&
-             this.name() == other.name()
-    }
-  
-    p.inspect = function(){return "*" + this._attributeName}
-  
-    return F
-  }()
-
-  knit.NestedAttributeReference = function(){
-  
-    var F = function(attributeName, nestedAttributes) {
-      this._attribute = new knit.UnresolvedNestedAttributeReference(attributeName, nestedAttributes)
-    }; var p = F.prototype
-  
-    p.resolve = function(bindings) { 
-      if (this._attribute.resolve)  this._attribute = this._attribute.resolve(bindings) 
-      return this
-    }
-  
-    p.name = function() { return this._attribute.name() }
-    p.setSourceRelation = function(sourceRelation) { return this._attribute.setSourceRelation(sourceRelation) }
-    p.sourceRelation = function() { return this._attribute.sourceRelation() }
-    p.nestedRelation = function() { return this._attribute.nestedRelation() }
-  
-    p.isSame = p.isEquivalent = function(other) {
-      return knit.quacksLike(other, knit.signature.attribute) &&
-             this._attribute.isSame(other)
-    }
-  
-    p.inspect = function(){return this._attribute.inspect()}
-  
-    return F
-  }()
-
-  knit.UnresolvedNestedAttributeReference = function(){
-    var F = function(attributeName, nestedAttributes) {
-      this._attributeName = attributeName
-      this._nestedAttributes = nestedAttributes
-      this._sourceRelation = knit.NullRelation
-    }; var p = F.prototype
-
-    p.resolve = function(bindings) { 
-      _A.each(this._nestedAttributes, function(nestedAttribute){nestedAttribute.resolve(bindings)})
-      return this.sourceRelation().newNestedAttribute(this._attributeName, this._nestedAttributes)
-    }
-  
-    p.name = function() { return this._attributeName }
-    p.sourceRelation = function() { return this._sourceRelation }
-    p.setSourceRelation = function(sourceRelation) { this._sourceRelation = sourceRelation; return this }
-    p.nestedRelation = function() { throw("nestedRelation is not available until after resolve") }
-  
-    p.isSame = p.isEquivalent = function(other) {
-      return knit.quacksLike(other, knit.signature.attribute) &&
-             this.sourceRelation().isSame(other.sourceRelation()) &&
-             this.name() == other.name()
-    }
-  
-    p.inspect = function(){return "*" + this._attributeName}
-  
-    return F
-  }()
-
-
-  knit.ReferenceEnvironment = function(){
-    var F = function() {
-      this._keyToRef = {}
-    }; var p = F.prototype
-  
-    p.relation = function(relationName) {
-      var relationRef = this._keyToRef[relationName] = this._keyToRef[relationName] || new knit.RelationReference(relationName)
-      return relationRef
-    }
-  
-    function regularAttr(relationNameDotAttributeName) {
-      var key = relationNameDotAttributeName
-      var parts = relationNameDotAttributeName.split(".")
-      var relationRef = this.relation(parts[0])
-      var attributeName = parts[1]
-      var attributeRef = this._keyToRef[key] = this._keyToRef[key] || new knit.AttributeReference(relationRef, attributeName)
-      return attributeRef
-    }
-  
-    function nestedAttr(attributeName, nestedAttributeRefs) {
-      var key = attributeName
-      var attributeRef = this._keyToRef[key] = this._keyToRef[key] || new knit.NestedAttributeReference(attributeName, nestedAttributeRefs)
-      return attributeRef
-    }
-  
-    p.attr = function() {
-      var args = _A.toArray(arguments)
-    
-      if (args.length == 1) {
-        var relationNameDotAttributeName = args[0]
-        return knit._util.bind(regularAttr, this)(relationNameDotAttributeName)
-      } else if (args.length==2 && _.isArray(args[1]) ){
-        var attributeName = args[0]
-        var nestedAttributeRefs = args[1]
-        return knit._util.bind(nestedAttr, this)(attributeName, nestedAttributeRefs)
-      } else {
-        var self = this
-        return _A.map(args, function(relationNameDotAttributeName){return self.attr(relationNameDotAttributeName)})
-      }
-    }
-  
-    p.resolve = function(bindings) {
-      var self = this
-    
-      var resolved = []
-      _A.each(_.keys(bindings), function(relationKey){
-      
-        self.relation(relationKey).resolve(bindings)
-        resolved.push(relationKey)
-      
-        _A.each(bindings[relationKey].attributes(), function(attribute){
-          var attributeKey = relationKey + "." + attribute.name()
-          self.attr(attributeKey).resolve(bindings)
-          resolved.push(attributeKey)
-        })
-      })
-    
-      var stillToResolve = _A.without.apply(null, [_.keys(this._keyToRef)].concat(resolved))
-      _A.each(stillToResolve, function(key){
-        self._keyToRef[key].resolve(bindings)
-      })
-    
-      return this
-    }
-  
-    p.decorate = function(target, bindings) {
-      target.relation = knit._util.bind(this.relation, this)
-      target.attr = knit._util.bind(this.attr, this)
-      var resolveF = knit._util.bind(this.resolve, this)
-      target.resolve = function(){resolveF(bindings())}
-      return target
-    }
-  
-    return F
-  }()
-})()
-
-
-//knit/signatures ======================================================
-knit.signature = function(){
+//knit/core/signatures ======================================================
+knit.signature = (function(){
   var _ = knit._util
   
-  var like = {
-    isSame:Function, 
-    isEquivalent:Function
-  }
+  var inspectable = {inspect:Function},
+      like = {isSame:Function, isEquivalent:Function},
+      signatures = {}
   
-  var signatures = {}
-  
-  signatures.attribute = _.extend({
-    name:Function, 
-    sourceRelation:Function}, 
-    like
+  signatures.attribute = _.extend(
+    {name:Function, type:Function, sourceRelation:Function}, 
+    like,
+    inspectable
   )
   
-  signatures.nestedAttribute = _.extend({
-    nestedRelation:Function}, 
+  signatures.nestedAttribute = _.extend(
+    {nestedRelation:Function}, 
     signatures.attribute
   )
   
-  signatures.relation = _.extend({
-    attributes:Function, 
-    split:Function, 
-    merge:Function, 
-    newNestedAttribute:Function}, 
-    like
+  signatures.relation = _.extend(
+    {attributes:Function, split:Function, merge:Function, newNestedAttribute:Function}, 
+    like,
+    inspectable
   )
   
-  signatures.join = _.extend({
-    relationOne:Object, 
-    relationTwo:Object, 
-    predicate:Object}, 
+  signatures.relationExpression = _.extend(
+    {defaultCompiler:Function, compile:Function}, 
+    signatures.relation
+  )
+  
+  signatures.compiledRelation = _.extend(
+    {rows:Function, objects:Function, cost:Function}, 
+    signatures.relation
+  )
+  
+  signatures.executionStrategy = _.extend(
+    {rowsAsync:Function, rowsSync:Function}, 
+    signatures.relation
+  )
+  
+  signatures.join = _.extend(
+    {relationOne:Object, relationTwo:Object, predicate:Object}, 
     signatures.relation
   )
 
   return signatures
-}()
+})()
 
 
 
-//knit/dsl_function ======================================================
-//see http://alexyoung.org/2009/10/22/javascript-dsl/
-
-global.DSLFunction = (function() {
-  var _A = CollectionFunctions.Array.functions,
-      _ = knit._util
+//knit/core/reference ======================================================
+knit.RelationReference = (function(){
   
-  var dslLocals = {}
-  var outerFunction = function(userFunction, what_theKeywordThis_IsSupposedToBe){
-    if (what_theKeywordThis_IsSupposedToBe == undefined) {
-      what_theKeywordThis_IsSupposedToBe = this
+  var _ = knit._util,
+      C = function(relationName) {
+            this._relation = new knit.UnresolvedRelationReference(relationName)
+          },
+      p = C.prototype
+
+  p.resolve = function(bindings) { 
+    if (this._relation.resolve) this._relation = this._relation.resolve(bindings) 
+    return this
+  }
+
+  _.each(["id", "attr", "name"], function(methodNameToDelegate) {
+    p[methodNameToDelegate] = function() { 
+      return this._relation[methodNameToDelegate].apply(this._relation, arguments) 
+    }
+  })
+  
+  _.delegate(p, 
+             _.extend({}, knit.signature.compiledRelation, knit.signature.relationExpression), 
+             function(){return this._relation})
+  
+  p.isSame = 
+    p.isEquivalent = function(other) { 
+      return this._relation.isSame(other) || !!(other._relation && this._relation.isSame(other._relation))
+    }
+
+  return C
+})()
+
+knit.UnresolvedRelationReference = (function(){
+  
+  var _ = knit._util,
+      _id = 0,
+      C = function(relationName) {
+            this._relationName = relationName
+            _id += 1
+            this._id = "unresolvedRelation_" + _id
+          },
+      p = C.prototype
+
+  p.id = function(bindings) { return this._id }
+  p.resolve = function(bindings) { return bindings[this._relationName] }
+  
+  _.each(["attributes", "attr", "merge", "split", "newNestedAttribute"], function(methodNameToDelegate) {
+    p[methodNameToDelegate] = function() { 
+      throw(methodNameToDelegate + " not available until after resolve (and refs are bound to real relations)")
+    }
+  })
+
+  p.isSame = 
+    p.isEquivalent = function(other) {
+      return other.constructor == C &&
+             this._relationName == other._relationName
+    }
+
+  p.inspect = function(){return "*" + this._relationName }
+
+  return C
+})()
+
+knit.NullRelation = (function(){
+  var C = function() {},
+      p = C.prototype
+  p.resolve = function(bindings) { return this }
+  p.id = function() { return "nullRelation_id" }
+  p.attributes = function() { return new knit.Attributes([]) }
+  p.attr = function() { throw("Null Relation has no attributes") }
+  p.inspect = function() { return "nullRelation" }
+  p.merge = 
+    p.split = function() { return this }
+  p.newNestedAttribute = function() { throw("It doesn't make sense for Null Relation to create attributes") }
+  p.isSame = 
+    p.isEquivalent = function(other) { return this === other }
+  return new C()  
+})()
+
+knit.AttributeReference = (function(){
+  
+  var C = function(relationRef, attributeName) {
+            this._attribute = new knit.UnresolvedAttributeReference(relationRef, attributeName)
+          },
+      p = C.prototype
+
+  p.resolve = function(bindings) { 
+    if (this._attribute.resolve) this._attribute = this._attribute.resolve(bindings) 
+    return this
+  }
+
+  p.name = function() { return this._attribute.name() }
+  p.fullyQualifiedName = function() { return this._attribute.fullyQualifiedName() }
+  p.structuredName = function() { return this._attribute.structuredName() }
+  p.type = function() { return this._attribute.type() }
+  p.sourceRelation = function() { return this._attribute.sourceRelation() }
+  p.isSame = 
+    p.isEquivalent = function(other) { return this._attribute.isSame(other) }
+  p.inspect = function(){return this._attribute.inspect()}
+
+  return C
+})()
+
+knit.UnresolvedAttributeReference = (function(){
+  
+  var _ = knit._util,
+      C = function(relationRef, attributeName) {
+            this._relationRef = relationRef
+            this._attributeName = attributeName
+          },
+      p = C.prototype
+
+  p.resolve = function(bindings) {
+    return this._relationRef.resolve(bindings).attr(this._attributeName)
+  }
+
+  p.name = function() { return this._attributeName }
+  p.fullyQualifiedName = function() { return this._attributeName }
+  p.structuredName = function() { return this._attributeName }
+  p.type = function() { return null }
+  p.sourceRelation = function() { return this._relationRef }
+
+  p.isSame = 
+    p.isEquivalent = function(other) {
+      return _.quacksLike(other, knit.signature.attribute) &&
+             this.sourceRelation().isSame(other.sourceRelation()) &&
+             this.name() == other.name()
+    }
+
+  p.inspect = function(){return "*" + this._attributeName}
+
+  return C
+})()
+
+knit.NestedAttributeReference = (function(){
+  
+  var _ = knit._util,
+      C = function(attributeName, nestedAttributes) {
+            this._attribute = new knit.UnresolvedNestedAttributeReference(attributeName, nestedAttributes)
+          },
+      p = C.prototype
+
+  p.resolve = function(bindings) { 
+    if (this._attribute.resolve)  this._attribute = this._attribute.resolve(bindings) 
+    return this
+  }
+
+  p.name = function() { return this._attribute.name() }
+  p.structuredName = function() { return this._attribute.structuredName() }
+  p.fullyQualifiedName = function() { return this._attribute.fullyQualifiedName() }
+  p.type = function() { return knit.attributeType.Nested }
+  p.setSourceRelation = function(sourceRelation) { return this._attribute.setSourceRelation(sourceRelation) }
+  p.sourceRelation = function() { return this._attribute.sourceRelation() }
+  p.nestedRelation = function() { return this._attribute.nestedRelation() }
+
+  p.isSame = 
+    p.isEquivalent = function(other) {
+      return _.quacksLike(other, knit.signature.attribute) &&
+             this._attribute.isSame(other)
+    }
+
+  p.inspect = function(){return this._attribute.inspect()}
+
+  return C
+})()
+
+knit.UnresolvedNestedAttributeReference = (function(){
+  
+  var _ = knit._util,
+      C = function(attributeName, nestedAttributes) {
+            this._attributeName = attributeName
+            this._nestedAttributes = nestedAttributes
+            this._sourceRelation = knit.NullRelation
+          },
+      p = C.prototype
+
+  p.resolve = function(bindings) { 
+    _.each(this._nestedAttributes, function(nestedAttribute){nestedAttribute.resolve(bindings)})
+    return this.sourceRelation().newNestedAttribute(this._attributeName, this._nestedAttributes)
+  }
+
+  p.name = function() { return this._attributeName }
+  p.structuredName = function() { return this._attributeName }
+  p.fullyQualifiedName = function() { return this._attributeName }
+  p.type = function() { return knit.attributeType.Nested }
+  p.sourceRelation = function() { return this._sourceRelation }
+  p.setSourceRelation = function(sourceRelation) { this._sourceRelation = sourceRelation; return this }
+  p.nestedRelation = function() { throw("nestedRelation is not available until after resolve") }
+
+  p.isSame = 
+    p.isEquivalent = function(other) {
+      return _.quacksLike(other, knit.signature.attribute) &&
+             this.sourceRelation().isSame(other.sourceRelation()) &&
+             this.name() == other.name()
+    }
+
+  p.inspect = function(){return "*" + this._attributeName}
+
+  return C
+})()
+
+
+knit.ReferenceEnvironment = (function(){
+  
+  var _ = knit._util,
+      C = function() {
+            this._keyToRef = {}
+            this._internalBindings = {}
+          },
+      p = C.prototype
+
+  p.relation = function(relationName) {
+    var relationRef = this._keyToRef[relationName] = this._keyToRef[relationName] || new knit.RelationReference(relationName)
+    return relationRef
+  }
+
+  function regularAttr(relationNameDotAttributeName) {
+    var key = relationNameDotAttributeName,
+        parts = relationNameDotAttributeName.split("."),
+        relationRef = this.relation(parts[0]),
+        attributeName = parts[1],
+        attributeRef = this._keyToRef[key] = this._keyToRef[key] || new knit.AttributeReference(relationRef, attributeName)
+    return attributeRef
+  }
+
+  function nestedAttr(attributeName, nestedAttributeRefs) {
+    var key = attributeName,
+        attributeRef = this._keyToRef[key] = this._keyToRef[key] || new knit.NestedAttributeReference(attributeName, nestedAttributeRefs)
+    return attributeRef
+  }
+
+  p.attr = function() {
+    var args = _.toArray(arguments)
+  
+    if (args.length == 1) {
+      var relationNameDotAttributeName = args[0]
+      return knit._util.bind(regularAttr, this)(relationNameDotAttributeName)
+    } else if (args.length==2 && _.isArray(args[1]) ){
+      var attributeName = args[0],
+          nestedAttributeRefs = args[1]
+      return knit._util.bind(nestedAttr, this)(attributeName, nestedAttributeRefs)
+    } else {
+      var self = this
+      return _.map(args, function(relationNameDotAttributeName){return self.attr(relationNameDotAttributeName)})
+    }
+  }
+
+  p.resolve = function(externalBindings) {
+    var self = this
+    
+    function resolveRelation(resolved, relationKey) {
+      _.each(_.keys(externalBindings), function(relationKey){
+
+        self.relation(relationKey).resolve(externalBindings)
+        resolved.push(relationKey)
+
+        _.each(externalBindings[relationKey].attributes(), function(attribute){
+          resolveAttribute(resolved, relationKey, attribute)
+        })
+      })        
     }
     
-    var localNames = []
-    var localValues = []
-    _A.each(_.keys(dslLocals), function(key){
-      localNames.push(key)
-      localValues.push(dslLocals[key])
-    })
+    function resolveAttribute(resolved, relationKey, attribute) {
+      var attributeKey = relationKey + "." + attribute.name()
+      self.attr(attributeKey).resolve(externalBindings)
+      resolved.push(attributeKey)        
+    }
     
-    var userFunctionBody = "(knit._util.bind(" + userFunction.toString().replace(/\s+$/, "") + ",this))()"
-    var wrappingFunctionBody = "(function(" + localNames.join(",") + "){return " + userFunctionBody + "})"
-    return eval(wrappingFunctionBody).apply(what_theKeywordThis_IsSupposedToBe, localValues)
+    
+    var resolved = []
+    _.each(_.keys(externalBindings), function(relationKey){ resolveRelation(resolved, relationKey) })
+  
+    var stillToResolve = _.differ(_.keys(this._keyToRef), resolved),
+        allBindings = _.extend(externalBindings, this._internalBindings)
+    _.each(stillToResolve, function(key){ self._keyToRef[key].resolve(allBindings) })
+  
+    return this
   }
   
-  outerFunction.dslLocals = dslLocals
-  
-  outerFunction.specialize = function(childDslLocals) {
-    var allDslLocals = _.extend({}, outerFunction.dslLocals)
-    var allDslLocals = _.extend(allDslLocals, childDslLocals)
-    var childDslFunction = new DSLFunction()
-    _.extend(childDslFunction.dslLocals, allDslLocals)
-    return childDslFunction
+  p.decorate = function(target, bindings) {
+    target.relation = knit._util.bind(this.relation, this)
+    target.attr = knit._util.bind(this.attr, this)
+    
+    var self = this,
+        originalRename = target.rename
+    target.rename = function(thing, alias) {
+      var renameResult = originalRename(thing, alias)
+      self._internalBindings[alias] = renameResult
+      return renameResult
+    }
+    
+    var resolveF = knit._util.bind(this.resolve, this)
+    target.resolve = function(){resolveF(bindings())}
+    return target
+  }
+
+  return C
+})()
+
+
+//knit/core/relation_defaults ======================================================
+knit.mixin.relationDefaults = function(target) {
+
+  target.compile = function(compiler){
+    compiler = compiler || this.defaultCompiler()
+    return compiler(this)
   }
   
-  return outerFunction
-})
+  target.split = 
+    target.merge = function(){return this}
+  
+  target.toAlgorithm = function() {
+    var self = this
+    return function(){return self}
+  }
+
+}
 
 
+//knit/core/dsl_function ======================================================
+//see http://alexyoung.org/2009/10/22/javascript-dsl/
+knit._DSLFunction = function() {
+  var _ = knit._util,
+      dslLocals = {},
+      outerFunction = function(userFunction, what_theKeywordThis_IsSupposedToBe){
+        if (what_theKeywordThis_IsSupposedToBe == undefined) {
+          what_theKeywordThis_IsSupposedToBe = this
+        }
+    
+        var localNames = []
+        var localValues = []
+        _.each(_.keys(dslLocals), function(key){
+          localNames.push(key)
+          localValues.push(dslLocals[key])
+        })
+    
+        var userFunctionBody = "(knit._util.bind(" + userFunction.toString().replace(/\s+$/, "") + ",this))()"
+        var wrappingFunctionBody = "(function(" + localNames.join(",") + "){return " + userFunctionBody + "})"
+        return eval(wrappingFunctionBody).apply(what_theKeywordThis_IsSupposedToBe, localValues)
+      }
+  
+  return _.extend(outerFunction, {
+
+    dslLocals:dslLocals,
+
+    specialize: function(childDslLocals) {
+      var allDslLocals = _.extend({}, outerFunction.dslLocals)
+      var allDslLocals = _.extend(allDslLocals, childDslLocals)
+      var childDslFunction = new knit._DSLFunction()
+      _.extend(childDslFunction.dslLocals, allDslLocals)
+      return childDslFunction
+    }
+
+  }) 
+}
 
 
-
-//knit/builder_function ======================================================
+//knit/core/builder_function ======================================================
 
 knit.createBuilderFunction = function(setup) {
   var bindings = typeof setup.bindings == "function" ? setup.bindings : function(){return setup.bindings}
 
   var referenceResolvingWrapper = function() {
-    var dslFunction = new DSLFunction()
+    var dslFunction = new knit._DSLFunction()
     knit._util.extend(dslFunction.dslLocals, knit.createBuilderFunction.dslLocals)
     var environment = new knit.ReferenceEnvironment()
     environment.decorate(dslFunction.dslLocals, bindings)
@@ -1014,59 +1148,80 @@ knit.createBuilderFunction = function(setup) {
 knit.createBuilderFunction.dslLocals = {}
 
 
-
-
-
-//knit/rows_and_objects ======================================================
-
-knit.mixin.RowsAndObjects = function(proto) {
-  proto.rows = function(){return this.perform().rows()}
-  proto.objects = function(){return this.perform().objects()}
+//knit/core/attribute_types ======================================================
+knit.attributeType = {
+  Integer: "INTEGER",
+  String: "STRING",
+  Nested: "NESTED"
 }
 
 
-//knit/attributes ======================================================
 
-knit.Attributes = function() {
-  
-  var F = function(attributeArray) {
-    this._attributeArray = attributeArray
-  }; var p = F.prototype
+//knit/core/attributes ======================================================
+knit.Attributes = (function() {
 
-  var _A = CollectionFunctions.Array.functions
-  
-  var localCF = CollectionFunctions({
-    iterator:function(attributes) { return _A.iterator(attributes._attributeArray)}, 
-    nothing:function(){return null}, 
-    equals:function(a,b){return a && b && a.isSame && b.isSame && a.isSame(b)},
-    newCollection:function(){return new F([])},
-    append:function(attributes, attribute){attributes._attributeArray.push(attribute)}
-  })
-  
-  var _O = localCF.functions
-  var objectStyleCF = localCF.makeObjectStyleFunctions(function(){return this})
-  _A.each(["clone", "concat", "inspect", "without", "map",
+  var _ = knit._util,
+      C = function(attributeArray) {
+            this._attributeArray = attributeArray
+          },
+      p = C.prototype,
+      localCF = CollectionFunctions({
+        iterator:function(attributes) { return _.iterator(attributes._attributeArray)}, 
+        nothing:function(){return null}, 
+        equals:function(a,b){return a && b && a.isSame && b.isSame && a.isSame(b)},
+        newCollection:function(){return new C([])},
+        append:function(attributes, attribute){attributes._attributeArray.push(attribute)}
+      }),
+      _O = localCF.functions,
+      objectStyleCF = localCF.makeObjectStyleFunctions(function(){return this})
+
+  _.each(["clone", "concat", "inspect", "without", "map",
            "each", "indexOf", "size", "differ", "empty", "indexOf", "indexesOf"], function(functionName) {
     p[functionName] = objectStyleCF[functionName]
   })
-  p.isSame = p.isEquivalent = objectStyleCF.equals
+  
+  p.isSame = 
+    p.isEquivalent = objectStyleCF.equals
   p.splice = objectStyleCF.splice
   
   p.names = function(){return _O.pluck(this, 'name')}
+  p.structuredNames = function(){return _O.pluck(this, 'structuredName')}
+  p.fullyQualifiedNames = function(){return _O.pluck(this, 'fullyQualifiedName')}
+  p.types = function(){return _O.pluck(this, 'type')}
+  p.namesAndTypes = function(){return _O.map(this, function(attr){return [attr.name(),attr.type()]})}
   p.get = function() { 
     if (arguments.length==1) {
       var name = arguments[0]
       return _O.detect(this, function(attr){return attr.name() == name}) 
     } else {
-      var args = _A.toArray(arguments)
-      return _O.select(this, function(attr){return _A.include(args, attr.name())}) 
+      var args = _.toArray(arguments)
+      return _O.select(this, function(attr){return _.include(args, attr.name())}) 
     }
+  }
+  p.fromPrimitives = function(attrNamePrimitives) {
+    var flattenedAttrNamePrimitives = 
+      _.map(attrNamePrimitives, function(attrNamePrimitive){
+        return typeof attrNamePrimitive == "string" ? attrNamePrimitive : _.keys(attrNamePrimitive)[0]
+      })
+    var self = this
+    return new knit.Attributes(_.map(flattenedAttrNamePrimitives, function(attrNamePrimitive){
+      return _O.detect(self, function(attr){return attr.name() == attrNamePrimitive}) ||
+             _O.detect(self, function(attr){return attr.fullyQualifiedName() == attrNamePrimitive})
+    }))
   }
   
   p.spliceInNestedAttribute = function(nestedAttribute) {
     var firstNestedAttributePosition = _O.indexesOf(this, nestedAttribute.nestedRelation().attributes()).sort()[0]
     var withoutAttributesToNest = _O.differ(this, nestedAttribute.nestedRelation().attributes())
-    return _O.splice(withoutAttributesToNest, new F([nestedAttribute]), firstNestedAttributePosition)
+    return _O.splice(withoutAttributesToNest, new C([nestedAttribute]), firstNestedAttributePosition)
+  }
+  
+  p.wrapWithOrderBy = function(relation, direction) {
+    var result = relation
+    _O.each(this, function(orderByAttr){
+      result = new knit.algebra.Order(relation, orderByAttr, knit.algebra.Order.ASC)
+    })
+    return result
   }
   
   p.makeObjectFromRow = function(row) {
@@ -1083,81 +1238,85 @@ knit.Attributes = function() {
     return object
   }
   
-  return F
-}()
+  return C
+})()
+
+
+
+
+
+//knit/algebra ======================================================
 
 
 
 //knit/algebra/predicate/equality ======================================================
 
-knit.algebra.predicate.Equality = function() {
-  var _A = CollectionFunctions.Array.functions
+knit.algebra.predicate.Equality = (function(){
   
-  var F = function(leftAtom, rightAtom) {
-    this.leftAtom = leftAtom
-    this.rightAtom = rightAtom
-  }; var p = F.prototype
+  var _ = knit._util,
+      C = function(leftAtom, rightAtom) {
+            this.leftAtom = leftAtom
+            this.rightAtom = rightAtom
+          },
+      p = C.prototype
 
-  p._isAttribute = function(thing) {
-    return thing.name && !thing.attributes
-  }
+  function isAttribute(thing) { return _.quacksLike(thing, knit.signature.attribute) }
+  p.leftIsAttribute = function(thing) { return isAttribute(this.leftAtom) }
+  p.rightIsAttribute = function(thing) { return isAttribute(this.rightAtom) }
   
   p._attributesReferredTo = function() {
     var attributes = []
-    if (this._isAttribute(this.leftAtom)) { 
-      attributes.push(this.leftAtom)
-    } 
-    if (this._isAttribute(this.rightAtom)) { 
-      attributes.push(this.rightAtom)
-    } 
+    if (this.leftIsAttribute()) { attributes.push(this.leftAtom) } 
+    if (this.rightIsAttribute()) { attributes.push(this.rightAtom) } 
     return new knit.Attributes(attributes)
   }
   
   p._attributesFromRelations = function(relations) {
     var allAttributes = new knit.Attributes([])
-    _A.each(relations, function(r){allAttributes = allAttributes.concat(r.attributes())})
+    _.each(relations, function(r){allAttributes = allAttributes.concat(r.attributes())})
     return allAttributes
   }
 
   p.concernedWithNoOtherRelationsBesides = function() {    
-    var expectedExclusiveRelations = _A.toArray(arguments)
+    var expectedExclusiveRelations = _.toArray(arguments)
     var allAttributes = new knit.Attributes([])
-    _A.each(expectedExclusiveRelations, function(r){allAttributes = allAttributes.concat(r.attributes())})
+    _.each(expectedExclusiveRelations, function(r){allAttributes = allAttributes.concat(r.attributes())})
     
     return this._attributesReferredTo().differ(allAttributes).empty()
   }
     
   p.concernedWithAllOf = function() {
-    var expectedRelations = _A.toArray(arguments)
+    var expectedRelations = _.toArray(arguments)
     var myAttributes = this._attributesReferredTo()
     
     this._attributesReferredTo().each(function(attr){
-      var relationToCheckOff = _A.detect(expectedRelations, function(r){return attr.sourceRelation().isSame(r)})
-      if (relationToCheckOff) expectedRelations = _A.without(expectedRelations, relationToCheckOff)
+      var relationToCheckOff = _.detect(expectedRelations, function(r){return attr.sourceRelation().isSame(r)})
+      if (relationToCheckOff) expectedRelations = _.without(expectedRelations, relationToCheckOff)
     })
 
-    return _A.empty(expectedRelations)
+    return _.empty(expectedRelations)
   }
     
 
-  p._areTheseTwoThingsTheSame = function(a, b) {
+  function areTheseTwoThingsTheSame(a, b) {
     return a.isSame && b.isSame && a.isSame(b) || a == b
   }
   
   p.isSame = function(other) {  
-    return other.constructor == F && 
-           this._areTheseTwoThingsTheSame(this.leftAtom, other.leftAtom) &&
-           this._areTheseTwoThingsTheSame(this.rightAtom, other.rightAtom)
+    return other.constructor == C && 
+           areTheseTwoThingsTheSame(this.leftAtom, other.leftAtom) &&
+           areTheseTwoThingsTheSame(this.rightAtom, other.rightAtom)
   }
   
   p.isEquivalent = function(other) {
     return this.isSame(other) ||
-             other.constructor == F && 
-             this._areTheseTwoThingsTheSame(this.leftAtom, other.rightAtom) &&
-             this._areTheseTwoThingsTheSame(this.rightAtom, other.leftAtom)
+             other.constructor == C && 
+             areTheseTwoThingsTheSame(this.leftAtom, other.rightAtom) &&
+             areTheseTwoThingsTheSame(this.rightAtom, other.leftAtom)
   }
 
-  p._inspectAtom = function(value) {
+
+  function inspectAtom(value) {
     if (value.inspect) {
       return value.inspect()
     } else if (typeof value == "string") {
@@ -1167,18 +1326,18 @@ knit.algebra.predicate.Equality = function() {
     }
   }
   
-  p.inspect = function() { return "eq(" + this._inspectAtom(this.leftAtom) + "," + 
-                                          this._inspectAtom(this.rightAtom) + ")" }
+  p.inspect = function() {     
+    return "eq(" + inspectAtom(this.leftAtom) + "," + inspectAtom(this.rightAtom) + ")" 
+  }
 
-  return F
-}()
+  return C
+})()
 
 knit.createBuilderFunction.dslLocals.equality = function(leftAtom, rightAtom) {
   return new knit.algebra.predicate.Equality(leftAtom, rightAtom)
 }
 
 knit.createBuilderFunction.dslLocals.eq = knit.createBuilderFunction.dslLocals.equality
-
 
 
 //knit/algebra/predicate/true_false ======================================================
@@ -1197,40 +1356,40 @@ knit.createBuilderFunction.dslLocals.FALSE = new knit.algebra.predicate.False()
 
 //knit/algebra/predicate/conjunction ======================================================
 
-knit.algebra.predicate.Conjunction = function(){
-  var _A = CollectionFunctions.Array.functions
+knit.algebra.predicate.Conjunction = (function(){
   
-  var F = function(leftPredicate, rightPredicate) { //har
-    this.leftPredicate = leftPredicate
-    this.rightPredicate = rightPredicate
-  }; var p = F.prototype
+  var _ = knit._util,
+      C = function(leftPredicate, rightPredicate) {
+            this.leftPredicate = leftPredicate
+            this.rightPredicate = rightPredicate
+          },
+      p = C.prototype
 
   p.concernedWithNoOtherRelationsBesides = function() {
-    var expectedExclusiveRelations = _A.toArray(arguments)
+    var expectedExclusiveRelations = _.toArray(arguments)
     return this.leftPredicate.concernedWithNoOtherRelationsBesides.apply(this.leftPredicate, expectedExclusiveRelations) &&
            this.rightPredicate.concernedWithNoOtherRelationsBesides.apply(this.rightPredicate, expectedExclusiveRelations)
   }
   
   p.concernedWithAllOf = function() {
-    var expectedRelations = _A.toArray(arguments)
-  
-    var self = this
-    var remainingRelations = _A.select(expectedRelations, function(relation){
-      return ! (self.leftPredicate.concernedWithAllOf(relation) || self.rightPredicate.concernedWithAllOf(relation))
-    })
+    var expectedRelations = _.toArray(arguments)
+        self = this,
+        remainingRelations = _.select(expectedRelations, function(relation){
+          return ! (self.leftPredicate.concernedWithAllOf(relation) || self.rightPredicate.concernedWithAllOf(relation))
+        })
 
-    return _A.empty(remainingRelations)
+    return _.empty(remainingRelations)
   }
       
   p.isSame = function(other) {
-    return other.constructor == F && 
+    return other.constructor == C && 
            this.leftPredicate.isSame(other.leftPredicate) &&
            this.rightPredicate.isSame(other.rightPredicate)
   }
   
   p.isEquivalent = function(other) {
     return this.isSame(other) ||
-             other.constructor == F && 
+             other.constructor == C && 
              this.leftPredicate.isEquivalent(other.rightPredicate) &&
              this.rightPredicate.isEquivalent(other.leftPredicate)
   }
@@ -1238,8 +1397,8 @@ knit.algebra.predicate.Conjunction = function(){
   p.inspect = function() { return "and(" + this.leftPredicate.inspect() + "," + 
                                            this.rightPredicate.inspect() + ")" }
   
-  return F
-}()
+  return C
+})()
 
 knit.createBuilderFunction.dslLocals.conjunction = function(leftPredicate, rightPredicate) {
   return new knit.algebra.predicate.Conjunction(leftPredicate, rightPredicate)
@@ -1248,30 +1407,30 @@ knit.createBuilderFunction.dslLocals.conjunction = function(leftPredicate, right
 knit.createBuilderFunction.dslLocals.and = knit.createBuilderFunction.dslLocals.conjunction
 
 
-
 //knit/algebra/predicate ======================================================
 
 
 
 //knit/algebra/join ======================================================
 
-knit.algebra.Join = function(){
+knit.algebra.Join = (function(){
 
-  var F = function(relationOne, relationTwo, predicate) {
-    this.relationOne = relationOne
-    this.relationTwo = relationTwo
-    this.predicate = predicate || new knit.algebra.predicate.True()
-  }; var p = F.prototype
+  var C = function(relationOne, relationTwo, predicate) {
+            this.relationOne = relationOne
+            this.relationTwo = relationTwo
+            this.predicate = predicate || new knit.algebra.predicate.True()
+          },
+      p = C.prototype
   
-  knit.mixin.RowsAndObjects(p)
+  knit.mixin.relationDefaults(p)
+  
+  p.operationName = function(){return "join"}
   
   p.newNestedAttribute = function() {    
     return this.relationOne.newNestedAttribute.apply(this.relationOne, arguments)
   }
   
-  p.perform = function() {
-    return this.relationOne.perform().performJoin(this.relationTwo.perform(), this.predicate)
-  }
+  p.defaultCompiler = function(){ return this.relationOne.defaultCompiler() }
 
   p.attributes = function(){ return this.relationOne.attributes().concat(this.relationTwo.attributes()) }
   
@@ -1289,7 +1448,7 @@ knit.algebra.Join = function(){
   }
 
   p.isSame = function(other) {
-    return other.constructor == F && 
+    return other.constructor == C && 
            this.relationOne.isSame(other.relationOne) &&
            this.relationTwo.isSame(other.relationTwo) &&
            this.predicate.isSame(other.predicate)
@@ -1297,7 +1456,7 @@ knit.algebra.Join = function(){
  
   p.isEquivalent = function(other) {
     return this.isSame(other) ||
-             other.constructor == F && 
+             other.constructor == C && 
 
              ((this.relationOne.isSame(other.relationOne) &&
               this.relationTwo.isSame(other.relationTwo)) ||
@@ -1308,10 +1467,8 @@ knit.algebra.Join = function(){
              this.predicate.isEquivalent(other.predicate)
   }
   
-  p.split = p.merge = function(){return this}
-  
   p.inspect = function(){
-    var inspectStr = "join(" + this.relationOne.inspect() + "," + this.relationTwo.inspect()
+    var inspectStr = this.operationName() + "(" + this.relationOne.inspect() + "," + this.relationTwo.inspect()
   
     if (!this._predicateIsDefault()) {
       inspectStr += "," + this.predicate.inspect()
@@ -1321,21 +1478,29 @@ knit.algebra.Join = function(){
     return inspectStr
   }
 
-  return F
-}()
+  return C
+})()
 
 knit.createBuilderFunction.dslLocals.join = function(relationOne, relationTwo, predicate) { 
   return new knit.algebra.Join(relationOne, relationTwo, predicate) 
 }
 
+knit.algebra.LeftOuterJoin = (function(){
 
-knit.algebra.LeftOuterJoin = function(relationOne, relationTwo, predicate) {
-  var join = new knit.algebra.Join(relationOne, relationTwo, predicate)
-  join.perform = function() {
-    return this.relationOne.perform().performLeftOuterJoin(this.relationTwo.perform(), this.predicate)
-  }
-  return join
-}
+  var _ = knit._util,
+      C = function(relationOne, relationTwo, predicate) {
+            this.relationOne = relationOne
+            this.relationTwo = relationTwo
+            this.predicate = predicate || new knit.algebra.predicate.True()
+          },
+      p = C.prototype
+  
+  _.extend(p, knit.algebra.Join.prototype)
+  
+  p.operationName = function(){return "leftOuterJoin"}
+  
+  return C
+})()
 
 knit.createBuilderFunction.dslLocals.leftOuterJoin = function(relationOne, relationTwo, predicate) { 
   return new knit.algebra.LeftOuterJoin(relationOne, relationTwo, predicate) 
@@ -1343,13 +1508,22 @@ knit.createBuilderFunction.dslLocals.leftOuterJoin = function(relationOne, relat
 
 
 
-knit.algebra.RightOuterJoin = function(relationOne, relationTwo, predicate) {
-  var join = new knit.algebra.Join(relationOne, relationTwo, predicate)
-  join.perform = function() {
-    return this.relationOne.perform().performRightOuterJoin(this.relationTwo.perform(), this.predicate)
-  }
-  return join
-}
+knit.algebra.RightOuterJoin = (function(){
+
+  var _ = knit._util,
+      C = function(relationOne, relationTwo, predicate) {
+            this.relationOne = relationOne
+            this.relationTwo = relationTwo
+            this.predicate = predicate || new knit.algebra.predicate.True()
+          },
+      p = C.prototype
+  
+  _.extend(p, knit.algebra.Join.prototype)
+  
+  p.operationName = function(){return "rightOuterJoin"}
+  
+  return C
+})()
 
 knit.createBuilderFunction.dslLocals.rightOuterJoin = function(relationOne, relationTwo, predicate) { 
   return new knit.algebra.RightOuterJoin(relationOne, relationTwo, predicate) 
@@ -1357,56 +1531,237 @@ knit.createBuilderFunction.dslLocals.rightOuterJoin = function(relationOne, rela
 
 
 
-knit.algebra.NaturalJoin = function(relationOne, relationTwo) {
-  var _A = CollectionFunctions.Array.functions
+knit.algebra.NaturalJoin = (function(){
+
+  var _ = knit._util,
+      C = function(relationOne, relationTwo, suffix) {
+            this.relationOne = relationOne
+            this.relationTwo = relationTwo
+            this.suffix = suffix || "Id"
+          },
+      p = C.prototype
   
-  var join = new knit.algebra.Join(relationOne, relationTwo, new knit.algebra.predicate.True())
+  _.extend(p, knit.algebra.Join.prototype)
+  
+  p.operationName = function(){return "naturalJoin"}
+  
+  return C
+})()
 
-  join.perform = function() {
-    var commonAttributeNames = _A.intersect(this.relationOne.attributes().names(), 
-                                            this.relationTwo.attributes().names())
-    var commonIdAttributeNames = _A.select(commonAttributeNames, function(attributeName){return attributeName.match(/Id$/)})
+knit.createBuilderFunction.dslLocals.naturalJoin = function(relationOne, relationTwo, suffix) { 
+  return new knit.algebra.NaturalJoin(relationOne, relationTwo, suffix) 
+}
 
-    function attributeNamesToPredicate(attributeNames, relationOne, relationTwo) {
-      if (attributeNames.length == 1) {
-        var attributeName = attributeNames.shift()
-        return new knit.algebra.predicate.Equality(relationOne.attr(attributeName), relationTwo.attr(attributeName))
-      } else if (attributeNames.length > 1) {
-        var attributeOne = attributeNames.shift()
-        return new knit.algebra.predicate.Conjunction(attributeNamesToPredicate([attributeOne], relationOne, relationTwo), 
-                                                      attributeNamesToPredicate(attributeNames, relationOne, relationTwo))
-      } else {
-        return new knit.algebra.predicate.True()
-      }
+
+
+//knit/algebra/divide ======================================================
+
+knit.algebra.Divide = (function(){
+
+  var C = function(dividend, divisor) {
+            this.dividend = dividend
+            this.divisor = divisor
+            //predicate?
+          },
+      p = C.prototype
+  
+  knit.mixin.relationDefaults(p)
+  
+  p.newNestedAttribute = function() {    
+    return this.dividend.newNestedAttribute.apply(this.dividend, arguments)
+  }
+  
+  p.attributes = function(){ return this.dividend.attributes().differ(this.divisor.attributes()) }
+  
+  p.defaultCompiler = function() { return this.dividend.defaultCompiler() }
+
+  p.isSame = 
+    p.isEquivalent = function(other) {
+      return other.constructor == C && 
+             this.dividend.isSame(other.dividend) &&
+             this.dividend.isSame(other.divisor)
     }
-
-    var predicate = attributeNamesToPredicate(commonIdAttributeNames, this.relationOne, this.relationTwo)
-    
-    return this.relationOne.perform().performRightOuterJoin(this.relationTwo.perform(), predicate)
+   // 
+   // p.isEquivalent = function(other) {
+   //   return this.isSame(other) ||
+   //            other.constructor == C && 
+   // 
+   //            ((this.dividendOne.isSame(other.relationOne) &&
+   //             this.dividendTwo.isSame(other.relationTwo)) ||
+   // 
+   //            (this.dividendOne.isSame(other.relationTwo) &&
+   //             this.dividendTwo.isSame(other.relationOne))) &&
+   // 
+   //            this.predicate.isEquivalent(other.predicate)
+   // }
+  
+  p.inspect = function(){
+    return "divide(" + this.dividend.inspect() + "," + this.divisor.inspect() + ")"
   }
 
-  return join
+  return C
+})()
+
+knit.createBuilderFunction.dslLocals.divide = function(dividend, divisor) { 
+  return new knit.algebra.Divide(dividend, divisor) 
 }
 
-knit.createBuilderFunction.dslLocals.naturalJoin = function(relationOne, relationTwo) { 
-  return new knit.algebra.NaturalJoin(relationOne, relationTwo) 
+
+//knit/algebra/nest_unnest ======================================================
+
+knit.algebra.Unnest = (function(){
+
+  var C = function(relation, nestedAttribute) {
+            this.relation = relation
+            this.nestedAttribute = nestedAttribute
+          },
+      p = C.prototype
+  
+  knit.mixin.relationDefaults(p)
+  
+  p.defaultCompiler = function(){ return this.relation.defaultCompiler() }
+
+  p.attributes = function(){ 
+    var nestedAttributeIndex = this.relation.attributes().indexOf(this.nestedAttribute)
+    return this.relation.attributes().splice(this.nestedAttribute.nestedRelation().attributes(), nestedAttributeIndex, 1)
+  }
+  
+  p.isSame = 
+    p.isEquivalent = function(other) {
+      return other.constructor == C && 
+             this.relation.isSame(other.relation) &&
+             this.nestedAttribute.isSame(other.nestedAttribute)
+    }
+  
+  p.inspect = function(){return "unnest(" + this.relation.inspect() + "," + 
+                                            this.nestedAttribute.inspect() + ")"}
+  
+  return C
+})()
+
+knit.createBuilderFunction.dslLocals.unnest = function(relation, nestedAttribute) { 
+  return new knit.algebra.Unnest(relation, nestedAttribute) 
 }
 
+knit.algebra.Nest = (function(){
+
+  var C = function(relation, nestedAttribute) {
+            this.relation = relation
+            this.nestedAttribute = nestedAttribute
+            this.nestedAttribute.setSourceRelation(relation)
+          },
+      p = C.prototype
+  
+  knit.mixin.relationDefaults(p)
+  
+  p.defaultCompiler = function(){ return this.relation.defaultCompiler() }
+  
+  p.attributes = function(){ 
+    return this.relation.attributes().spliceInNestedAttribute(this.nestedAttribute)
+  }
+  
+  p.newNestedAttribute = function() {
+    return this.relation.newNestedAttribute.apply(this.relation, arguments)
+  }
+  
+  p.isSame = 
+    p.isEquivalent = function(other) {
+      return other.constructor == C && 
+             this.relation.isSame(other.relation) &&
+             this.nestedAttribute.isSame(other.nestedAttribute)
+    }
+  
+  p.inspect = function(){return "nest(" + this.relation.inspect() + "," + this.nestedAttribute.inspect() + ")"}
+
+  return C
+})()
+
+knit.createBuilderFunction.dslLocals.nest = function(relation, nestedAttribute) {
+  return new knit.algebra.Nest(relation, nestedAttribute)
+}
+
+
+
+
+
+//knit/algebra/rename ======================================================
+
+knit.algebra.RenameRelation = (function() {
+
+  var _ = knit._util,
+      C = function(relation, alias) {
+            this.relation = relation
+            this.alias = alias
+          },
+      p = C.prototype
+  
+  knit.mixin.relationDefaults(p)
+  
+  p.attributes = function(){ return this.relation.attributes() }
+  p.attr = function() { return this.relation.attributes().get(_.toArray(arguments)) }
+  
+  p.newNestedAttribute = function() { return this.relation.newNestedAttribute.apply(this.relation, arguments) }
+
+  p.isSame = 
+    p.isEquivalent = function(other) {
+      return other.constructor == C && 
+             this.relation.isSame(other.relation) &&
+             this.alias == other.alias
+    }
+  
+  p.inspect = function(){return "rename(" + this.relation.inspect() + "," + this.alias + ")"}
+
+  return C
+})()
+
+knit.algebra.RenameAttribute = (function() {
+
+  var C = function(attribute, alias) {
+            this.attribute = attribute
+            this.alias = alias
+          },
+      p = C.prototype
+  
+  p.name = function(){ return this.alias }
+  p.type = function(){ return this.attribute.type() }
+  p.sourceRelation = function(){ return this.attribute.sourceRelation() }
+
+  p.isSame = 
+    p.isEquivalent = function(other) {
+      return other.constructor == C && 
+             this.attribute.isSame(other.attribute) &&
+             this.alias == other.alias
+    }
+  
+  p.inspect = function(){return "#" + this.alias}
+
+  return C
+})()
+
+
+knit.createBuilderFunction.dslLocals.rename = function(thing, alias) {
+  if (knit._util.quacksLike(thing, knit.signature.relation)) {
+    return new knit.algebra.RenameRelation(thing, alias)
+  } else {
+    return new knit.algebra.RenameAttribute(thing, alias)
+  }
+}
 
 
 //knit/algebra/select ======================================================
 
-knit.algebra.Select = function() {
-  var _A = CollectionFunctions.Array.functions
+knit.algebra.Select = (function() {
   
-  var F = function(relation, criteria) {
-    this.relation = relation
-    this.criteria = criteria
-  }; var p = F.prototype
+  var _ = knit._util,
+      C = function(relation, predicate) {
+        this.relation = relation
+        this.predicate = predicate
+      }, 
+      p = C.prototype
   
-  knit.mixin.RowsAndObjects(p)
+  knit.mixin.relationDefaults(p)
   
-  p.perform = function() { return this.relation.perform().performSelect(this.criteria) }
+  p.defaultCompiler = function() { return this.relation.defaultCompiler() }
 
   p.attributes = function(){ return this.relation.attributes() }
   
@@ -1415,38 +1770,38 @@ knit.algebra.Select = function() {
   }
   
   p.merge = function() {
-    if (this.relation.criteria) {
-      return new F(this.relation.relation.merge(), new knit.algebra.predicate.Conjunction(this.relation.criteria, this.criteria))
+    if (this.relation.predicate) {
+      return new C(this.relation.relation.merge(), new knit.algebra.predicate.Conjunction(this.relation.predicate, this.predicate))
     } else {
       return this
     }
   }
   
   p.split = function() {
-    if (this.criteria.constructor == knit.algebra.predicate.Conjunction) {
-        return new F(
-          new F(this.relation.split(), this.criteria.leftPredicate),
-          this.criteria.rightPredicate
+    if (this.predicate.constructor == knit.algebra.predicate.Conjunction) {
+        return new C(
+          new C(this.relation.split(), this.predicate.leftPredicate),
+          this.predicate.rightPredicate
         )
     } else {
       return this
     }
   }
   
-  p._doPush = function(relation) { return new F(relation, this.criteria).push() }
+  p._doPush = function(relation) { return new C(relation, this.predicate).push() }
   
   p.push = function() {
-    if (knit.quacksLike(this.relation, knit.signature.join)) {
+    if (_.quacksLike(this.relation, knit.signature.join)) {
       var join = this.relation
-      if (this.criteria.concernedWithNoOtherRelationsBesides(join.relationOne)) {
+      if (this.predicate.concernedWithNoOtherRelationsBesides(join.relationOne)) {
         join.relationOne = this._doPush(join.relationOne)
         return join
-      } else if (this.criteria.concernedWithNoOtherRelationsBesides(join.relationTwo)) {
+      } else if (this.predicate.concernedWithNoOtherRelationsBesides(join.relationTwo)) {
         join.relationTwo = this._doPush(join.relationTwo)
         return join
-      } else if (this.criteria.concernedWithNoOtherRelationsBesides(join.relationOne, join.relationTwo) &&
-                 this.criteria.concernedWithAllOf(join.relationOne, join.relationTwo)) {
-        join.appendToPredicate(this.criteria)
+      } else if (this.predicate.concernedWithNoOtherRelationsBesides(join.relationOne, join.relationTwo) &&
+                 this.predicate.concernedWithAllOf(join.relationOne, join.relationTwo)) {
+        join.appendToPredicate(this.predicate)
         return join
       } else {
         return this
@@ -1491,32 +1846,32 @@ knit.algebra.Select = function() {
   }
   
   p.isSame = function(other) {
-    return other.constructor == F && 
+    return other.constructor == C && 
            this.relation.isSame(other.relation) &&
-           this.criteria.isSame(other.criteria)
+           this.predicate.isSame(other.predicate)
   }
   
   p.isEquivalent = function(other) {
-    if (other.constructor == F) {
+    if (other.constructor == C) {
       var thisMerged = this.merge()
       var otherMerged = other.merge()
     
       return thisMerged.isSame(otherMerged) ||
                thisMerged.relation.isEquivalent(otherMerged.relation) &&
-               thisMerged.criteria.isEquivalent(otherMerged.criteria)
+               thisMerged.predicate.isEquivalent(otherMerged.predicate)
     } else {
       return false
     }
   }
   
   p.inspect = function(){return "select(" + this.relation.inspect() + "," + 
-                                            this.criteria.inspect() + ")"}
+                                            this.predicate.inspect() + ")"}
   
-  return F
-}()
+  return C
+})()
 
-knit.createBuilderFunction.dslLocals.select = function(relation, criteria) {
-  return new knit.algebra.Select(relation, criteria)
+knit.createBuilderFunction.dslLocals.select = function(relation, predicate) {
+  return new knit.algebra.Select(relation, predicate)
 }
 
 
@@ -1524,35 +1879,35 @@ knit.createBuilderFunction.dslLocals.select = function(relation, criteria) {
 //knit/algebra/project ======================================================
 
 //proh JEKT
-knit.algebra.Project = function() {
+knit.algebra.Project = (function() {
 
-  var F = function(relation, attributes) {
-    this._attributes = attributes
-    this.relation = relation
-  }; var p = F.prototype
+  var C = function(relation, attributes) {
+            this._attributes = attributes
+            this.relation = relation
+          },
+      p = C.prototype
   
-  knit.mixin.RowsAndObjects(p)
+  knit.mixin.relationDefaults(p)
   
-  p.perform = function() { return this.relation.perform().performProject(this.attributes()) }
-
+  p.defaultCompiler = function() { return this.relation.defaultCompiler() }
   p.attributes = function(){ return this._attributes }
   
   p.newNestedAttribute = function() {
     return this.relation.newNestedAttribute.apply(this.relation, arguments)
   }
 
-  p.isSame = p.isEquivalent = function(other) {
-    return other.constructor == F && 
-           this.relation.isSame(other.relation) &&
-           this.attributes().isSame(other.attributes())
-  }
+  p.isSame = 
+    p.isEquivalent = function(other) {
+      return other.constructor == C && 
+             this.relation.isSame(other.relation) &&
+             this.attributes().isSame(other.attributes())
+    }
   
   p.inspect = function(){return "project(" + this.relation.inspect() + "," + 
-                                "[" + this.attributes().inspect() + "])"}
+                                        "[" + this.attributes().inspect() + "])"}
 
-  return F
-}()
-
+  return C
+})()
 
 knit.createBuilderFunction.dslLocals.project = function(relation, attributes) {
   return new knit.algebra.Project(relation, new knit.Attributes(attributes))
@@ -1561,19 +1916,18 @@ knit.createBuilderFunction.dslLocals.project = function(relation, attributes) {
 
 //knit/algebra/order ======================================================
 
-knit.algebra.Order = function(){
+knit.algebra.Order = (function(){
   
-  var F = function(relation, orderAttribute, direction) {
-    this.relation = relation
-    this.orderAttribute = orderAttribute
-    this.direction = direction
-  }; var p = F.prototype
+  var C = function(relation, orderAttribute, direction) {
+            this.relation = relation
+            this.orderAttribute = orderAttribute
+            this.direction = direction
+          },
+      p = C.prototype
   
-  knit.mixin.RowsAndObjects(p)
+  knit.mixin.relationDefaults(p)
   
-  p.perform = function() {
-    return this.relation.perform().performOrder(this.orderAttribute, this.direction)
-  }
+  p.defaultCompiler = function(){ return this.relation.defaultCompiler() }
 
   p.attributes = function(){ return this.relation.attributes() }
   
@@ -1581,107 +1935,28 @@ knit.algebra.Order = function(){
     return this.relation.newNestedAttribute.apply(this.relation, arguments)
   }
   
-  p.isSame = p.isEquivalent = function(other) {
-    return other.constructor == F && 
-           this.relation.isSame(other.relation) &&
-           this.orderAttribute.isSame(other.orderAttribute) &&
-           this.direction == other.direction
-  }
+  p.isSame = 
+    p.isEquivalent = function(other) {
+      return other.constructor == C && 
+             this.relation.isSame(other.relation) &&
+             this.orderAttribute.isSame(other.orderAttribute) &&
+             this.direction == other.direction
+    }
   
   p.inspect = function(){return "order." + this.direction + 
                                   "(" + this.relation.inspect() + "," + 
                                         this.orderAttribute.inspect() + ")"}
   
-  F.ASC = "asc"
-  F.DESC = "desc"
+  C.ASC = "asc"
+  C.DESC = "desc"
   
-  return F
-}()
+  return C
+})()
 
 knit.createBuilderFunction.dslLocals.order = {
   asc: function(relation, orderAttribute) { return new knit.algebra.Order(relation, orderAttribute, knit.algebra.Order.ASC) },
   desc: function(relation, orderAttribute) { return new knit.algebra.Order(relation, orderAttribute, knit.algebra.Order.DESC) }
 }
-
-
-
-
-
-//knit/algebra/nest_unnest ======================================================
-
-knit.algebra.Unnest = function(){
-
-  var F = function(relation, nestedAttribute) {
-    this.relation = relation
-    this.nestedAttribute = nestedAttribute
-  }; var p = F.prototype
-  
-  knit.mixin.RowsAndObjects(p)
-  
-  p.perform = function() {
-    return this.relation.perform().performUnnest(this.nestedAttribute)
-  }  
-
-  p.attributes = function(){ return this.relation.attributes() }
-  
-  p.isSame = p.isEquivalent = function(other) {
-    return other.constructor == F && 
-           this.relation.isSame(other.relation) &&
-           this.nestedAttribute.isSame(other.nestedAttribute)
-  }
-  
-  p.inspect = function(){return "unnest(" + this.relation.inspect() + "," + 
-                                            this.nestedAttribute.inspect() + ")"}
-  
-  return F
-}()
-
-knit.createBuilderFunction.dslLocals.unnest = function(relation, nestedAttribute) { 
-  return new knit.algebra.Unnest(relation, nestedAttribute) 
-}
-
-knit.algebra.Nest = function(){
-
-  var F = function(relation, nestedAttribute) {
-    this.relation = relation
-    this.nestedAttribute = nestedAttribute
-    this.nestedAttribute.setSourceRelation(relation)
-  }; var p = F.prototype
-  
-  knit.mixin.RowsAndObjects(p)
-  
-  p.perform = function() {
-    //impose order for now
-    var relation = this.relation
-    this.attributes().without(this.nestedAttribute).each(function(orderByAttr){
-      relation = new knit.algebra.Order(relation, orderByAttr, knit.algebra.Order.ASC)
-    })
-    return relation.perform().performNest(this.nestedAttribute, this.attributes())
-  }
-  
-  p.attributes = function(){ 
-    return this.relation.attributes().spliceInNestedAttribute(this.nestedAttribute)
-  }
-  
-  p.newNestedAttribute = function() {
-    return this.relation.newNestedAttribute.apply(this.relation, arguments)
-  }
-  
-  p.isSame = p.isEquivalent = function(other) {
-    return other.constructor == F && 
-           this.relation.isSame(other.relation) &&
-           this.nestedAttribute.isSame(other.nestedAttribute)
-  }
-  
-  p.inspect = function(){return "nest(" + this.relation.inspect() + "," + this.nestedAttribute.inspect() + ")"}
-
-  return F
-}()
-
-knit.createBuilderFunction.dslLocals.nest = function(relation, nestedAttribute) {
-  return new knit.algebra.Nest(relation, nestedAttribute)
-}
-
 
 
 

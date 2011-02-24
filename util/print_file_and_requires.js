@@ -2,7 +2,7 @@ var path = require('path')
 var fs = require('fs')
 var sys = require('sys')
 require(path.join(__dirname, "../lib/vendor/collection_functions"))
-var _ = knit._util
+var _ = CollectionFunctions.Array.functions
 
 printFile = function(baseDir, f, alreadyReadIn) {
   var requireRegex = /^\s*require\((.*)?\)\s*$/

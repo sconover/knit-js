@@ -2,6 +2,8 @@ Relational algebra for javascript.
 
 To start us off...
 
+    //aside: [http://aresemicolonsnecessaryinjavascript.com](http://aresemicolonsnecessaryinjavascript.com)
+    
     require("knit/engine/memory")
     
     var $R = knit({

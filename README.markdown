@@ -1,7 +1,7 @@
 Relational algebra for javascript.
 
 ## Abstract
-  
+
 Expressions of relational algebra in pure form are rare in the programming world.  It's a shame - the relational paradigm is a powerful and efficient way of organizing and manipulating data in general, not just within RDBs.
   
 Knit follows projects like Arel<a href="#arel">*</a> and LINQ as an attempt to bring the power of relational algebra to programmers.
@@ -15,7 +15,7 @@ Quick start:
 1. Create a couple of in-memory relations.
 2. Join them on cityId, and project the resulting relation down to house address and city name.
 
-
+...
 
     //aside: http://aresemicolonsnecessaryinjavascript.com
     
@@ -152,7 +152,7 @@ Breaking down the in-memory example above.  We started by creating a DSL functio
             ]} 
     })
 
-I can create a relational expression using knit's DSL:
+Then we created a relational expression using knit's DSL:
 
     var expression = $R(function(){
       return project(

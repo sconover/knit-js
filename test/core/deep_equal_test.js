@@ -4,8 +4,8 @@ require("knit/core/util")
 require("../test_relation.js")
 
 regarding("traverse down and compare equality", function() {
-  var _ = knit._util
-  var deepEqualWithIsEqual = function(a,b){return _.deepEqual(a,b,"isEqual")}
+  var _ = knit._util,
+      deepEqualWithIsEqual = function(a,b){return _.deepEqual(a,b,"isEqual")}
   
   beforeEach(function(){
     this.butterfly = {

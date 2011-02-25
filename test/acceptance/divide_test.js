@@ -5,7 +5,7 @@ acceptanceTest("divide - relational divsion (think: opposite of cartesian join)"
   
  test("divide cartesian product by a relation", function (){
     
-    allPeopleCombinedWithAllHouses = this.$R(function(){
+    var allPeopleCombinedWithAllHouses = this.$R(function(){
       return join(relation("person"), relation("house"))
     })
     
@@ -29,7 +29,7 @@ acceptanceTest("divide - relational divsion (think: opposite of cartesian join)"
     }, allPeopleCombinedWithAllHouses)
 
 
-    allPeopleCombinedWithAllHousesBackToPeople = this.$R(function(){
+    var allPeopleCombinedWithAllHousesBackToPeople = this.$R(function(){
       return divide(join(relation("person"), relation("house")), relation("house"))
     })
 
@@ -51,7 +51,7 @@ acceptanceTest("divide - relational divsion (think: opposite of cartesian join)"
       [109, "Broderick", 1001]
     ])
     
-    allPeopleCombinedWithAllHousesBackToPeople = this.$R(function(){
+    var allPeopleCombinedWithAllHousesBackToPeople = this.$R(function(){
       return divide(
                naturalJoin(relation("person"), relation("house")), 
                select(relation("house"), eq(attr("house.address"), "Chimney Hill"))

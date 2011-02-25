@@ -4,7 +4,7 @@ acceptanceTest("join", engine.memory, engine.sqlite, function(){
 
   test("combine each row on the left with each row on the right (cartesian product)", function (){
     
-    allPeopleCombinedWithAllHouses = this.$R(function(){
+    var allPeopleCombinedWithAllHouses = this.$R(function(){
       return join(relation("person"), relation("house"))
     })
     
@@ -31,7 +31,7 @@ acceptanceTest("join", engine.memory, engine.sqlite, function(){
   
   test("two joins", function (){
 
-    allPeopleCombinedWithAllHousesCombinedWithAllCities = this.$R(function(){
+    var allPeopleCombinedWithAllHousesCombinedWithAllCities = this.$R(function(){
       return join(join(relation("person"), relation("house")), relation("city"))
     })
 
@@ -70,7 +70,7 @@ acceptanceTest("join", engine.memory, engine.sqlite, function(){
 
   test("join predicate (YAY!)", function (){
     
-    allPeopleCombinedWithAllHouses = this.$R(function(){
+    var allPeopleCombinedWithAllHouses = this.$R(function(){
       return join(relation("person"), relation("house"), equality(attr("person.houseId"), attr("house.houseId")))
     })
     

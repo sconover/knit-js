@@ -10,7 +10,9 @@ Knit is alpha quality and the api changes regularly.
     
 ## Examples
 
-To start us off...
+Quick start:
+1) Create a couple of in-memory relations.
+2) Join them on cityId, and project the resulting relation down to house address and city name.
 
     //aside: http://aresemicolonsnecessaryinjavascript.com
     
@@ -30,6 +32,10 @@ To start us off...
             ]} 
     })
     
+    //If you're new to RA but familiar with SQL, think:
+    //  select house.address, city.name
+    //  from house join city on house.cityId = city.cityId
+    
     $R(function(){
       return project(
                join(relation("house"), relation("city"), 
@@ -43,14 +49,94 @@ To start us off...
               ["Canal",     "New Orleans"]
             ]
 
+This should provide a good flavor of what's possible with pure relational algebra.
+Rather than expressing relational operations as a big blob of sql:
+
+    select house.address, city.name from house join city on house.cityId = city.cityId
+    
+Each operation is itself a composable relation.
+
+The following are all valid relations, with sql equivalents:
+
+    relation("house") 
+      //select * from house
+    
+    relation("city") 
+      //select * from city
+    
+    join(relation("house"), relation("city")) 
+      //cartesian join: select * from house join city
+    
+    project(relation("house"), attr("house.houseId", "house.address"))
+      //select house.houseId, house.address from house
+
+
+
 
     
+The same example binding to a RDB.  Makes use of knit's (*very alpha*) sqlite support.
+    
 
-## Status, Directions
+    var db = new knit.engine.sqlite.Database(":memory:")
+    db.open()
+    
+    
+    //create a couple of tables, with rows
+    
+    var house = knit.engine.sqlite.Table.create(
+                  db, 
+                  "house", 
+                  [["houseId", knit.attributeType.Integer], 
+                   ["address", knit.attributeType.String], 
+                   ["cityId",  knit.attributeType.Integer]], 
+                  ["houseId"]
+                ).merge([
+                  [101, "Market", 1001],
+                  [102, "Parnassus", 1001],
+                  [103, "Canal", 1002]                
+                ])
+        
+    var city = knit.engine.sqlite.Table.create(
+                 db, 
+                 "city", 
+                 [["cityId",  knit.attributeType.Integer], 
+                  ["name",    knit.attributeType.String]], 
+                 ["cityId"]
+               ).merge([
+                 [1001, "San Francisco"],
+                 [1002, "New Orleans"]
+               ])
+    
+    var $R = knit({bindings:{city:city, house:house}})
+    
+    
+    //join and project as in the first example
+    
+    $R(function(){
+      return project(
+               join(relation("house"), relation("city"), 
+                    eq(attr("house.cityId"), attr("city.cityId"))), 
+               attr("house.address", "city.name")
+             )
+    }).compile().rows()
+       ==>  [
+              ["Market",    "San Francisco"],
+              ["Parnassus", "San Francisco"],
+              ["Canal",     "New Orleans"]
+            ]
+
+    db.close()
+
+
+## Concepts, Lifecycle    
+
+
+
+## Status, Direction
 
 Knit works.  It's an exciting initial attempt at working out a multi-engine RA library.
 
-But it's far from finished, and there are so many interesting avenues to explore.  Here's just a sampling of todos / possible directions:
+But it's far from finished, and there are many interesting avenues to explore.  Here's just a sampling of todos / possible directions:
 
 - Beef up the sql/sqlite implementation.  
   - SQL transformation capability is naive
@@ -64,16 +150,26 @@ But it's far from finished, and there are so many interesting avenues to explore
   - ...which would allow us to express the acceptance tests in a manner that crosses languages
   - Now RA expressions can be shipped across the wire, stored, etc.  Neat!
 - Cross-engine capability
+- Efficiency.  Many O(N) enhancements are possible.
+- Error reporting.  Knit could use better guardrails.
 - Move from a array-of-rows orientation to a stream / iterator style
 - Evaluate async style - would it make sense?  (there are challenges - think of how join might be implemented give that the constituent relations are returning rows asynchronously)
-...etc...
+- ...etc...
   
+## Relational Algebra Resources
+
+[Wikipedia: Relational Algebra](http://en.wikipedia.org/wiki/Relational_algebra)
+
+[University of Rochester, CSC173, Relational Algebra Intro](http://www.cs.rochester.edu/~nelson/courses/csc_173/relations/algebra.html)
+
+## Running the Tests
+
 
 ## Footnotes
 
-*that is, Arel as originally envisioned.  Arel 1.0 had echoes of relational algebra (the terminology, implementations of the major RA operations).  More importantly for Rails, it enabled a powerful composable style, and perhaps because of its success within the Rails project Rails developers reworked it as a focused SQL-oriented tool.
+*that is, Arel as originally envisioned.  [Arel 1.0](https://github.com/nkallen/arel) had echoes of relational algebra (the terminology, implementations of the major RA operations).  More importantly for Rails, it enabled a powerful composable style, and perhaps because of its success within the Rails project Rails developers reworked it as a focused SQL-oriented tool.
   
-As of version 2.0 Arel is really a SQL AST, as [Aaron Patterson indicates](http://engineering.attinteractive.com/2010/12/architecture-of-arel-2-0/):
+As of [version 2.0](https://github.com/rails/arel) Arel is really a SQL AST library, as [Aaron Patterson indicates](http://engineering.attinteractive.com/2010/12/architecture-of-arel-2-0/):
   
 <blockquote>
   Though ARel is billed as a “relational algebra” library, the current implementation is entirely built using patterns found in compiler technology. I think a more accurate description of ARel would be “an SQL compiler.

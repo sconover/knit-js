@@ -1,6 +1,8 @@
 audit
   baserelation.rows, .objects...
   .attr?
+  sqlite db -> connection
+  newNestedAttribute on compiler?  or elsewhere?
         
 fill out backlog...
   tests run in a browser

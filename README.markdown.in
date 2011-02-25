@@ -95,9 +95,21 @@ But it's far from finished, and there are many interesting avenues to explore.  
 
 Sorry this is a little cumbersome, it's a todo to clean this up (presumably use npm).
 
-In particular, I'm sorry about the v0.2.6 requirement - this is so knit + sqlite works.  The combination of a pretty rough world when it comes to node/sqlite support and my own requirements (namely, that the sqlite driver supports sync operation) means I need to use grumdig's node-sqlite, which segfaults on node > 0.2.6.  Suffice it to say, doing something about this state of affairs is a priority.
+### "Main" suite (everything but sqlite, should work with any modern node install)
 
 1. Install [Node.js](https://github.com/joyent/node/wiki/Installation)
+2. Clone knit-js
+3. In a sibling directory, clone sconover's jasmine-node:
+    git clone https://github.com/sconover/jasmine-node.git
+4. cd to knit-js.  run 
+    node test/main_suite.js
+
+
+### Sqlite suite (everything but sqlite) - requires node 0.2.x for now
+
+Regarding the node v0.2.6 requirement - the combination of a pretty rough world when it comes to node/sqlite support and my own requirements (namely, that the sqlite driver supports sync operation) means I need to use grumdig's node-sqlite, which segfaults on node > 0.2.6.  Improving this state of affairs is a priority.
+
+1. Install [Node.js](https://github.com/joyent/node/wiki/Installation) - IMPORTANT - must be v0.2.x!
 2. Clone knit-js
 3. In a sibling directory, clone sconover's jasmine-node:
     git clone https://github.com/sconover/jasmine-node.git

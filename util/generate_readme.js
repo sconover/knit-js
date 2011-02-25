@@ -10,7 +10,7 @@ function getExamples() {
   var currentExampleName = null
   var currentExampleString = ""
   
-  fs.readFileSync("test/readme_test.js").
+  fs.readFileSync("test/readme_includes_sqlite_test.js").
     toString().
     split('\n').
     forEach(function(line) { 

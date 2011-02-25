@@ -4,13 +4,14 @@ Relational algebra for javascript.
   
 Expressions of relational algebra in pure form are rare in the programming world.  It's a shame - the relational paradigm is a powerful and efficient way of organizing and manipulating data in general, not just within RDBs.
   
-Knit follows projects like Arel* and LINQ as an attempt to bring the power of relational algebra to programmers.
+Knit follows projects like Arel<a href="#arel">*</a> and LINQ as an attempt to bring the power of relational algebra to programmers.
 
 Knit is alpha quality and the api changes regularly.
     
 ## Examples
 
 Quick start:
+
 1. Create a couple of in-memory relations.
 2. Join them on cityId, and project the resulting relation down to house address and city name.
 
@@ -49,7 +50,7 @@ Quick start:
               ["Canal",     "New Orleans"]
             ]
 
-This should provide a good flavor of what's possible with pure relational algebra.
+This should provide a flavor of what's possible with pure relational algebra.
 Rather than expressing relational operations as a big blob of sql:
 
     select house.address, city.name from house join city on house.cityId = city.cityId
@@ -127,7 +128,7 @@ The same example, using RDB storage.  Makes use of knit's *very alpha* sqlite su
     db.close()
 
 
-## Examples, continued: Acceptance Tests
+## Examples, Continued: Acceptance Tests
 
 Please see the suite of acceptance tests under test/acceptance, they are intended to be "executable documentation".  They should give you an overview of what's possible with knit.
 
@@ -161,7 +162,7 @@ I can create a relational expression using knit's DSL:
 
 "Expression" is an appropriate term here: the result has no "rows()" - it's an airy, abstract thing.
 
-It needs to be bound with base relations that contain rows.  I've chosen the compilation metaphor:
+It needs to be bound with base relations that contain rows.  I've chosen the compilation metaphor to express this (you're "compiling the expression down" to an algorithm, or to sql):
 
     var rows = expression.compile().rows()
 
@@ -206,8 +207,32 @@ But it's far from finished, and there are many interesting avenues to explore.  
 
 ## Running the Tests
 
+Sorry this is a little cumbersome, it's a todo to clean this up (presumably use npm).
 
-  
+### "Main" suite (everything but sqlite, should work with any modern node install)
+
+1. Install [Node.js](https://github.com/joyent/node/wiki/Installation)
+2. Clone knit-js
+3. In a sibling directory, clone sconover's jasmine-node:
+    git clone https://github.com/sconover/jasmine-node.git
+4. cd to knit-js.  run 
+    node test/main_suite.js
+
+
+### Sqlite suite (everything but sqlite) - requires node 0.2.x for now
+
+Regarding the node v0.2.6 requirement - the combination of a pretty rough world when it comes to node/sqlite support and my own requirements (namely, that the sqlite driver supports sync operation) means I need to use grumdig's node-sqlite, which segfaults on node > 0.2.6.  Improving this state of affairs is a priority.
+
+1. Install [Node.js](https://github.com/joyent/node/wiki/Installation) - IMPORTANT - must be v0.2.x!
+2. Clone knit-js
+3. In a sibling directory, clone sconover's jasmine-node:
+    git clone https://github.com/sconover/jasmine-node.git
+4. In a sibling directory, clone grumdrig's node-sqlite:
+    git clone https://github.com/grumdrig/node-sqlite.git
+5. Build node-sqlite - see the [node-sqlite installation instructions](http://grumdrig.com/node-sqlite/).
+6. cd to knit-js.  run 
+    node test/suite.js
+ 
 ## Relational Algebra Resources
 
 [Wikipedia: Relational Algebra](http://en.wikipedia.org/wiki/Relational_algebra)
@@ -218,10 +243,11 @@ But it's far from finished, and there are many interesting avenues to explore.  
 
 ## Footnotes
 
+<a name="arel">
 *that is, Arel as originally envisioned.  [Arel 1.0](https://github.com/nkallen/arel) had echoes of relational algebra (the terminology, implementations of the major RA operations).  More importantly for Rails, it enabled a powerful composable style, and perhaps because of its success within the Rails project Rails developers reworked it as a focused SQL-oriented tool.
   
 As of [version 2.0](https://github.com/rails/arel) Arel is really a SQL AST library, as [Aaron Patterson indicates](http://engineering.attinteractive.com/2010/12/architecture-of-arel-2-0/):
   
 <blockquote>
-  Though ARel is billed as a “relational algebra” library, the current implementation is entirely built using patterns found in compiler technology. I think a more accurate description of ARel would be “an SQL compiler.
+  Though ARel is billed as a “relational algebra” library, the current implementation is entirely built using patterns found in compiler technology. I think a more accurate description of ARel would be “a SQL compiler".
 </blockquote>

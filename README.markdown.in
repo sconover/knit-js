@@ -4,7 +4,7 @@ Relational algebra for javascript.
   
 Expressions of relational algebra in pure form are rare in the programming world.  It's a shame - the relational paradigm is a powerful and efficient way of organizing and manipulating data in general, not just within RDBs.
   
-Knit follows projects like Arel* and LINQ as an attempt to bring the power of relational algebra to programmers.
+Knit follows projects like Arel<a href="#arel">*</a> and LINQ as an attempt to bring the power of relational algebra to programmers.
 
 Knit is alpha quality and the api changes regularly.
     
@@ -14,7 +14,7 @@ Knit is alpha quality and the api changes regularly.
 
 <!-- EXAMPLE:sqlite -->
 
-## Examples, continued: Acceptance Tests
+## Examples, Continued: Acceptance Tests
 
 Please see the suite of acceptance tests under test/acceptance, they are intended to be "executable documentation".  They should give you an overview of what's possible with knit.
 
@@ -48,7 +48,7 @@ I can create a relational expression using knit's DSL:
 
 "Expression" is an appropriate term here: the result has no "rows()" - it's an airy, abstract thing.
 
-It needs to be bound with base relations that contain rows.  I've chosen the compilation metaphor:
+It needs to be bound with base relations that contain rows.  I've chosen the compilation metaphor to express this (you're "compiling the expression down" to an algorithm, or to sql):
 
     var rows = expression.compile().rows()
 
@@ -105,10 +105,11 @@ But it's far from finished, and there are many interesting avenues to explore.  
 
 ## Footnotes
 
+<a name="arel">
 *that is, Arel as originally envisioned.  [Arel 1.0](https://github.com/nkallen/arel) had echoes of relational algebra (the terminology, implementations of the major RA operations).  More importantly for Rails, it enabled a powerful composable style, and perhaps because of its success within the Rails project Rails developers reworked it as a focused SQL-oriented tool.
   
 As of [version 2.0](https://github.com/rails/arel) Arel is really a SQL AST library, as [Aaron Patterson indicates](http://engineering.attinteractive.com/2010/12/architecture-of-arel-2-0/):
   
 <blockquote>
-  Though ARel is billed as a “relational algebra” library, the current implementation is entirely built using patterns found in compiler technology. I think a more accurate description of ARel would be “an SQL compiler.
+  Though ARel is billed as a “relational algebra” library, the current implementation is entirely built using patterns found in compiler technology. I think a more accurate description of ARel would be “a SQL compiler".
 </blockquote>

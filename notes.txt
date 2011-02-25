@@ -42,12 +42,7 @@ aggregate(relation, [attr("person.name"), avg(attr("person.age"))])
 
 readme
     
-  Motivation
-    
-  The relational paradigm is .... efficient data organization and manipulation.  While SQL/RDBs are successful outgrowths of relational theory, expressions of relational algebra in its pure form are rare in the programming world.
-  
-  Knit follows Arel (or, Arel as originally envisioned *) as an attempt to bring the power of relational algebra to programmers.
-    
+
   
   Examples
   

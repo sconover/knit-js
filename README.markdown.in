@@ -1,3 +1,24 @@
 Relational algebra for javascript.
 
+## Abstract
+  
+Expressions of relational algebra in pure form are rare in the programming world.  It's a shame - the relational paradigm is a powerful and efficient way of organizing and manipulating data in general, not just within RDBs.
+  
+Knit follows projects like Arel* and LINQ as an attempt to bring the power of relational algebra to programmers.
+    
+## Examples
+
 <!-- EXAMPLE:dsl -->
+    
+
+## Footnotes
+
+*that is, Arel as originally envisioned.  Arel 1.0 had echoes of relational algebra (the terminology, implementations of the major RA operations).  More importantly for Rails, it enabled a powerful composable style, and perhaps because of its success within the Rails project Rails developers reworked it as a focused SQL-oriented tool.
+  
+As of version 2.0 Arel is really a SQL AST, as Aaron Patterson indicates:
+  
+<blockquote>
+  Though ARel is billed as a “relational algebra” library, the current implementation is entirely built using patterns found in compiler technology. I think a more accurate description of ARel would be “an SQL compiler.
+</blockquote>
+
+[Architecture of ARel 2.0](http://engineering.attinteractive.com/2010/12/architecture-of-arel-2-0/)

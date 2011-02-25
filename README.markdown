@@ -2,7 +2,7 @@ Relational algebra for javascript.
 
 To start us off...
 
-    //aside: [http://aresemicolonsnecessaryinjavascript.com](http://aresemicolonsnecessaryinjavascript.com)
+    //aside: http://aresemicolonsnecessaryinjavascript.com
     
     require("knit/engine/memory")
     

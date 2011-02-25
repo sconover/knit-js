@@ -1,6 +1,12 @@
-Relational algebra for javascript.
+require("./helper")
+require("knit/engine/memory")
 
+regarding("readme examples", function() {
+  
+  test("dsl", function (){
+/*
 To start us off...
+*/
 
     require("knit/engine/memory")
     
@@ -18,6 +24,7 @@ To start us off...
             ]} 
     })
     
+    assert.setsEqual( //omit
     $R(function(){
       return project(
                join(relation("house"), relation("city"), 
@@ -25,9 +32,14 @@ To start us off...
                attr("house.address", "city.name")
              )
     }).compile().rows()
-       ==>  [
+    , //omit
+    /* ==>*/[
               ["Market",    "San Francisco"],
               ["Parnassus", "San Francisco"],
               ["Canal",     "New Orleans"],
             ]
+    ) //omit
 
+  })
+  
+})

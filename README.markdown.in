@@ -93,8 +93,20 @@ But it's far from finished, and there are many interesting avenues to explore.  
 
 ## Running the Tests
 
+Sorry this is a little cumbersome, it's a todo to clean this up (presumably use npm).
 
-  
+In particular, I'm sorry about the v0.2.6 requirement - this is so knit + sqlite works.  The combination of a pretty rough world when it comes to node/sqlite support and my own requirements (namely, that the sqlite driver supports sync operation) means I need to use grumdig's node-sqlite, which segfaults on node > 0.2.6.  Suffice it to say, doing something about this state of affairs is a priority.
+
+1. Install [Node.js](https://github.com/joyent/node/wiki/Installation)
+2. Clone knit-js
+3. In a sibling directory, clone sconover's jasmine-node:
+    git clone https://github.com/sconover/jasmine-node.git
+4. In a sibling directory, clone grumdrig's node-sqlite:
+    git clone https://github.com/grumdrig/node-sqlite.git
+5. Build node-sqlite - see the [node-sqlite installation instructions](http://grumdrig.com/node-sqlite/).
+6. cd to knit-js.  run 
+    node test/suite.js
+ 
 ## Relational Algebra Resources
 
 [Wikipedia: Relational Algebra](http://en.wikipedia.org/wiki/Relational_algebra)

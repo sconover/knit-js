@@ -1,38 +1,6 @@
 require("../helper")
-
-require("knit/engine/memory")
-require("knit/engine/sqlite")
-
-function createMutableBaseRelation(name, attributeNamesAndTypes, primaryKey) {
-  return new knit.engine.memory.MutableBaseRelation(name, attributeNamesAndTypes, primaryKey)
-}
-
-function createTable(name, attributeNamesAndTypes, primaryKey) {
-  return knit.engine.sqlite.Table.create(this, name, attributeNamesAndTypes, primaryKey)
-}
-
-engine = {
-  
-  memory: {
-    name:"memory",
-    setup: function(target) {
-      knit._util.bind(setupAcceptanceFixtures, target)(createMutableBaseRelation)
-    }
-  },
-  
-  sqlite: {
-    name:"sqlite",
-    setup: function(target) {
-      target.db = new knit.engine.sqlite.Database(":memory:")
-      target.db.open()
-      knit._util.bind(setupAcceptanceFixtures, target)(knit._util.bind(createTable,target.db))
-    },
-    tearDown: function(target) {
-      target.db.close()
-    }
-  }
-  
-}
+require("knit/core")
+engine = typeof engine == "undefined" ? {} : engine
 
 acceptanceTest = function() {
   var _ = knit._util,
@@ -41,13 +9,15 @@ acceptanceTest = function() {
       jasmineFunction = args.pop(),
       engines = args
   
-  _.each(engines, function(engine){
-    describe("engine=" + engine.name + " " + name, function(){
-      beforeEach(function(){ engine.setup(this) })
-      afterEach(function(){ if (engine.tearDown) engine.tearDown(this) })
+  _.each(engines, function(anEngine){
+    if (anEngine) {
+      describe("engine=" + anEngine.name + " " + name, function(){
+        beforeEach(function(){ anEngine.setup(this) })
+        afterEach(function(){ if (anEngine.tearDown) anEngine.tearDown(this) })
       
-      jasmineFunction()
-    })
+        jasmineFunction()
+      })
+    }
   })
 }
 

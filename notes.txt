@@ -1,3 +1,7 @@
+separate sqilte suite.
+  what about AT's?  grumble.  code flag?
+    AT engine...if !undefined...
+
 audit
   baserelation.rows, .objects...
   .attr?

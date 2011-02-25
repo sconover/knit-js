@@ -7,6 +7,7 @@ regarding("readme examples", function() {
   test("dsl", function (){
 /*
 Quick start:
+
 1. Create a couple of in-memory relations.
 2. Join them on cityId, and project the resulting relation down to house address and city name.
 */
@@ -50,7 +51,7 @@ Quick start:
     ) //omit
 
 /*
-This should provide a good flavor of what's possible with pure relational algebra.
+This should provide a flavor of what's possible with pure relational algebra.
 Rather than expressing relational operations as a big blob of sql:
 
     select house.address, city.name from house join city on house.cityId = city.cityId

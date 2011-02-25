@@ -30,6 +30,6 @@ To start us off...
        ==>  [
               ["Market",    "San Francisco"],
               ["Parnassus", "San Francisco"],
-              ["Canal",     "New Orleans"],
+              ["Canal",     "New Orleans"]
             ]
 

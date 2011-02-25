@@ -10,6 +10,8 @@ Quick start:
 
 1. Create a couple of in-memory relations.
 2. Join them on cityId, and project the resulting relation down to house address and city name.
+
+
 */
 
     //aside: http://aresemicolonsnecessaryinjavascript.com

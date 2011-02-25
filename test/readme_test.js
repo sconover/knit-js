@@ -7,8 +7,8 @@ regarding("readme examples", function() {
   test("dsl", function (){
 /*
 Quick start:
-1) Create a couple of in-memory relations.
-2) Join them on cityId, and project the resulting relation down to house address and city name.
+1. Create a couple of in-memory relations.
+2. Join them on cityId, and project the resulting relation down to house address and city name.
 */
 
     //aside: http://aresemicolonsnecessaryinjavascript.com
@@ -55,7 +55,7 @@ Rather than expressing relational operations as a big blob of sql:
 
     select house.address, city.name from house join city on house.cityId = city.cityId
     
-Each operation is itself a composable relation.
+Each operation yields a relation.
 
 The following are all valid relations, with sql equivalents:
 
@@ -66,7 +66,7 @@ The following are all valid relations, with sql equivalents:
       //select * from city
     
     join(relation("house"), relation("city")) 
-      //cartesian join: select * from house join city
+      //(cartesian join) select * from house join city
     
     project(relation("house"), attr("house.houseId", "house.address"))
       //select house.houseId, house.address from house
@@ -81,11 +81,10 @@ The following are all valid relations, with sql equivalents:
 /*
 The same example, using RDB storage.  Makes use of knit's *very alpha* sqlite support.
 */
-    
+    require("knit/engine/sqlite")
 
     var db = new knit.engine.sqlite.Database(":memory:")
     db.open()
-    
     
     //create a couple of tables, with rows
     

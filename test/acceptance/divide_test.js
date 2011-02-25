@@ -1,6 +1,6 @@
 require("./helper")
 
-acceptanceTest("divide - relational divsion (think: opposite of cartesian join)", 
+acceptanceTest("divide - relational divsion (think: cartesian join / one of the sides of the join = the other side)", 
                engine.memory, function(){
   
  test("divide cartesian product by a relation", function (){

@@ -11,8 +11,8 @@ Knit is alpha quality and the api changes regularly.
 ## Examples
 
 Quick start:
-1) Create a couple of in-memory relations.
-2) Join them on cityId, and project the resulting relation down to house address and city name.
+1. Create a couple of in-memory relations.
+2. Join them on cityId, and project the resulting relation down to house address and city name.
 
     //aside: http://aresemicolonsnecessaryinjavascript.com
     
@@ -54,7 +54,7 @@ Rather than expressing relational operations as a big blob of sql:
 
     select house.address, city.name from house join city on house.cityId = city.cityId
     
-Each operation is itself a composable relation.
+Each operation yields a relation.
 
 The following are all valid relations, with sql equivalents:
 
@@ -65,7 +65,7 @@ The following are all valid relations, with sql equivalents:
       //select * from city
     
     join(relation("house"), relation("city")) 
-      //cartesian join: select * from house join city
+      //(cartesian join) select * from house join city
     
     project(relation("house"), attr("house.houseId", "house.address"))
       //select house.houseId, house.address from house
@@ -74,12 +74,11 @@ The following are all valid relations, with sql equivalents:
 
 
     
-The same example binding to a RDB.  Makes use of knit's (*very alpha*) sqlite support.
-    
+The same example, using RDB storage.  Makes use of knit's *very alpha* sqlite support.
+    require("knit/engine/sqlite")
 
     var db = new knit.engine.sqlite.Database(":memory:")
     db.open()
-    
     
     //create a couple of tables, with rows
     
@@ -128,8 +127,57 @@ The same example binding to a RDB.  Makes use of knit's (*very alpha*) sqlite su
     db.close()
 
 
+## Examples, continued: Acceptance Tests
+
+Please see the suite of acceptance tests under test/acceptance, they are intended to be "executable documentation".  They should give you an overview of what's possible with knit.
+
 ## Concepts, Lifecycle    
 
+Breaking down the in-memory example above.  We started by creating a DSL function, providing it the base relation "bindings":
+
+    var $R = knit({
+      house:{attributes:["houseId", "address", "cityId"],
+             rows:[
+               [101, "Market", 1001],
+               [102, "Parnassus", 1001],
+               [103, "Canal", 1002]
+             ]},
+      city:{attributes:["cityId", "name"],
+            rows:[
+              [1001, "San Francisco"],
+              [1002, "New Orleans"]
+            ]} 
+    })
+
+I can create a relational expression using knit's DSL:
+
+    var expression = $R(function(){
+      return project(
+               join(relation("house"), relation("city"), 
+                    eq(attr("house.cityId"), attr("city.cityId"))), 
+               attr("house.address", "city.name")
+             )
+    })
+
+"Expression" is an appropriate term here: the result has no "rows()" - it's an airy, abstract thing.
+
+It needs to be bound with base relations that contain rows.  I've chosen the compilation metaphor:
+
+    var rows = expression.compile().rows()
+
+Here's what's going on when using the in-memory engine:
+
+1. I define an expression (project(join(...)...)  etc).  
+2. As the expression passes out of the DSL function, the [base relations](https://github.com/sconover/knit-js/blob/master/lib/knit/engine/memory/base_relation.js) and [attributes](https://github.com/sconover/knit-js/blob/master/lib/knit/engine/memory/attribute.js) are "linked up" in the appropriate places.  relation("house") points to the in-memory relation "house".
+3. I call .compile().  The expression is [converted](https://github.com/sconover/knit-js/blob/master/lib/knit/translation/algorithm/algebra_to_algorithm.js) to its equivalent "algorithm" - implementations of relational operations that execute in-memory ([code](https://github.com/sconover/knit-js/blob/master/lib/knit/algorithms.js), [tests](https://github.com/sconover/knit-js/tree/master/test/algorithms)).  The result is an [executable relation](https://github.com/sconover/knit-js/blob/master/lib/knit/executable_relation.js).
+4. I call .rows() on the executable relation.  This pulls the rows from base relations, sends them through the appropriate algorithms, and returns the end result.
+
+And when using the sqlite engine:
+
+1. I define an expression (project(join(...)...)  etc).  
+2. As the expression passes out of the DSL function, the [tables](https://github.com/sconover/knit-js/blob/master/lib/knit/engine/sqlite/table.js) and [columns](https://github.com/sconover/knit-js/blob/master/lib/knit/engine/sqlite/column.js) are "linked up" in the appropriate places.  relation("house") points to the table "house".
+3. I call .compile().  The expression is [converted](https://github.com/sconover/knit-js/blob/master/lib/knit/translation/sql/algebra_to_sql.js) to its equivalent [sql object](https://github.com/sconover/knit-js/blob/master/lib/knit/translation/sql/base.js).  The result is an [executable relation](https://github.com/sconover/knit-js/blob/master/lib/knit/executable_relation.js), as before.
+4. I call .rows() on the executable relation.  The [sql query execution strategy](https://github.com/sconover/knit-js/blob/master/lib/knit/engine/sqlite/query.js) converts the sql object [into a sql statement](https://github.com/sconover/knit-js/blob/master/lib/knit/translation/sql/to_statement.js), executes this against the database, and returns the result.
 
 
 ## Status, Direction
@@ -155,6 +203,10 @@ But it's far from finished, and there are many interesting avenues to explore.  
 - Move from a array-of-rows orientation to a stream / iterator style
 - Evaluate async style - would it make sense?  (there are challenges - think of how join might be implemented give that the constituent relations are returning rows asynchronously)
 - ...etc...
+
+## Running the Tests
+
+
   
 ## Relational Algebra Resources
 
@@ -162,7 +214,6 @@ But it's far from finished, and there are many interesting avenues to explore.  
 
 [University of Rochester, CSC173, Relational Algebra Intro](http://www.cs.rochester.edu/~nelson/courses/csc_173/relations/algebra.html)
 
-## Running the Tests
 
 
 ## Footnotes

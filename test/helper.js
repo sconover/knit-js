@@ -77,38 +77,45 @@ assert.AssertionError.prototype.toString = function() {
 }
 
 
+
+
+
+
+
 jasmine.Matchers.prototype.toDeepEqual = function(expected) {
   return deepEqual(expected, this.actual)
 }
 
-// assert.equal = assert.deepEqual
 assert.equal = function(expected, actual){
   expect(expected).toDeepEqual(actual) 
 }
+
+
+jasmine.Matchers.prototype.toBeTheEquivalentSetOf = function(expectedArray) {
+  
+  var equalityFunction = function(a,b){return deepEqual(a,b)}
+  
+  var expectedSet = new HashSet(undefined, equalityFunction)
+  expectedSet.addAll(expectedArray)  
+  
+  var actualSet = new HashSet(undefined, equalityFunction)
+  actualSet.addAll(this.actual)
+    
+  var intersectionSize = expectedSet.intersection(actualSet).size()
+  return intersectionSize==actualSet.size() && intersectionSize==expectedSet.size()
+}
+
+
+assert.setsEqual = function(expectedArray, actualArray) {
+  expect(expectedArray).toBeTheEquivalentSetOf(actualArray)
+}
+
 
 
 
 
 assert._func = function(func, expected, actual, orientation, term, additionalMessageFunction) {
   var _ = knit._util
-  
-  function simpleInspect(obj) {
-    if (typeof obj == "object") {
-      return "{" + _.map(_.keys(obj).sort(), function(key){return "" + key + "=" + obj[key]}).join(" ") + "}"
-    } else {
-      return "" + obj
-    }
-  }
-  
-  function doInspect(obj) {
-    if (obj.inspect) {
-      return obj.inspect()
-    } else if (obj.push && obj.length) {
-      return knit._util.inspect(obj)
-    } else {
-      simpleInspect(obj)
-    }
-  }
   
   additionalMessageFunction = additionalMessageFunction || function(){return ""}
   var result = func(expected, actual)==orientation
@@ -121,29 +128,6 @@ assert._func = function(func, expected, actual, orientation, term, additionalMes
   
 }
 
-assert.setsEqual = function(expectedArray, actualArray) {
-  var equalityFunction = function(a,b){return deepEqual(a,b)}
-  
-  var expectedSet = new HashSet(undefined, equalityFunction)
-  expectedSet.addAll(expectedArray)  
-  
-  var actualSet = new HashSet(undefined, equalityFunction)
-  actualSet.addAll(actualArray)
-  assert._func(
-    function(expected, actual){
-      var intersectionSize = expectedSet.intersection(actualSet).size()
-      return intersectionSize==actualSet.size() && intersectionSize==expectedSet.size()
-    }, 
-    expectedArray, 
-    actualArray, 
-    true, 
-    "is Set-Equal",
-    function(){
-      var intersection = expectedSet.intersection(actualSet)
-      return "\nexpected-actual=" + knit._util.inspect(knit._util.differ(expectedArray, intersection.values())) +
-             "\nactual-expected=" + knit._util.inspect(knit._util.differ(actualArray, intersection.values()))
-    })
-}
 
 
 assert._equivalent = function(expected, actual, orientation, term) {

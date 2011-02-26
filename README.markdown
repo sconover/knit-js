@@ -1,3 +1,5 @@
+![Knit - Relational algebra for javascript](http://farm1.static.flickr.com/50/108225549_fd778a4a92_m.jpg)
+
 Relational algebra for javascript.
 
 ## Abstract

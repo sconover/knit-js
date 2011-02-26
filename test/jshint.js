@@ -32,7 +32,7 @@ _.each(files, function(file) {
                       
                       evil:true,              //dsl function uses eval
                       
-                      forin:true,             //while it's theoretically possible that we could be
+                      forin:true,             //while it's possible that we could be
                                               //considering unwanted prototype methods, mostly
                                               //we're doing this because the jsobjects are being
                                               //used as maps.  

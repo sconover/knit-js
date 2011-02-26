@@ -1,6 +1,7 @@
 audit
   convert to expect...
   .attr?
+  fork jasmine and put in pp alternative
         
 fill out backlog...
   tests run in a browser

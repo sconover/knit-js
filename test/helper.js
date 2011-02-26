@@ -79,7 +79,20 @@ assert.AssertionError.prototype.toString = function() {
 
 
 
+var librarypp = jasmine.pp
 
+jasmine.pp = function(value) {
+  var result = null
+  if (typeof value.inspect == "function") {
+    try {
+      result = value.inspect()
+    } catch (e) {
+      //ignore
+    }
+  } 
+  if (result === null) result = librarypp(value)  
+  return result
+};
 
 
 jasmine.Matchers.prototype.toDeepEqual = function(expected) {
@@ -134,7 +147,15 @@ assert._equivalent = function(expected, actual, orientation, term) {
   assert._func(function(expected, actual){return expected.isEquivalent(actual)}, expected, actual, orientation, term)
 }
 
+jasmine.Matchers.prototype.toBeTheEquivalentOf = function(expected) {
+  return expected.isEquivalent(this.actual)
+}
+
 assert.equivalent = function(expected, actual) {
+  expect(expected).toBeTheEquivalentOf(actual)
+}
+
+assert.xequivalent = function(expected, actual) {
   assert._equivalent(expected, actual, true, "is Equivalent")
 }
 

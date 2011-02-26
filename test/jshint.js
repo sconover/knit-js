@@ -24,19 +24,19 @@ var files = allFiles("./lib/knit")
 _.each(files, function(file) {
   var result = JSHINT(fs.readFileSync(file, "utf8"), {
                       
-                      asi:true, // DRY statement termination, less code spam.  
-                                // http://aresemicolonsnecessaryinjavascript.com/
+                      asi:true,               // DRY statement termination, less code spam.  
+                                              // http://aresemicolonsnecessaryinjavascript.com/
                       
-                      node:true, //we like node here
+                      node:true,              //we like node here
                       
-                      evil:true, //dsl function uses eval
+                      evil:true,              //dsl function uses eval
                       
-                      forin:true, //while it's theoretically possible that we could be
-                                  //considering unwanted prototype methods, mostly
-                                  //we're doing this because the jsobjects are being
-                                  //used as maps.  
+                      forin:true,             //while it's theoretically possible that we could be
+                                              //considering unwanted prototype methods, mostly
+                                              //we're doing this because the jsobjects are being
+                                              //used as maps.  
                       
-                      myGlobals:{knit:false} //no lint/hint code spam, ty very much
+                      myGlobals:{knit:false}  //no lint/hint code spam, ty very much
                       
                     })
   if (!result) {

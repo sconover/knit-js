@@ -588,7 +588,7 @@ CollectionFunctions = (function(){
 
 
 //knit/namespace ======================================================
-if (!(typeof window === 'undefined')) global=window
+if (typeof global === 'undefined') throw new Error("Please define global.  If you are in a browser, set global=window.")
 
 global.knit = {
   algebra: {predicate:{}},
@@ -606,29 +606,27 @@ knit._util = {
   //see http://fitzgeraldnick.com/weblog/39/
   quacksLike: function(object, signature) {
     if (typeof signature === "undefined") throw("no signature provided")
-    if (object == undefined) return false
+    if (object === undefined) return false
 
-    var k, ctor;
+    var k, ctor
     for ( k in signature ) {
-      ctor = signature[k];
+      ctor = signature[k]
       if ( ctor === Number ) {
-        if ( Object.prototype.toString.call(object[k]) !== "[object Number]"
-             || isNaN(object[k]) ) {
-          return false;
+        if ( Object.prototype.toString.call(object[k]) !== "[object Number]" || isNaN(object[k]) ) {
+          return false
         }
       } else if ( ctor === String ) {
-        if ( Object.prototype.toString.call(object[k])
-             !== "[object String]" ) {
-          return false;
+        if ( Object.prototype.toString.call(object[k]) !== "[object String]" ) {
+          return false
         }
       } else if ( ctor === Boolean ) {
         var value = object[k]
         if (!(value === true || value === false)) return false
       } else if ( ! (object[k] instanceof ctor) ) {
-        return false;
+        return false
       }
     }
-    return true;
+    return true
   },
       
   bind: function(f, objectThatShouldBeThis) {
@@ -649,7 +647,7 @@ knit._util = {
     var mergee = args.shift(),
         toMerges = args
     
-    for (var i=0; i<toMerges.length; i++) {
+    for (i=0; i<toMerges.length; i++) {
       var toMerge = toMerges[i]
       for(var k in toMerge) mergee[k] = toMerge[k]
     }
@@ -764,6 +762,9 @@ knit.signature = (function(){
     {relationOne:Object, relationTwo:Object, predicate:Object}, 
     signatures.relation
   )
+  
+  signatures.rawRelation = {attributes:Array, rows:Array}
+  
 
   return signatures
 })()
@@ -1095,7 +1096,7 @@ knit._DSLFunction = function() {
   var _ = knit._util,
       dslLocals = {},
       outerFunction = function(userFunction, what_theKeywordThis_IsSupposedToBe){
-        if (what_theKeywordThis_IsSupposedToBe == undefined) {
+        if (what_theKeywordThis_IsSupposedToBe === undefined) {
           what_theKeywordThis_IsSupposedToBe = this
         }
     
@@ -1116,8 +1117,7 @@ knit._DSLFunction = function() {
     dslLocals:dslLocals,
 
     specialize: function(childDslLocals) {
-      var allDslLocals = _.extend({}, outerFunction.dslLocals)
-      var allDslLocals = _.extend(allDslLocals, childDslLocals)
+      var allDslLocals = _.extend({}, outerFunction.dslLocals, childDslLocals)
       var childDslFunction = new knit._DSLFunction()
       _.extend(childDslFunction.dslLocals, allDslLocals)
       return childDslFunction
@@ -1130,8 +1130,32 @@ knit._DSLFunction = function() {
 //knit/core/builder_function ======================================================
 
 knit.createBuilderFunction = function(setup) {
-  var bindings = typeof setup.bindings == "function" ? setup.bindings : function(){return setup.bindings}
+  var _ = knit._util
 
+  function convenienceMemoryRelationConversion(rawBindings) {
+    var bindings = {}
+    _.each(_.keys(rawBindings), function(name){
+      var rawRelation = rawBindings[name],
+          stringAttributes = _.map(rawRelation.attributes, function(attribute){return [attribute, knit.attributeType.String]}),
+          inMemoryBaseRelation = new knit.engine.memory.MutableBaseRelation(name, stringAttributes)
+
+      inMemoryBaseRelation.merge(rawRelation.rows)
+      bindings[name] = inMemoryBaseRelation      
+    })
+    return bindings
+  }
+  
+  var bindings = null
+  if (setup.bindings) {
+    if (typeof setup.bindings == "function") {
+      bindings = setup.bindings
+    } else {
+      bindings = function(){return setup.bindings}
+    }
+  } else {
+    bindings = function(){return convenienceMemoryRelationConversion(setup)}
+  }
+  
   var referenceResolvingWrapper = function() {
     var dslFunction = new knit._DSLFunction()
     knit._util.extend(dslFunction.dslLocals, knit.createBuilderFunction.dslLocals)
@@ -1146,6 +1170,13 @@ knit.createBuilderFunction = function(setup) {
 }
 
 knit.createBuilderFunction.dslLocals = {}
+
+;(function() {
+  //switcheroo
+  
+  var oldKnit = global.knit
+  global.knit = oldKnit._util.extend(knit.createBuilderFunction, oldKnit)
+})()
 
 
 //knit/core/attribute_types ======================================================
@@ -1372,7 +1403,7 @@ knit.algebra.predicate.Conjunction = (function(){
   }
   
   p.concernedWithAllOf = function() {
-    var expectedRelations = _.toArray(arguments)
+    var expectedRelations = _.toArray(arguments),
         self = this,
         remainingRelations = _.select(expectedRelations, function(relation){
           return ! (self.leftPredicate.concernedWithAllOf(relation) || self.rightPredicate.concernedWithAllOf(relation))

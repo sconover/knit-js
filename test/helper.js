@@ -118,9 +118,22 @@ jasmine.Matchers.prototype.toBeTheEquivalentSetOf = function(expectedArray) {
   return intersectionSize==actualSet.size() && intersectionSize==expectedSet.size()
 }
 
-
 assert.setsEqual = function(expectedArray, actualArray) {
   expect(expectedArray).toBeTheEquivalentSetOf(actualArray)
+}
+
+
+
+jasmine.Matchers.prototype.toBeTheEquivalentOf = function(expected) {
+  return expected.isEquivalent(this.actual)
+}
+
+assert.equivalent = function(expected, actual) {
+  expect(expected).toBeTheEquivalentOf(actual)
+}
+
+assert.notEquivalent = function(expected, actual) {
+  expect(expected).not.toBeTheEquivalentOf(actual)
 }
 
 
@@ -147,21 +160,6 @@ assert._equivalent = function(expected, actual, orientation, term) {
   assert._func(function(expected, actual){return expected.isEquivalent(actual)}, expected, actual, orientation, term)
 }
 
-jasmine.Matchers.prototype.toBeTheEquivalentOf = function(expected) {
-  return expected.isEquivalent(this.actual)
-}
-
-assert.equivalent = function(expected, actual) {
-  expect(expected).toBeTheEquivalentOf(actual)
-}
-
-assert.xequivalent = function(expected, actual) {
-  assert._equivalent(expected, actual, true, "is Equivalent")
-}
-
-assert.notEquivalent = function(expected, actual) {
-  assert._equivalent(expected, actual, false, "is Not Equivalent")
-}
 
 assert._same = function(expected, actual, orientation, term) {
   assert._func(function(expected, actual){return expected.isSame(actual)}, expected, actual, orientation, term)

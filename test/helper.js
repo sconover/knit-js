@@ -76,8 +76,18 @@ assert.AssertionError.prototype.toString = function() {
   return this.originalToString() + "\nEXPECTED:\n" + formatFunction.format(this.expected) + "\n\nACTUAL:\n" + formatFunction.format(this.actual)
 }
 
-assert.doubleEqual = assert.equal
-assert.equal = assert.deepEqual
+
+jasmine.Matchers.prototype.toDeepEqual = function(expected) {
+  return deepEqual(expected, this.actual)
+}
+
+// assert.equal = assert.deepEqual
+assert.equal = function(expected, actual){
+  expect(expected).toDeepEqual(actual) 
+}
+
+
+
 
 assert._func = function(func, expected, actual, orientation, term, additionalMessageFunction) {
   var _ = knit._util

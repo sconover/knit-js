@@ -179,7 +179,18 @@ assert.deepSame = function(expected, actual) {
 }
 
 
+
+jasmine.Matchers.prototype.toQuackLike = function(expectedSignature) {
+  return knit._util.quacksLike(this.actual, expectedSignature)
+}
+
 assert.quacksLike = function(actualObject, expectedSignature) {
+  expect(actualObject).toQuackLike(expectedSignature)
+}
+
+
+
+assert.xquacksLike = function(actualObject, expectedSignature) {
   assert._func(function(expectedSignature, actualObject){return knit._util.quacksLike(actualObject, expectedSignature)}, 
                expectedSignature, 
                actualObject, 

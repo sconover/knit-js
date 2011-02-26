@@ -68,18 +68,17 @@ getAttributes = function(relation) {
 }
 
 assert.relationEqual = function(expected, relation) {
-  //transitional
   var compiled = relation.compile()
-  assert.equal(expected.name, compiled.name())
-  assert.equal(expected.attributes, getAttributes(compiled))
-  assert.setsEqual(expected.rows, compiled.rows())
+  expect(expected.name).toEqual(compiled.name())
+  expect(expected.attributes).toEqual(getAttributes(compiled))
+  expect(expected.rows).toBeTheEquivalentSetOf(compiled.rows())
   
   if (compiled._executionStrategy.rowsAsync) {
     //talk to davis and xian about async
     var rowsAsync = []
     compiled.rows(function(row) {
       if (row === null) {
-        assert.setsEqual(expected.rows, rowsAsync)
+        expect(expected.rows).toBeTheEquivalentSetOf(rowsAsync)
       } else {
         rowsAsync.push(row)
       }

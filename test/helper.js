@@ -153,23 +153,6 @@ assert.notSame = function(expected, actual) {
 
 
 
-
-assert._func = function(func, expected, actual, orientation, term, additionalMessageFunction) {
-  var _ = knit._util
-  
-  additionalMessageFunction = additionalMessageFunction || function(){return ""}
-  var result = func(expected, actual)==orientation
-  assert.ok(result, 
-            !result &&
-            term + " failure: " + 
-            "\n    expected: " + doInspect(expected) + 
-            "\n    actual:   " + doInspect(actual) + 
-            additionalMessageFunction(expected, actual))    
-  
-}
-
-
-
 jasmine.Matchers.prototype.toBeDeepSameAs = function(expected) {
   return knit._util.deepSame(this.actual, expected) // err umm we have a directionality problem.  solve later
 }

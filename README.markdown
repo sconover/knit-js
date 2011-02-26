@@ -80,13 +80,13 @@ The following are all valid relations, with sql equivalents:
 The same example, using RDB storage.  Makes use of knit's *very alpha* sqlite support.
     require("knit/engine/sqlite")
 
-    var db = new knit.engine.sqlite.Database(":memory:")
-    db.open()
+    var conn = new knit.engine.sqlite.Connection(":memory:")
+    conn.open()
     
     //create a couple of tables, with rows
     
     var house = knit.engine.sqlite.Table.create(
-                  db, 
+                  conn, 
                   "house", 
                   [["houseId", knit.attributeType.Integer], 
                    ["address", knit.attributeType.String], 
@@ -99,7 +99,7 @@ The same example, using RDB storage.  Makes use of knit's *very alpha* sqlite su
                 ])
         
     var city = knit.engine.sqlite.Table.create(
-                 db, 
+                 conn, 
                  "city", 
                  [["cityId",  knit.attributeType.Integer], 
                   ["name",    knit.attributeType.String]], 
@@ -127,12 +127,62 @@ The same example, using RDB storage.  Makes use of knit's *very alpha* sqlite su
               ["Canal",     "New Orleans"]
             ]
 
-    db.close()
+    conn.close()
 
 
 ## Examples, Continued: Acceptance Tests
 
 Please see the suite of acceptance tests under test/acceptance, they are intended to be "executable documentation".  They should give you an overview of what's possible with knit.
+
+## DSL
+
+The DSL uses a functional programming style.  In fact it ought to read very much like this [explanation of relational algebra](http://www.cs.rochester.edu/~nelson/courses/csc_173/relations/algebra.html).
+
+The pattern is as follows:
+
+    operation(relation, other_parameters...)
+
+So starting with a relation representing a bunch of houses:
+
+    relation("house")
+
+Select houses on Main street:
+
+    select(
+      relation("house"), 
+      eq(attr("house.address"), "Main")
+    )
+
+Houses on Main street and the people in them:
+
+    naturalJoin(
+      select(
+        relation("house"), 
+        eq(attr("house.address"), "Main")
+      ), 
+      relation("person")
+    )
+
+People found in houses on Main street:
+
+    project(
+      naturalJoin(
+        select(
+          relation("house"), 
+          eq(attr("house.address"), "Main")
+        ), 
+        relation("person")
+      ),
+      attr("person.name", "person.age")
+    )
+
+You could of course extract the relations into variables:
+
+    var housesOnMainStreet = select(relation("house"), eq(attr("house.address"), "Main"))
+     
+    var peopleAndHousesOnMainStreet = naturalJoin(housesOnMainStreet, relation("person"))
+    
+    var peopleOnMainStreet = project(peopleAndHousesOnMainStreet, attr("person.name", "person.age"))
 
 ## Concepts, Lifecycle    
 

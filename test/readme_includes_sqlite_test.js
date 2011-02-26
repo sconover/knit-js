@@ -86,13 +86,13 @@ The same example, using RDB storage.  Makes use of knit's *very alpha* sqlite su
 */
     require("knit/engine/sqlite")
 
-    var db = new knit.engine.sqlite.Database(":memory:")
-    db.open()
+    var conn = new knit.engine.sqlite.Connection(":memory:")
+    conn.open()
     
     //create a couple of tables, with rows
     
     var house = knit.engine.sqlite.Table.create(
-                  db, 
+                  conn, 
                   "house", 
                   [["houseId", knit.attributeType.Integer], 
                    ["address", knit.attributeType.String], 
@@ -105,7 +105,7 @@ The same example, using RDB storage.  Makes use of knit's *very alpha* sqlite su
                 ])
         
     var city = knit.engine.sqlite.Table.create(
-                 db, 
+                 conn, 
                  "city", 
                  [["cityId",  knit.attributeType.Integer], 
                   ["name",    knit.attributeType.String]], 
@@ -136,6 +136,6 @@ The same example, using RDB storage.  Makes use of knit's *very alpha* sqlite su
             ]
     ) //omit
 
-    db.close()
+    conn.close()
   })
 })

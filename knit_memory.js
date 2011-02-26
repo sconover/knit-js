@@ -2643,7 +2643,7 @@ knit.UseAlgorithms = (function() {
   
   // p.rowsAsync = function(rowCallback) {
   //   var disambiguatingColumnNamesInOrder = getDisambiguatingColumnNamesInOrder(this)
-  //   this._db.query(this._sqlSelectObject.toStatement(), function(rawObject){
+  //   this._conn.query(this._sqlSelectObject.toStatement(), function(rawObject){
   //     if (rawObject==null) {
   //       rowCallback(null)
   //     } else {

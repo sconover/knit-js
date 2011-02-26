@@ -1,12 +1,9 @@
-separate sqilte suite.
-  what about AT's?  grumble.  code flag?
-    AT engine...if !undefined...
-
 audit
   baserelation.rows, .objects...
   .attr?
   sqlite db -> connection
   newNestedAttribute on compiler?  or elsewhere?
+  $R -> $K
         
 fill out backlog...
   tests run in a browser

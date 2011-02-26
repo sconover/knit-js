@@ -8,11 +8,11 @@ engine = typeof engine == "undefined" ? {} : engine
 engine.sqlite = {
   name:"sqlite",
   setup: function(target) {
-    target.db = new knit.engine.sqlite.Database(":memory:")
-    target.db.open()
-    knit._util.bind(setupAcceptanceFixtures, target)(knit._util.bind(createTable,target.db))
+    target.conn = new knit.engine.sqlite.Connection(":memory:")
+    target.conn.open()
+    knit._util.bind(setupAcceptanceFixtures, target)(knit._util.bind(createTable,target.conn))
   },
   tearDown: function(target) {
-    target.db.close()
+    target.conn.close()
   }
 }

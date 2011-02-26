@@ -170,9 +170,14 @@ assert._func = function(func, expected, actual, orientation, term, additionalMes
 
 
 
-assert.deepSame = function(expected, actual) {
-  assert._func(function(expected, actual){return knit._util.deepSame(expected, actual)}, expected, actual, true, "is Deep Same")
+jasmine.Matchers.prototype.toBeDeepSameAs = function(expected) {
+  return knit._util.deepSame(this.actual, expected) // err umm we have a directionality problem.  solve later
 }
+
+assert.deepSame = function(expected, actual) {
+  expect(expected).toBeDeepSameAs(actual)
+}
+
 
 assert.quacksLike = function(actualObject, expectedSignature) {
   assert._func(function(expectedSignature, actualObject){return knit._util.quacksLike(actualObject, expectedSignature)}, 

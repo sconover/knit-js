@@ -78,7 +78,7 @@ assert.relationEqual = function(expected, relation) {
     //talk to davis and xian about async
     var rowsAsync = []
     compiled.rows(function(row) {
-      if (row==null) {
+      if (row === null) {
         assert.setsEqual(expected.rows, rowsAsync)
       } else {
         rowsAsync.push(row)

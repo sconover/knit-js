@@ -21,7 +21,7 @@ regarding("query", function() {
         results = []
         
     query.rowsAsync(function(row){
-      if (row==null) {
+      if (row === null) {
         assert.equal([
           [1, 'blue'],
           [2, 'red']

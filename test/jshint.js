@@ -6,20 +6,21 @@ var JSHINT = require("jshint.js").JSHINT;
 var _ = CollectionFunctions.Array.functions
 
 
-function allFiles(rootDir) {
+function allJsFiles(rootDir) {
   var files = []
   _.each(fs.readdirSync(rootDir), function(thing) {
     var path = rootDir + "/" + thing
     if (fs.statSync(path).isDirectory()) {
-      files = files.concat(allFiles(path))
+      files = files.concat(allJsFiles(path))
     } else {
-      files.push(path)
+      if (path.match(/\.js$/)) files.push(path)
     }
   })  
   return files
 }
 
-var files = allFiles("./lib/knit")
+var files = allJsFiles("./lib/knit").concat(allJsFiles("./test"))
+files = _.select(files, function(path){return path.indexOf("readme_")<0 && path.indexOf("vendor/")<0})
 
 _.each(files, function(file) {
   var result = JSHINT(fs.readFileSync(file, "utf8"), {

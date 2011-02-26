@@ -24,7 +24,7 @@ acceptanceTest("left outer join", engine.memory, function(){
         [2, 101, "Puck", 12, 101, "Chimney Hill", 1001],
         [3, 102, "Fanny", 30, 102, "Parnassus", 1001],
         [4, 103, "Amy", 6, 103, "Canal", 1002],
-        [5, 104, "Felix", 10, null, null, null],
+        [5, 104, "Felix", 10, null, null, null]
       ]
     }, allPeopleCombinedWithAllHouses)
       

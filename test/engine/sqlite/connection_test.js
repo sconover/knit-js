@@ -21,7 +21,7 @@ regarding("sqlite conn", function() {
     this.conn.execute({sql:"insert into foo values('red')"})
     var objects = []
     this.conn.query({sql:"select * from foo"}, function(next){
-      if (next == null) {
+      if (next === null) {
         assert.equal([{"color":"red"}], objects)
       } else {
         objects.push(next)

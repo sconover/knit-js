@@ -18,13 +18,13 @@ TestRelation = function() {
                   if (nameAndType.name) {
                     return nameAndType
                   } else if (nameAndType.length && nameAndType.length==2) {
-                    var attributeName = nameAndType[0]
-                    var attributeType = nameAndType[1]
+                    var attributeName = nameAndType[0],
+                        attributeType = nameAndType[1]
                     return new TestAttribute(attributeName, attributeType, self)
                   } else {
-                    var attributeName = _.keys(nameAndType)[0]
-                    var nestedRelation = _.values(nameAndType)[0]
-                    return new TestNestedAttribute(attributeName, nestedRelation, self)
+                    var nestedAttributeName = _.keys(nameAndType)[0],
+                        nestedRelation = _.values(nameAndType)[0]
+                    return new TestNestedAttribute(nestedAttributeName, nestedRelation, self)
                   }      
                 })
               )

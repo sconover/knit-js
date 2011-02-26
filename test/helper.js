@@ -20,7 +20,7 @@ xtest = xit
 
 var sys = require('sys')
 
-global["d"] = function(str) {
+global.d = function(str) {
   sys.puts(str)
 }
 

@@ -138,6 +138,20 @@ assert.notEquivalent = function(expected, actual) {
 
 
 
+jasmine.Matchers.prototype.toBeTheSameAs = function(expected) {
+  return this.actual.isSame(expected) // err umm we have a directionality problem.  solve later
+}
+
+assert.same = function(expected, actual) {
+  expect(expected).toBeTheSameAs(actual)
+}
+
+assert.notSame = function(expected, actual) {
+  expect(expected).not.toBeTheSameAs(actual)
+}
+
+
+
 
 
 assert._func = function(func, expected, actual, orientation, term, additionalMessageFunction) {
@@ -155,24 +169,6 @@ assert._func = function(func, expected, actual, orientation, term, additionalMes
 }
 
 
-
-assert._equivalent = function(expected, actual, orientation, term) {
-  assert._func(function(expected, actual){return expected.isEquivalent(actual)}, expected, actual, orientation, term)
-}
-
-
-assert._same = function(expected, actual, orientation, term) {
-  assert._func(function(expected, actual){return expected.isSame(actual)}, expected, actual, orientation, term)
-}
-
-
-assert.same = function(expected, actual) {
-  assert._same(expected, actual, true, "is Same")
-}
-
-assert.notSame = function(expected, actual) {
-  assert._same(expected, actual, false, "is Not Same")
-}
 
 assert.deepSame = function(expected, actual) {
   assert._func(function(expected, actual){return knit._util.deepSame(expected, actual)}, expected, actual, true, "is Deep Same")

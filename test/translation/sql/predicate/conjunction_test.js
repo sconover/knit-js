@@ -10,7 +10,7 @@ regarding("conjunction to sql", function() {
   regarding("predicate to sql object", function() {
   
     test("shallow", function(){
-      var and = this.$R(function(){
+      var and = this.$K(function(){
         return and(eq(1,1),eq(2,2))
       })
       assert.equal(
@@ -23,7 +23,7 @@ regarding("conjunction to sql", function() {
     })
 
     test("nested", function(){
-      var and = this.$R(function(){
+      var and = this.$K(function(){
         return and(eq(1,1),and(eq(2,2),eq(3,3)))
       })
       assert.equal(

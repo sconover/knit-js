@@ -4,7 +4,7 @@ acceptanceTest("order", engine.memory, engine.sqlite, function(){
 
   test("rows are in ascending order", function (){
     var peopleInNameOrderAscending = 
-      this.$R(function(){
+      this.$K(function(){
         return order.asc(relation("person"), attr("person.name"))
       })
       
@@ -22,7 +22,7 @@ acceptanceTest("order", engine.memory, engine.sqlite, function(){
             
   test("rows are in descending order", function (){
     var peopleInNameOrderDescending = 
-      this.$R(function(){
+      this.$K(function(){
         return order.desc(relation("person"), attr("person.name"))
       })
       

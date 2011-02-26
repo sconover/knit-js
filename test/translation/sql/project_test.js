@@ -10,7 +10,7 @@ regarding("project(proh-JEKT)", function() {
   regarding("translate expression to sql object", function(){  
 
     test("convert a project(proh-JEKT) to sql", function(){
-      var project = this.$R(function(){
+      var project = this.$K(function(){
         return project(relation("person"), attr("person.name", "person.age"))
       })
       assert.same(

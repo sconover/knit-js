@@ -10,7 +10,7 @@ regarding("join to sql", function() {
   regarding("expression to sql object", function() {
     
     test("cartesian", function(){
-      var join = this.$R(function(){
+      var join = this.$K(function(){
         return join(relation("person"), relation("house"))
       })
       assert.same(
@@ -21,7 +21,7 @@ regarding("join to sql", function() {
     })
 
     test("with predicate", function(){
-      var join = this.$R(function(){
+      var join = this.$K(function(){
         return join(relation("person"), relation("house"), eq(attr("house.houseId"), attr("person.houseId")))
       })
       assert.same(
@@ -32,7 +32,7 @@ regarding("join to sql", function() {
     })
     
     test("multiple joins", function(){
-      var join = this.$R(function(){
+      var join = this.$K(function(){
         return join(join(relation("person"), relation("house")), relation("city"))
       })
       
@@ -43,7 +43,7 @@ regarding("join to sql", function() {
         join.toSql()
       )
       
-      // join = this.$R(function(){
+      // join = this.$K(function(){
       //   return join(relation("person"), join(relation("house"), relation("city")))
       // })
       // 

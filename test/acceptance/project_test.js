@@ -3,7 +3,7 @@ require("./helper")
 acceptanceTest("project", engine.memory, engine.sqlite, function(){
 
   test("project a subset of attributes over the relation", function (){
-    var narrowerRelation = this.$R(function(){
+    var narrowerRelation = this.$K(function(){
       return project(relation("person"), attr("person.name", "person.age"))
     })
     

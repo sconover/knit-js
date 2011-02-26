@@ -72,7 +72,7 @@ You could of course extract the relations into variables:
 
 Breaking down the in-memory example above.  We started by creating a DSL function, providing it the base relation "bindings":
 
-    var $R = knit({
+    var $K = knit({
       house:{attributes:["houseId", "address", "cityId"],
              rows:[
                [101, "Market", 1001],
@@ -88,7 +88,7 @@ Breaking down the in-memory example above.  We started by creating a DSL functio
 
 Then we created a relational expression using knit's DSL:
 
-    var expression = $R(function(){
+    var expression = $K(function(){
       return project(
                join(relation("house"), relation("city"), 
                     eq(attr("house.cityId"), attr("city.cityId"))), 

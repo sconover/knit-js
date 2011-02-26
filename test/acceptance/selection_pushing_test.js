@@ -8,7 +8,7 @@ acceptanceTest("selection pushing and cost", engine.memory, function(){
   
   test("pushing in a select is less costly than leaving it outside, unnecessarily", function (){
     
-    var expression = this.$R(function(){
+    var expression = this.$K(function(){
       return select(join(relation("person"), relation("house")), equality(attr("house.address"), "Chimney Hill"))
     })
     
@@ -31,7 +31,7 @@ acceptanceTest("selection pushing and cost", engine.memory, function(){
 
   test("pushing in a select and making it into a join predicate is less costly than just leaving the select outside", function (){
 
-    var expression = this.$R(function(){
+    var expression = this.$K(function(){
       return select(join(relation("person"), relation("house")), equality(attr("house.houseId"), attr("person.houseId")))
     })
     

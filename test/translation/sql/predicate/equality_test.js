@@ -10,7 +10,7 @@ regarding("equality to sql", function() {
   regarding("translate predicate to sql object", function(){
     
     test("left and right are values", function(){
-      var equality = this.$R(function(){
+      var equality = this.$K(function(){
         return eq(1,2)
       })
       assert.equal(
@@ -20,7 +20,7 @@ regarding("equality to sql", function() {
     })
     
     test("attr and values", function(){
-      var equality = this.$R(function(){
+      var equality = this.$K(function(){
         return eq(attr("person.name"), "Jane")
       })
       assert.equal(
@@ -30,7 +30,7 @@ regarding("equality to sql", function() {
     })
     
     test("two attributes", function(){
-      var equality = this.$R(function(){
+      var equality = this.$K(function(){
         return eq(attr("house.houseId"), attr("person.houseId"))
       })
       assert.equal(

@@ -10,7 +10,7 @@ xregarding("sql select is a relation", function() {
   var sql = knit.translation.sql
 
   test("'what' contains the attributes", function(){
-    var project = this.$R(function(){
+    var project = this.$K(function(){
       return project(relation("person"), attr("person.name", "person.age"))
     })
     assert.equal(

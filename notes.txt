@@ -3,7 +3,7 @@ audit
   .attr?
   sqlite db -> connection
   newNestedAttribute on compiler?  or elsewhere?
-  $R -> $K
+  $K -> $K
         
 fill out backlog...
   tests run in a browser

@@ -11,19 +11,19 @@ regarding("attributes", function() {
     this.house = new TestRelation([["houseId", knit.attributeType.Integer], 
                                    ["address", knit.attributeType.String], 
                                    {"people":this.person}])
-    this.$R = knit.createBuilderFunction({bindings:{
+    this.$K = knit.createBuilderFunction({bindings:{
       person:this.person,
       house:this.house
     }})
   })
 
-  test("inspect", function(){this.$R(function(){
+  test("inspect", function(){this.$K(function(){
     assert.equal("*people,*name", 
                  new knit.Attributes([attr("house.people"), attr("person.name")]).inspect())
   })})
 
   regarding("sameness and equivalence", function() {
-    test("same", function(){this.$R(function(){
+    test("same", function(){this.$K(function(){
       assert.same(new knit.Attributes([attr("house.people"), attr("person.name")]), 
                   new knit.Attributes([attr("house.people"), attr("person.name")]))
       assert.notSame(new knit.Attributes([attr("house.people"), attr("person.age")]), 
@@ -31,7 +31,7 @@ regarding("attributes", function() {
     })})    
   })
 
-  test("names", function(){this.$R(function(){
+  test("names", function(){this.$K(function(){
     assert.equal(["people", "name"], 
                  new knit.Attributes([attr("house.people"), attr("person.name")]).names())
   })})
@@ -47,12 +47,12 @@ regarding("attributes", function() {
   })
 
   regarding("get", function() {
-    test("single", function(){this.$R(function(){
+    test("single", function(){this.$K(function(){
       var attributes = new knit.Attributes([attr("house.people"), attr("person.name")])
       assert.equal(attr("house.people"), attributes.get("people"))
     })})
 
-    test("multiple", function(){this.$R(function(){
+    test("multiple", function(){this.$K(function(){
       var attributes = new knit.Attributes([attr("house.people"), attr("person.name")])
       assert.same(new knit.Attributes([attr("house.people"), attr("person.name")]), attributes.get("people", "name"))
     })})

@@ -6,7 +6,7 @@ acceptanceTest("select", engine.memory, engine.sqlite, function(){
   
     test("basic equality", function (){
       var smallerRelation = 
-        this.$R(function(){
+        this.$K(function(){
           return select(relation("person"), eq(attr("person.name"), "Fanny"))
         })
         
@@ -21,7 +21,7 @@ acceptanceTest("select", engine.memory, engine.sqlite, function(){
     
     test("conjunction / and", function (){
       var smallerRelation = 
-        this.$R(function(){
+        this.$K(function(){
           return select(relation("person"), and(eq(attr("person.houseId"), 101), eq(attr("person.age"), 5)))
         })
         

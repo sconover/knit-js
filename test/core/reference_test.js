@@ -152,8 +152,8 @@ regarding("references allow late-binding of core relations and attributes. " +
   
   regarding("relation and attribute referencing is resolved on the way out of a knit builder function", function() {
     test("relation refs are resolved on the way out according to the bindings set up", function(){      
-      var $R = knit.createBuilderFunction({bindings:{person:this.person}})
-      var personResult = $R(function(){
+      var $K = knit.createBuilderFunction({bindings:{person:this.person}})
+      var personResult = $K(function(){
         var personRef = relation("person")
         assert.notSame(personRef, this.person)
         return personRef
@@ -162,9 +162,9 @@ regarding("references allow late-binding of core relations and attributes. " +
     })
 
     test("attribute refs are resolved on the way out according to the bindings set up", function(){
-      var $R = knit.createBuilderFunction({bindings:{person:this.person}})
+      var $K = knit.createBuilderFunction({bindings:{person:this.person}})
       
-      var ageResult = $R(function(){
+      var ageResult = $K(function(){
         var ageRef = attr("person.age")
         assert.notSame(ageRef, this.person.attr("age"))
         return ageRef
@@ -173,16 +173,16 @@ regarding("references allow late-binding of core relations and attributes. " +
     })
 
     test("bindings can be a function", function(){
-      var $R = knit.createBuilderFunction({bindings:{person:this.person}})
+      var $K = knit.createBuilderFunction({bindings:{person:this.person}})
       
-      var personResult = $R(function(){return relation("person")})
+      var personResult = $K(function(){return relation("person")})
       assert.same(personResult, this.person)
     })
 
     test("resolve within the builder function", function(){
-      var $R = knit.createBuilderFunction({bindings:{person:this.person}})
+      var $K = knit.createBuilderFunction({bindings:{person:this.person}})
       
-      var personResult = $R(function(){
+      var personResult = $K(function(){
         var personRef = relation("person")
         assert.notSame(personRef, this.outerPerson)
         resolve()
@@ -195,9 +195,9 @@ regarding("references allow late-binding of core relations and attributes. " +
     })
 
     test("resolve creates references to relations and attributes from bindings if they don't exist", function(){
-      var $R = knit.createBuilderFunction({bindings:{person:this.person}})
+      var $K = knit.createBuilderFunction({bindings:{person:this.person}})
       
-      $R(function(){
+      $K(function(){
         resolve()
         assert.same(relation("person"), this.outerPerson)
         assert.same(attr("person.houseId"), this.outerPerson.attr("houseId"))
@@ -205,9 +205,9 @@ regarding("references allow late-binding of core relations and attributes. " +
     })
     
     test("relation renames register themselves with the environment.  references to renames are replaced with the renamed relations", function(){
-      var $R = knit.createBuilderFunction({bindings:{person:this.person}})
+      var $K = knit.createBuilderFunction({bindings:{person:this.person}})
       
-      var martian = $R(function(){
+      var martian = $K(function(){
         rename(relation("person"), "martian")
         return relation("martian")
       }, {person:this.person})        
@@ -216,9 +216,9 @@ regarding("references allow late-binding of core relations and attributes. " +
     })
     
     test("attribute renames register themselves with the environment.  references to renames are replaced with the renamed attributes", function(){
-      var $R = knit.createBuilderFunction({bindings:{person:this.person}})
+      var $K = knit.createBuilderFunction({bindings:{person:this.person}})
       
-      var oldness = $R(function(){
+      var oldness = $K(function(){
         rename(attr("person.age"), "oldness")
         return attr("oldness")
       }, {person:this.person})        

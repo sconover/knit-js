@@ -5,7 +5,7 @@ acceptanceTest("nested object style", engine.memory, function(){
   
   test(".objects should cause nested stuff to be object-style too", function (){
     
-    var nested = this.$R(function(){
+    var nested = this.$K(function(){
       var cityHousePersonUnnested = 
         project(
           join(

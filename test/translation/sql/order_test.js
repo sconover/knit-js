@@ -10,7 +10,7 @@ regarding("order to sql", function() {
   regarding("translate expression to sql object", function() {
   
     test("asc", function(){
-      var order = this.$R(function(){
+      var order = this.$K(function(){
         return order.asc(relation("person"), attr("person.name"))
       })
       assert.same(
@@ -22,7 +22,7 @@ regarding("order to sql", function() {
     })
 
     test("desc", function(){
-      var order = this.$R(function(){
+      var order = this.$K(function(){
         return order.desc(relation("person"), attr("person.name"))
       })
       assert.same(
@@ -34,7 +34,7 @@ regarding("order to sql", function() {
     })
 
     test("nested orders - inner are leftmost", function(){
-      var order = this.$R(function(){
+      var order = this.$K(function(){
         return order.asc(order.desc(relation("person"), attr("person.age")), attr("person.name"))
       })
       assert.same(

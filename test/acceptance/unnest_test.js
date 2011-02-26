@@ -4,7 +4,7 @@ acceptanceTest("unnest.  take grouped up 'subrows' and flatten them into the par
                  engine.memory, function(){
 
   beforeEach(function() {
-    this.simplePerson = this.$R(function(){return project(relation("person"), attr("person.personId", "person.name", "person.age"))})
+    this.simplePerson = this.$K(function(){return project(relation("person"), attr("person.personId", "person.name", "person.age"))})
   })
 
   test("simple.  flattens the nested relation by distributing.", function (){
@@ -25,7 +25,7 @@ acceptanceTest("unnest.  take grouped up 'subrows' and flatten them into the par
     assert.equal(["houseId", {"people":["personId", "name", "age"]}, "address"], getAttributes(housePeopleNested))
 
     var housePeopleUnnested = 
-      this.$R(function(){
+      this.$K(function(){
         return unnest(this.housePeople, this.housePeople.attr("people"))
       }, {housePeople:housePeopleNested})
             
@@ -67,7 +67,7 @@ acceptanceTest("unnest.  take grouped up 'subrows' and flatten them into the par
     assert.equal(["cityId", "name", {"houses":["houseId", "address", {"people":["personId", "name", "age"]}]}], getAttributes(cityHousesPeopleNested))
     
     
-    var unnestHousesOnly = this.$R(function(){
+    var unnestHousesOnly = this.$K(function(){
       return unnest(this.cityHousesPeople, this.cityHousesPeople.attr("houses"))
     }, {cityHousesPeople:cityHousesPeopleNested})
                     
@@ -83,7 +83,7 @@ acceptanceTest("unnest.  take grouped up 'subrows' and flatten them into the par
     }, unnestHousesOnly)
     
     
-    var unnestHousesAndPeople = this.$R(function(){
+    var unnestHousesAndPeople = this.$K(function(){
       return unnest(
                unnest(this.cityHousesPeople, this.cityHousesPeople.attr("houses")), 
                this.housePeople.attr("people")

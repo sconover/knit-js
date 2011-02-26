@@ -4,7 +4,7 @@ acceptanceTest("join and project", engine.memory, engine.sqlite, function(){
   
   test("a join with a project", function (){
     
-    var combo = this.$R(function(){
+    var combo = this.$K(function(){
       return project(
                join(relation("person"), relation("house"), 
                     eq(attr("person.houseId"), attr("house.houseId"))),

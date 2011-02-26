@@ -6,7 +6,7 @@ xregarding("memory", function() {
   beforeEach(function(){
     var r = this.createRelation("foo", ["a", "b"])
     this.r = r
-    this.$R = knit.createBuilderFunction({bindings:{
+    this.$K = knit.createBuilderFunction({bindings:{
       r:r
     }})
   })
@@ -20,7 +20,7 @@ xregarding("memory", function() {
   })
 
   xregarding(".rows / .objects", function() {
-    test("they cause the relation to be applied", function(){this.$R(function(){
+    test("they cause the relation to be applied", function(){this.$K(function(){
       resolve()
       
       relation("r").merge([
@@ -39,12 +39,12 @@ xregarding("memory", function() {
   
   xregarding("the 'cost' of a perform using the memory engine is the sum of all the rows of all relations created", function() {
 
-    test("just performing a relation and doing nothing else is zero cost", function(){this.$R(function(){
+    test("just performing a relation and doing nothing else is zero cost", function(){this.$K(function(){
       resolve()
       assert.equal(0, relation("r").perform().cost)
     })})
     
-    test("the size of the select result is the cost", function(){this.$R(function(){
+    test("the size of the select result is the cost", function(){this.$K(function(){
       resolve()
       relation("r").merge([
         [1, 98],
@@ -58,7 +58,7 @@ xregarding("memory", function() {
       assert.equal(6, select(select(relation("r"), TRUE), TRUE).perform().cost)
     })})
     
-    test("join cost usually depends greatly on whether a good join predicate is available", function(){this.$R(function(){
+    test("join cost usually depends greatly on whether a good join predicate is available", function(){this.$K(function(){
       var person = this.createRelation("person", ["id", "houseId", "name", "age"])
       var house = this.createRelation("house", ["houseId", "address", "cityId"])
       var city = this.createRelation("city", ["cityId", "name"])
@@ -87,7 +87,7 @@ xregarding("memory", function() {
                                city, equality(house.attr("cityId"), city.attr("cityId"))).perform().cost)
     }, this)})
     
-    test("the numbers of rows involved in an order is the cost", function(){this.$R(function(){
+    test("the numbers of rows involved in an order is the cost", function(){this.$K(function(){
       resolve()
       
       relation("r").merge([

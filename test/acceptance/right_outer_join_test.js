@@ -12,7 +12,7 @@ acceptanceTest("right outer join", engine.memory, function(){
        "or if there's no predicate match for to a row on the left, " +
        "return a joined row that consists of the row on the right with nulls on the left", function (){
     
-    var allPeopleCombinedWithAllHouses = this.$R(function(){
+    var allPeopleCombinedWithAllHouses = this.$K(function(){
       return rightOuterJoin(relation("person"), relation("house"), equality(attr("person.houseId"), attr("house.houseId")))
     })
 

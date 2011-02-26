@@ -7,7 +7,7 @@ regarding("predicates", function() {
 
   beforeEach(function(){ setupPersonHouseCity(this) })
   
-  test("sameness", function(){this.$R(function(){
+  test("sameness", function(){this.$K(function(){
     assert.same(TRUE, TRUE)
     assert.notSame(TRUE, FALSE)
     assert.same(FALSE, FALSE)
@@ -20,7 +20,7 @@ regarding("predicates", function() {
     assert.notSame(conjunction(TRUE, FALSE), conjunction(TRUE, TRUE))
   })})  
   
-  test("sameness - equality - uses primitives and attributes", function(){this.$R(function(){
+  test("sameness - equality - uses primitives and attributes", function(){this.$K(function(){
     assert.notSame(FALSE, 1)
     assert.notSame(TRUE, 1)
     
@@ -42,12 +42,12 @@ regarding("predicates", function() {
   }, this)})  
   
   
-  test("shorthand", function(){this.$R(function(){
+  test("shorthand", function(){this.$K(function(){
     assert.same(eq(true, false), equality(true, false))
     assert.same(and(TRUE, FALSE), conjunction(TRUE, FALSE))
   })})  
 
-  test("inspect", function(){this.$R(function(){
+  test("inspect", function(){this.$K(function(){
     assert.equal("eq(1,1)", TRUE.inspect())
     assert.equal("eq(1,2)", FALSE.inspect())
     
@@ -58,7 +58,7 @@ regarding("predicates", function() {
     assert.equal("and(eq(1,1),eq(1,2))", conjunction(TRUE, FALSE).inspect())
   })})  
     
-  test("associativity - order doesn't matter", function(){this.$R(function(){
+  test("associativity - order doesn't matter", function(){this.$K(function(){
     assert.equivalent(equality(1, 2), equality(2, 1))
     assert.notEquivalent(equality(1, 2), equality(2, 2))
 
@@ -73,13 +73,13 @@ regarding("predicates", function() {
     assert.notEquivalent(equality(attr("person.name"), 2), equality(2, attr("person.age")))
   })})
   
-  test("associativity - nested equivalence", function(){this.$R(function(){
+  test("associativity - nested equivalence", function(){this.$K(function(){
     assert.equivalent(conjunction(equality(1, 2), FALSE), conjunction(FALSE, equality(1, 2)))
     assert.notEquivalent(conjunction(equality(1, 2), FALSE), conjunction(TRUE, equality(2, 2)))
   })})  
   
   test("determine whether a predicate is concerned with a particular relation (and no others).  " +
-       "that means all attributes are of that relation, and otherwise there are primitives", function(){this.$R(function(){
+       "that means all attributes are of that relation, and otherwise there are primitives", function(){this.$K(function(){
     resolve()
     assert.equal(true, equality(1, 2).concernedWithNoOtherRelationsBesides(relation("person")))
     assert.equal(true, equality(1, 2).concernedWithNoOtherRelationsBesides(relation("house")))
@@ -105,7 +105,7 @@ regarding("predicates", function() {
     
   })})
   
-  test("concerned with no other relation ... works with compound relations", function(){this.$R(function(){
+  test("concerned with no other relation ... works with compound relations", function(){this.$K(function(){
     resolve()
     assert.equal(true, equality(attr("person.age"), 55).concernedWithNoOtherRelationsBesides(join(relation("person"), relation("house"))))
     assert.equal(true, conjunction(equality(attr("person.age"), 55), equality(attr("house.address"), "123 Main")).
@@ -116,7 +116,7 @@ regarding("predicates", function() {
                           concernedWithNoOtherRelationsBesides(join(relation("house"), relation("city"))))
   })})
 
-  test("only concerned with...more than one relation", function(){this.$R(function(){
+  test("only concerned with...more than one relation", function(){this.$K(function(){
     resolve()
     assert.equal(true, equality(attr("person.age"), 55).concernedWithNoOtherRelationsBesides(relation("person"), relation("house")))
     assert.equal(true, equality(attr("person.age"), attr("house.address")).concernedWithNoOtherRelationsBesides(relation("person"), relation("house")))
@@ -125,7 +125,7 @@ regarding("predicates", function() {
                          concernedWithNoOtherRelationsBesides(relation("person"), relation("house")))
   })})
 
-  test("concerned with all of - somewhere in the predicate we're concerned with the relation(s)", function(){this.$R(function(){
+  test("concerned with all of - somewhere in the predicate we're concerned with the relation(s)", function(){this.$K(function(){
     resolve()
     assert.equal(true, equality(attr("person.age"), 55).concernedWithAllOf(relation("person")))
     assert.equal(true, equality(attr("person.age"), attr("house.address")).concernedWithAllOf(relation("person")))

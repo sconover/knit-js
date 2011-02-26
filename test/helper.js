@@ -42,7 +42,7 @@ setupPersonHouseCity = function(target, createRelation) {
   target.city = createRelation("city", [["cityId", knit.attributeType.Integer], 
                                         ["name", knit.attributeType.String]], ["cityId"])  
   
-  target.$R = knit.createBuilderFunction({bindings:{
+  target.$K = knit.createBuilderFunction({bindings:{
     person:target.person,
     house:target.house,
     city:target.city

@@ -21,7 +21,7 @@ Quick start:
     
     require("knit/engine/memory")
     
-    var $R = knit({
+    var $K = knit({
       house:{attributes:["houseId", "address", "cityId"],
              rows:[
                [101, "Market", 1001],
@@ -39,7 +39,7 @@ Quick start:
     //  select house.address, city.name
     //  from house join city on house.cityId = city.cityId
     
-    $R(function(){
+    $K(function(){
       return project(
                join(relation("house"), relation("city"), 
                     eq(attr("house.cityId"), attr("city.cityId"))), 
@@ -109,12 +109,12 @@ The same example, using RDB storage.  Makes use of knit's *very alpha* sqlite su
                  [1002, "New Orleans"]
                ])
     
-    var $R = knit({bindings:{city:city, house:house}})
+    var $K = knit({bindings:{city:city, house:house}})
     
     
     //join and project as in the first example
     
-    $R(function(){
+    $K(function(){
       return project(
                join(relation("house"), relation("city"), 
                     eq(attr("house.cityId"), attr("city.cityId"))), 
@@ -134,61 +134,11 @@ The same example, using RDB storage.  Makes use of knit's *very alpha* sqlite su
 
 Please see the suite of acceptance tests under test/acceptance, they are intended to be "executable documentation".  They should give you an overview of what's possible with knit.
 
-## DSL
-
-The DSL uses a functional programming style.  In fact it ought to read very much like this [explanation of relational algebra](http://www.cs.rochester.edu/~nelson/courses/csc_173/relations/algebra.html).
-
-The pattern is as follows:
-
-    operation(relation, other_parameters...)
-
-So starting with a relation representing a bunch of houses:
-
-    relation("house")
-
-Select houses on Main street:
-
-    select(
-      relation("house"), 
-      eq(attr("house.address"), "Main")
-    )
-
-Houses on Main street and the people in them:
-
-    naturalJoin(
-      select(
-        relation("house"), 
-        eq(attr("house.address"), "Main")
-      ), 
-      relation("person")
-    )
-
-People found in houses on Main street:
-
-    project(
-      naturalJoin(
-        select(
-          relation("house"), 
-          eq(attr("house.address"), "Main")
-        ), 
-        relation("person")
-      ),
-      attr("person.name", "person.age")
-    )
-
-You could of course extract the relations into variables:
-
-    var housesOnMainStreet = select(relation("house"), eq(attr("house.address"), "Main"))
-     
-    var peopleAndHousesOnMainStreet = naturalJoin(housesOnMainStreet, relation("person"))
-    
-    var peopleOnMainStreet = project(peopleAndHousesOnMainStreet, attr("person.name", "person.age"))
-
 ## Concepts, Lifecycle    
 
 Breaking down the in-memory example above.  We started by creating a DSL function, providing it the base relation "bindings":
 
-    var $R = knit({
+    var $K = knit({
       house:{attributes:["houseId", "address", "cityId"],
              rows:[
                [101, "Market", 1001],
@@ -204,7 +154,7 @@ Breaking down the in-memory example above.  We started by creating a DSL functio
 
 Then we created a relational expression using knit's DSL:
 
-    var expression = $R(function(){
+    var expression = $K(function(){
       return project(
                join(relation("house"), relation("city"), 
                     eq(attr("house.cityId"), attr("city.cityId"))), 

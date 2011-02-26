@@ -18,7 +18,7 @@ Quick start:
     
     require("knit/engine/memory")
     
-    var $R = knit({
+    var $K = knit({
       house:{attributes:["houseId", "address", "cityId"],
              rows:[
                [101, "Market", 1001],
@@ -37,7 +37,7 @@ Quick start:
     //  from house join city on house.cityId = city.cityId
     
     assert.setsEqual( //omit
-    $R(function(){
+    $K(function(){
       return project(
                join(relation("house"), relation("city"), 
                     eq(attr("house.cityId"), attr("city.cityId"))), 
@@ -115,13 +115,13 @@ The same example, using RDB storage.  Makes use of knit's *very alpha* sqlite su
                  [1002, "New Orleans"]
                ])
     
-    var $R = knit({bindings:{city:city, house:house}})
+    var $K = knit({bindings:{city:city, house:house}})
     
     
     //join and project as in the first example
     
     assert.setsEqual( //omit
-    $R(function(){
+    $K(function(){
       return project(
                join(relation("house"), relation("city"), 
                     eq(attr("house.cityId"), attr("city.cityId"))), 

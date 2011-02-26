@@ -48,7 +48,7 @@ regarding("starting relation", function() {
   regarding("translate expression to sql object", function(){
     
     test("convert a straight relation reference to sql", function(){
-      var relation = this.$R(function(){
+      var relation = this.$K(function(){
         return relation("person")
       })
 

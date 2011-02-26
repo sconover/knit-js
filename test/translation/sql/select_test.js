@@ -17,7 +17,7 @@ regarding("select", function() {
     })
     
     test("convert a select to sql", function(){
-      var select = this.$R(function(){
+      var select = this.$K(function(){
         return select(relation("person"), eq(attr("person.name"), "Jane"))
       })
       

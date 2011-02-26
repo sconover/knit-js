@@ -4,7 +4,7 @@ acceptanceTest("nest.  matching on duplicate/ordered parent rows, and take " +
                  "the other columns and group them into 'subrows'.", engine.memory, function(){
   
   test("simple.  works with intermingled nested/non-nested columns.", function (){
-    var housePersonUnnested = this.$R(function(){
+    var housePersonUnnested = this.$K(function(){
       return project(
                join(relation("house"), relation("person"), eq(attr("house.houseId"), attr("person.houseId"))), 
                attr("house.houseId", "person.personId", "person.name", "house.address", "person.age")
@@ -24,7 +24,7 @@ acceptanceTest("nest.  matching on duplicate/ordered parent rows, and take " +
 
 
 
-    var housePeopleNested = this.$R(function(){
+    var housePeopleNested = this.$K(function(){
       return order.asc(
         nest(this.housePersonUnnested, attr("people", attr("person.personId", "person.name", "person.age"))),
         attr("house.houseId")
@@ -46,7 +46,7 @@ acceptanceTest("nest.  matching on duplicate/ordered parent rows, and take " +
   
   
   test("multiple levels of nesting", function (){
-    var cityHousePersonUnnested = this.$R(function(){
+    var cityHousePersonUnnested = this.$K(function(){
       return project(
                join(
                  join(
@@ -73,7 +73,7 @@ acceptanceTest("nest.  matching on duplicate/ordered parent rows, and take " +
     }, cityHousePersonUnnested)
 
 
-    var cityHousePersonNested = this.$R(function(){
+    var cityHousePersonNested = this.$K(function(){
       return order.asc(
         nest(
           nest(
@@ -108,7 +108,7 @@ acceptanceTest("nest.  matching on duplicate/ordered parent rows, and take " +
       [104, "Ashbury", 1001]
     ])
      
-    var housePersonUnnested = this.$R(function(){
+    var housePersonUnnested = this.$K(function(){
       return project(
                leftOuterJoin(relation("house"), relation("person"), eq(attr("house.houseId"), attr("person.houseId"))), 
                attr("house.houseId", "person.personId", "person.name", "house.address", "person.age")
@@ -129,7 +129,7 @@ acceptanceTest("nest.  matching on duplicate/ordered parent rows, and take " +
 
 
 
-    var housePeopleNested = this.$R(function(){
+    var housePeopleNested = this.$K(function(){
       return order.asc(
         nest(this.housePersonUnnested, attr("people", attr("person.personId", "person.name", "person.age"))),
         attr("house.houseId")

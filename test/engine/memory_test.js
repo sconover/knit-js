@@ -6,7 +6,7 @@ regarding("memory", function() {
   beforeEach(function(){
     var r = new knit.engine.memory.MutableBaseRelation("foo", [["a",knit.attributeType.Integer], ["b",knit.attributeType.String]])
     this.r = r
-    this.$R = knit.createBuilderFunction({bindings:{
+    this.$K = knit.createBuilderFunction({bindings:{
       r:r
     }})
   })
@@ -21,7 +21,7 @@ regarding("memory", function() {
 
   regarding("memory predicate - match", function() {
   
-    test("true false match", function(){this.$R(function(){
+    test("true false match", function(){this.$K(function(){
       assert.equal(true, TRUE.match([[attr("r.b"),1]]))
       assert.equal(false, FALSE.match([[attr("r.b"),1]]))
     })})
@@ -56,12 +56,12 @@ regarding("memory", function() {
   
   regarding("the cost of doing an in-memory operation is all the iterations that happened in the course of calculating the result", function() {
     
-    test("just compiling a relation and doing nothing else is zero cost", function(){this.$R(function(){
+    test("just compiling a relation and doing nothing else is zero cost", function(){this.$K(function(){
       resolve()
       assert.equal(0, relation("r").compile().cost())
     })})
     
-    test("the size of the select result is the cost", function(){this.$R(function(){
+    test("the size of the select result is the cost", function(){this.$K(function(){
       resolve()
       relation("r").merge([
         [1, 98],
@@ -75,7 +75,7 @@ regarding("memory", function() {
       assert.equal(6, select(select(relation("r"), TRUE), TRUE).compile().cost())
     })})
     
-    test("join cost usually depends greatly on whether a good join predicate is available", function(){this.$R(function(){
+    test("join cost usually depends greatly on whether a good join predicate is available", function(){this.$K(function(){
       var person = new knit.engine.memory.MutableBaseRelation("person", [["id", knit.attributeType.Integer], 
                                                                 ["houseId", knit.attributeType.Integer], 
                                                                 ["name", knit.attributeType.String], 
@@ -110,7 +110,7 @@ regarding("memory", function() {
                                city, equality(house.attr("cityId"), city.attr("cityId"))).compile().cost())
     })})
     
-    test("the cost is proportional to the number of rows", function(){this.$R(function(){
+    test("the cost is proportional to the number of rows", function(){this.$K(function(){
       resolve()
       
       relation("r").merge([

@@ -188,11 +188,6 @@ assert.quacksLike = function(actualObject, expectedSignature) {
   expect(actualObject).toQuackLike(expectedSignature)
 }
 
-
 assert.doesntQuackLike = function(actualObject, expectedSignature) {
-  assert._func(function(expectedSignature, actualObject){return knit._util.quacksLike(actualObject, expectedSignature)}, 
-               expectedSignature, 
-               actualObject, 
-               false, 
-               "Doesn't Quack Like")
+  expect(actualObject).not.toQuackLike(expectedSignature)
 }

@@ -1,5 +1,5 @@
 require("./helper")
-require("knit/algorithms")
+var algorithm = require("knit/algorithms")
 var _ = require("knit/core/util")
 
 regarding("select", function() {
@@ -9,17 +9,17 @@ regarding("select", function() {
 
     assert.rawRelationEqual(
       {attributes:["id", "color"], rows:[[2, "blue"],[3, "blue"]]},
-      knit.algorithms.select(relation, function(row){return row[1]=="blue"})
+      algorithm.select(relation, function(row){return row[1]=="blue"})
     )
     
     assert.rawRelationEqual(
       {attributes:["id", "color"], rows:[[1, "red"]]},
-      knit.algorithms.select(relation, function(row){return row[1]=="red"})
+      algorithm.select(relation, function(row){return row[1]=="red"})
     )
     
     assert.rawRelationEqual(
       {attributes:["id", "color"], rows:[]},
-      knit.algorithms.select(relation, function(row){return row[1]=="PURPLE"})
+      algorithm.select(relation, function(row){return row[1]=="PURPLE"})
     )
   })
   

@@ -1,5 +1,5 @@
 require("./helper")
-require("knit/algorithms")
+var algorithm = require("knit/algorithms")
 var _ = require("knit/core/util")
 
 regarding("left outer join", function() {
@@ -18,7 +18,7 @@ regarding("left outer join", function() {
          [2, "blue", "carrera"],
          [2, "blue", "mustang"]
        ]},
-      knit.algorithms.leftOuterJoin(colors, cars)
+      algorithm.leftOuterJoin(colors, cars)
     )
         
   })
@@ -33,7 +33,7 @@ regarding("left outer join", function() {
          [2, "blue", "carrera"],
          [2, "blue", "mustang"]
        ]},
-      knit.algorithms.leftOuterJoin(colors, cars, function(candidateRow){
+      algorithm.leftOuterJoin(colors, cars, function(candidateRow){
         return candidateRow[1]=="blue"
       })
     )

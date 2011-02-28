@@ -1,5 +1,5 @@
 require("./helper")
-require("knit/algorithms")
+var algorithm = require("knit/algorithms")
 var _ = require("knit/core/util")
 
 regarding("unnest", function() {
@@ -20,7 +20,7 @@ regarding("unnest", function() {
          ["accord",  2, "blue", 1998],
          ["carrera", 3, "blue",  1970]
        ]},
-      knit.algorithms.unnest(relation, {"individualCars": ["id", "color", "year"]})
+      algorithm.unnest(relation, {"individualCars": ["id", "color", "year"]})
     )
     
   })
@@ -41,8 +41,8 @@ regarding("unnest", function() {
          ["accord",  2, "blue", 1998, "Amy"],
          ["carrera", 3, "blue",  1970, "Jane"]
        ]},
-      knit.algorithms.unnest(
-        knit.algorithms.unnest(
+      algorithm.unnest(
+        algorithm.unnest(
           relation,
           {"individualCars": ["id", "color", "year", {"owners":["owner"]}]}
         ),

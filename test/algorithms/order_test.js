@@ -1,5 +1,5 @@
 require("./helper")
-require("knit/algorithms")
+var algorithm = require("knit/algorithms")
 var _ = require("knit/core/util")
 
 regarding("order", function() {
@@ -9,12 +9,12 @@ regarding("order", function() {
 
     assert.rawRelationEqual(
       {attributes:["id", "color"], rows:[[2, "blue"],[3, "green"],[1, "red"]]},
-      knit.algorithms.orderAsc(relation, "color")
+      algorithm.orderAsc(relation, "color")
     )
     
     assert.rawRelationEqual(
       {attributes:["id", "color"], rows:[[1, "red"],[3, "green"],[2, "blue"]]},
-      knit.algorithms.orderDesc(relation, "color")
+      algorithm.orderDesc(relation, "color")
     )
     
   })

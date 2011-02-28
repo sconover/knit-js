@@ -1,5 +1,5 @@
 require("./helper")
-require("knit/algorithms")
+var algorithm = require("knit/algorithms")
 var _ = require("knit/core/util")
 
 regarding("natural join - join on common column names", function() {
@@ -14,7 +14,7 @@ regarding("natural join - join on common column names", function() {
          [1, "red",  "accord", 1], 
          [2, "blue", "mustang", 2]
        ]},
-      knit.algorithms.naturalJoin(colors, cars)
+      algorithm.naturalJoin(colors, cars)
     )
         
   })
@@ -30,7 +30,7 @@ regarding("natural join - join on common column names", function() {
          [1, "red",  "accord", 1, "red"], 
          [2, "blue", "mustang", 2, "red"]
        ]},
-      knit.algorithms.naturalJoin(colors, cars, "Id")
+      algorithm.naturalJoin(colors, cars, "Id")
     )
         
   })

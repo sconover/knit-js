@@ -1,5 +1,5 @@
 require("./helper")
-require("knit/algorithms")
+var algorithm = require("knit/algorithms")
 var _ = require("knit/core/util")
 
 regarding("nest", function() {
@@ -19,7 +19,7 @@ regarding("nest", function() {
                      [2, "blue", 1998]]],
          ["carrera", [[3, "blue", 1970]]]
        ]},
-      knit.algorithms.nest(relation, 
+      algorithm.nest(relation, 
                            {"individualCars": ["id", "color", "year"]}, 
                            ["model", {"individualCars": ["id", "color", "year"]}])
     )
@@ -42,8 +42,8 @@ regarding("nest", function() {
                      [2, "blue", 1998, [["Amy"]] ] ]],
          ["carrera", [[3, "blue", 1970, [["Jane"]] ]] ]
        ]},
-      knit.algorithms.nest(
-        knit.algorithms.nest(
+      algorithm.nest(
+        algorithm.nest(
           relation,
           {"owners": ["owner"]},
           ["id", "color", "model", "year", {"owners":["owner"]}]

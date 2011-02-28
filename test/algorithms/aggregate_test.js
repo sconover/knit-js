@@ -1,5 +1,5 @@
 require("./helper")
-require("knit/algorithms")
+var algorithm = require("knit/algorithms")
 var _ = require("knit/core/util")
 
 xregarding("aggregate", function() {
@@ -14,8 +14,8 @@ xregarding("aggregate", function() {
     
     assert.rawRelationEqual(
       {attributes:["sum(miles)", "sum(minutes)"], rows:[ [12, 142] ]},
-      knit.algorithms.aggregate(jogging, [knit.algorithms.aggregate.sum("miles"),
-                                          knit.algorithms.aggregate.sum("minutes")])
+      algorithm.aggregate(jogging, [algorithm.aggregate.sum("miles"),
+                                          algorithm.aggregate.sum("minutes")])
     )
       
   })

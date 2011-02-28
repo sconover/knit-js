@@ -1,5 +1,5 @@
 require("./helper")
-require("knit/algorithms")
+var algorithm = require("knit/algorithms")
 var _ = require("knit/core/util")
 
 regarding("project (proh-JEKT)", function() {
@@ -9,12 +9,12 @@ regarding("project (proh-JEKT)", function() {
 
     assert.rawRelationEqual(
       {attributes:["id", "color"], rows:[[1, "red"], [2, "blue"]]},
-      knit.algorithms.project(relation, ["id", "color"])
+      algorithm.project(relation, ["id", "color"])
     )
     
     assert.rawRelationEqual(
       {attributes:[], rows:[[], []]},
-      knit.algorithms.project(relation, [])
+      algorithm.project(relation, [])
     )
   })
   

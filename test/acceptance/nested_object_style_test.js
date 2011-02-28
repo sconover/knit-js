@@ -1,7 +1,7 @@
 require("./helper")
+var _ = require("knit/core/util")
 
 acceptanceTest("nested object style", engine.memory, function(){
-  var _ = knit._util
   
   test(".objects should cause nested stuff to be object-style too", function (){
     

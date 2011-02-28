@@ -1,8 +1,8 @@
 require("./helper")
 require("knit/algorithms")
+var _ = require("knit/core/util")
 
 regarding("natural join - join on common column names", function() {
-  var _ = knit._util
   
   test("combine all the rows on the left with all the rows on the right (cartesian)", function(){
     var colors = {attributes:["colorId", "color"], rows:[[1, "red"],[2, "blue"],[3,"green"]]},

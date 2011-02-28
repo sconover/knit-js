@@ -1,8 +1,8 @@
 require("./helper")
 require("knit/algorithms")
+var _ = require("knit/core/util")
 
 regarding("project (proh-JEKT)", function() {
-  var _ = knit._util
   
   test("cut down to only the specified attributes / columns", function(){
     var relation = {attributes:["id", "color", "age"], rows:[[1, "red", 5],[2, "blue", 15]]}

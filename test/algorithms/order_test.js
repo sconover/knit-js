@@ -1,8 +1,8 @@
 require("./helper")
 require("knit/algorithms")
+var _ = require("knit/core/util")
 
 regarding("order", function() {
-  var _ = knit._util
   
   test("order rows by an attribute and direction", function(){
     var relation = {attributes:["id", "color"], rows:[[1, "red"],[2, "blue"],[3, "green"]]}

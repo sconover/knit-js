@@ -1,8 +1,8 @@
 require("./helper")
 require("knit/algorithms")
+var _ = require("knit/core/util")
 
 regarding("select", function() {
-  var _ = knit._util
   
   test("filter rows based on a predicate", function(){
     var relation = {attributes:["id", "color"], rows:[[1, "red"],[2, "blue"],[3, "blue"]]}

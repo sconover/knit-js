@@ -1,3 +1,9 @@
+jasmine - (branch) default node runner
+  ...(branch) configurable output
+  knit -> jasmine dependency
+    ...or, just check in jasmine
+
+
 audit
   convert to expect...
   .attr?

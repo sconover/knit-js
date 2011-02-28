@@ -1,8 +1,8 @@
 require("./helper")
 require("knit/algorithms")
+var _ = require("knit/core/util")
 
 regarding("unnest", function() {
-  var _ = knit._util
   
   test("take nested columns and flatten them", function(){
     var relation = {attributes:["model", {"individualCars": ["id", "color", "year"]}], 

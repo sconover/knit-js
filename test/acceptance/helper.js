@@ -1,10 +1,10 @@
 require("../helper")
 require("knit/core")
 engine = typeof engine == "undefined" ? {} : engine
+var _ = require("knit/core/util")
 
 acceptanceTest = function() {
-  var _ = knit._util,
-      args = _.toArray(arguments),
+  var args = _.toArray(arguments),
       name = args.shift(),
       jasmineFunction = args.pop(),
       engines = args

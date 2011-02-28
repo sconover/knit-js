@@ -1,9 +1,9 @@
 require("./helper")
 require("knit/algorithms")
+var _ = require("knit/core/util")
 
 regarding("unnest", function() {
-  var _ = knit._util,
-      colors = {attributes:["id", "color"], rows:[[1, "red"],[2, "blue"]]},
+  var colors = {attributes:["id", "color"], rows:[[1, "red"],[2, "blue"]]},
       cars = {attributes:["model"], rows:[["accord"],["carrera"],["mustang"]]}
 
   test("divide cartesian product by a relation", function (){

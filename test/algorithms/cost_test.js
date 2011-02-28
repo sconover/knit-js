@@ -1,9 +1,8 @@
 require("./helper")
 require("knit/algorithms")
+var _ = require("knit/core/util")
 
 regarding("cost is the number of iterations done in the course of executing an algorithm", function() {
-  var _ = knit._util
-  
   test("for example, select is N", function(){
     var relation = {attributes:["id", "color"], rows:[[1, "red"],[2, "blue"],[3, "blue"]]}
     assert.equal(3, knit.algorithms.select(relation, function(row){return row[1]=="blue"}).cost)

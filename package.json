@@ -1,0 +1,8 @@
+{ "name": "knit", 
+  "version": "0.0.1", 
+  "description": "Relational algebra for javascript.", 
+  "main": "index.js",
+  "keywords": ["knit", "relational", "algebra", "arel", "database", "sql", "orm", "rdb", "sqlite"],
+  "homepage": "https://github.com/sconover/knit-js",
+  "author": {"name": "Steve Conover", "email": "sconover@gmail.com", "url": "https://github.com/sconover"},
+  "repository": { "type": "git", "url": "https://github.com/sconover/knit-js.git" } }

@@ -154,7 +154,7 @@ assert.notSame = function(expected, actual) {
 
 
 jasmine.Matchers.prototype.toBeDeepSameAs = function(expected) {
-  return knit._util.deepSame(this.actual, expected) // err umm we have a directionality problem.  solve later
+  return require("knit/core/util").deepSame(this.actual, expected) // err umm we have a directionality problem.  solve later
 }
 
 assert.deepSame = function(expected, actual) {
@@ -164,7 +164,7 @@ assert.deepSame = function(expected, actual) {
 
 
 jasmine.Matchers.prototype.toQuackLike = function(expectedSignature) {
-  return knit._util.quacksLike(this.actual, expectedSignature)
+  return require("knit/core/util").quacksLike(this.actual, expectedSignature)
 }
 
 assert.quacksLike = function(actualObject, expectedSignature) {

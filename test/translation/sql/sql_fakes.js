@@ -1,10 +1,9 @@
 require("knit/core")
-
+var _ = require("knit/core/util")
 require("test_relation")
 
 FakeTable = function() {
-  var _ = knit._util,
-      C = function(name, attributeNamesAndTypes) {
+  var C = function(name, attributeNamesAndTypes) {
             this._testRelation = new TestRelation(attributeNamesAndTypes)
             this._testRelation.name = function(){return name}
     

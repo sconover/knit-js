@@ -1,8 +1,8 @@
 require("./helper")
 require("knit/algorithms")
+var _ = require("knit/core/util")
 
 regarding("nest", function() {
-  var _ = knit._util
   
   test("take flattened columns and group them up", function(){
     var relation = {attributes:["id", "color", "model", "year"], 

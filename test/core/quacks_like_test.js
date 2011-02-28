@@ -1,6 +1,6 @@
 require("../helper")
 require("knit/namespace")
-require("knit/core/util")
+var _ = require("knit/core/util")
 require("../test_relation.js")
 
 regarding("slightly-more-formal duck typing support. " +

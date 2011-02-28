@@ -1,9 +1,9 @@
 require("./helper")
 require("knit/algorithms")
+var _ = require("knit/core/util")
 
 regarding("join", function() {
-  var _ = knit._util,
-      colors = {attributes:["id", "color"], rows:[[1, "red"],[2, "blue"]]},
+  var colors = {attributes:["id", "color"], rows:[[1, "red"],[2, "blue"]]},
       cars = {attributes:["model"], rows:[["accord"],["carrera"],["mustang"]]}
   
   test("combine all the rows on the left with all the rows on the right (cartesian)", function(){

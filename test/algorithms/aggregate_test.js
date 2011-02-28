@@ -1,9 +1,9 @@
 require("./helper")
 require("knit/algorithms")
+var _ = require("knit/core/util")
 
 xregarding("aggregate", function() {
-  var _ = knit._util,
-      jogging = {attributes:["name", "miles", "minutes"], 
+  var jogging = {attributes:["name", "miles", "minutes"], 
                  rows:[
                    ["Amy", 5, 50],
                    ["Bob", 3, 32],

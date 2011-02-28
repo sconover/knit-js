@@ -1,7 +1,7 @@
 var path = require('path')
 var fs = require('fs')
 var sys = require('sys')
-require(path.join(__dirname, "../lib/vendor/collection_functions"))
+var CollectionFunctions = require("collection_functions")
 var _ = CollectionFunctions.Array.functions
 
 printFile = function(baseDir, f, alreadyReadIn) {

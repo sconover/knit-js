@@ -1,8 +1,9 @@
 require.paths.push("../jshint")
 var fs = require("fs")
 var sys = require("sys")
-require("../lib/vendor/collection_functions.js")
-var JSHINT = require("jshint.js").JSHINT;
+require("collection_functions")
+var JSHINT = require("jshint.js").JSHINT
+var CollectionFunctions = require("collection_functions")
 var _ = CollectionFunctions.Array.functions
 
 
